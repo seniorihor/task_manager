@@ -21,24 +21,24 @@ class User
   property :id,         Serial
   property :username,   String, required: true, length: 2..20, unique: true
   property :password,   String, required: true, length: 6..20
-  property :first_name, String, required: true, length: 2..20
-  property :last_name,  String, required: true, length: 2..20
+  property :firstname,  String, required: true, length: 2..20
+  property :lastname,   String, required: true, length: 2..20
   property :created_at, DateTime
 
   has n,   :tasks
 
-  def initialize(username, password, first_name = nil, last_name = nil)
+  def initialize(username, password, firstname = nil, lastname = nil)
     @username   = username
     @password   = password
-    @first_name = first_name
-    @last_name  = last_name
+    @firstname  = firstname
+    @lastname   = lastname
   end
 
   def register
     self.username   = @username
     self.password   = @password
-    self.first_name = @first_name
-    self.last_name  = @last_name
+    self.firstname  = @firstname
+    self.lastname   = @lastname
     self.save
   end
 
