@@ -3,7 +3,6 @@
 require 'sinatra'
 require 'sinatra/reloader'
 require 'bundler/setup'
-require 'json'
 require 'dm-core'
 require 'dm-sqlite-adapter'
 require 'dm-validations'
@@ -13,6 +12,8 @@ require 'dm-types'
 require 'dm-serializer/to_json'
 
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite:///#{Dir.pwd}/index.db")
+DataMapper::Property::String.length(20)
+DataMapper::Property::Text.length(140)
 
 class User
   include DataMapper::Resource
@@ -52,7 +53,7 @@ class Task
   include DataMapper::Resource
 
   property   :id,           Serial
-  property   :content,      String,    required: true
+  property   :content,      Text, required: true
   property   :priority,     Enum[1, 2, 3]
   property   :created_at,   DateTime
   #property   :user_id,      Integer
@@ -79,7 +80,4 @@ end
 DataMapper.finalize
 DataMapper.auto_upgrade!
 
-#валідація на всі поля (кирилиця...)
-#повертати помилку, яка виникає при реєстрації (обробка помилок)
-#валідація на content до 140 символів
-#обробка помилок і повернення значення
+#валідація на всі поля (кирилиця...) і обробка помилок при реєстрації...

@@ -2,7 +2,6 @@ source :rubygems
 gem 'sinatra'
 gem 'sinatra-reloader'
 gem 'thin'
-gem 'json'
 gem 'dm-core'
 gem 'dm-timestamps'
 gem 'dm-validations'
