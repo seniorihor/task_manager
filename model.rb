@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+require './controller.rb'
 require 'sinatra'
 require 'sinatra/reloader'
 require 'bundler/setup'
@@ -19,7 +20,7 @@ class User
   include DataMapper::Resource
 
   property :id,         Serial
-  property :username,   String, required: true, length: 2..20, format: /[a-zA-Z]/, unique: true
+  property :login,      String, required: true, length: 2..20, format: /[a-zA-Z]/, unique: true
   property :password,   String, required: true, length: 6..20, format: /[a-zA-Z]/
   property :firstname,  String, required: true, length: 2..20
   property :lastname,   String, required: true, length: 2..20
@@ -27,23 +28,23 @@ class User
 
   has n,   :tasks
 
-  def initialize(username, password, firstname = nil, lastname = nil)
-    @username   = username
-    @password   = password
-    @firstname  = firstname
-    @lastname   = lastname
+  def initialize(login, password, firstname = nil, lastname = nil)
+    @login     = login
+    @password  = password
+    @firstname = firstname
+    @lastname  = lastname
   end
 
   def register
-    self.username   = @username
-    self.password   = @password
-    self.firstname  = @firstname
-    self.lastname   = @lastname
+    self.login     = @login
+    self.password  = @password
+    self.firstname = @firstname
+    self.lastname  = @lastname
     self.save ? true : self.errors.each { |error| error }
   end
 
   def login
-    user = User.first(username: @username)
+    user = User.first(login: @login)
     user.nil? ? false : password == user.password
   end
 end
