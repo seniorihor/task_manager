@@ -19,8 +19,8 @@ class User
   include DataMapper::Resource
 
   property :id,         Serial
-  property :username,   String, required: true, length: 2..20, unique: true
-  property :password,   String, required: true, length: 6..20
+  property :username,   String, required: true, length: 2..20, format: /[a-zA-Z]/, unique: true
+  property :password,   String, required: true, length: 6..20, format: /[a-zA-Z]/
   property :firstname,  String, required: true, length: 2..20
   property :lastname,   String, required: true, length: 2..20
   property :created_at, DateTime
