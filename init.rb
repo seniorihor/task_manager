@@ -39,7 +39,7 @@ class User
     self.password   = @password
     self.firstname  = @firstname
     self.lastname   = @lastname
-    self.save
+    self.save ? true : self.errors.each { |error| error }
   end
 
   def login
@@ -73,11 +73,9 @@ class Task
     self.priority     = @priority
     self.user_id      = @user_id
     self.recipient_id = @recipient_id
-    self.save
+    self.save ? true : self.errors.each { |error| error }
   end
 end
 
 DataMapper.finalize
 DataMapper.auto_upgrade!
-
-#валідація на всі поля (кирилиця...) і обробка помилок при реєстрації...
