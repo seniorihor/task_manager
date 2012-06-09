@@ -44,7 +44,7 @@ class User
     self.save ? true : self.errors.each { |error| error }
   end
 
-  def login
+  def authentication?
     user = User.first(login: @login)
     user.nil? ? false : password == user.password
   end
@@ -91,35 +91,35 @@ before do
 end
 
 before '/protected/*' do
-  @auth = session[:curent_user].nil? ? false : true
+  @auth = session[:current_user].nil? ? false : true
 end
 
 # Helpers
 helpers do
 
-  def login_exists(login)
+  def login_exists?(login)
     User.first(login: login).nil? ? {login_exists: false} : {login_exists: true}
   end
 
   def login(login, password)
-    @user = User.new(login, password)
-    if @user.login
-      @user = User.first(login: login)
-      session[:curent_user] = @user
+    user = User.new(login, password)
+    if user.authentication?
+      user = User.first(login: login)
+      session[:current_user] = user
       {login: true}
     else
       {login: false}
     end
   end
 
-  def add_new_task(content, priority, user_id, receiver_id)
-    @user_id     = User.first(login: user_id)
-    @receiver_id = session[:curent_user]
+  def add_new_task(content, priority, user_id)
+    user_id     = User.first(login: user_id)
+    receiver_id = session[:current_user]
     if content.empty? || priority.empty?
       {newtask: false}
     else
-      @task = Task.new(content, priority, user_id, receiver_id)
-      @task.create
+      task = Task.new(content, priority, user_id, receiver_id)
+      task.create
       {newtask: true}
     end
   end
@@ -133,11 +133,7 @@ end
 
 post '/protected/newtask' do
 	if @auth
-    add_new_task(params[:content],
-         	       params[:priority],
-         	       params[:whom],
-                 params[:byWhom],
-                 params[:title])
+    add_new_task(params[:content], params[:priority], params[:user_id])
   else
     {auth: false}
   end
