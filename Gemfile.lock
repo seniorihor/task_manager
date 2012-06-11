@@ -1,7 +1,6 @@
 GEM
   remote: http://rubygems.org/
   specs:
-    ZenTest (4.8.1)
     addressable (2.2.8)
     autotest-fsevent (0.2.8)
       sys-uname
@@ -93,7 +92,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  ZenTest
   autotest-fsevent
   autotest-growl
   dm-core
