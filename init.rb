@@ -12,7 +12,7 @@ require 'dm-types'
 require 'dm-serializer/to_json'
 
 # Database
-DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite:///#{Dir.pwd}/index.db")
+DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/db.sqlite3")
 DataMapper::Property::String.length(20)
 DataMapper::Property::Text.length(140)
 
@@ -21,10 +21,14 @@ class User
   include DataMapper::Resource
 
   property :id,         Serial
-  property :login,      String, required: true, length: 2..20, format: /[a-zA-Z]/, unique: true
-  property :password,   String, required: true, length: 6..20, format: /[a-zA-Z]/
-  property :firstname,  String, required: true, length: 2..20
-  property :lastname,   String, required: true, length: 2..20
+  property :login,      String, required: true, length: 2..20, format: /[a-zA-Z]/, unique: true,
+                    messages: { presence: 1,    length: 2,     format: 3,          is_unique: 4}
+  property :password,   String, required: true, length: 6..20, format: /[a-zA-Z]/,
+                    messages: { presence: 1,    length: 2,     format: 3}
+  property :firstname,  String, required: true, length: 2..20,
+                    messages: { presence: 1,    length: 2}
+  property :lastname,   String, required: true, length: 2..20,
+                    messages: { presence: 1,    length: 2}
   property :created_at, DateTime
 
   has n,   :tasks
@@ -55,31 +59,33 @@ class Task
   include DataMapper::Resource
 
   property   :id,           Serial
-  property   :content,      Text, required: true
-  property   :priority,     Enum[1, 2, 3]
+  property   :content,      Text, required: true,
+                      messages: { presence: 1,    length: 2 }
+  property   :priority,     Enum[1, 2, 3],
+                      messages: { check_enum: 5 } # fix it
   property   :created_at,   DateTime
-  #property   :user_id,      Integer
+  property   :user_id,      Integer
   property   :receiver_id,  Integer
 
   belongs_to :user
 
   def initialize(content, priority, user_id, receiver_id)
-    @content      = content
-    @priority     = priority
-    @user_id      = user_id
-    @receiver_id  = receiver_id
+    @content     = content
+    @priority    = priority
+    @user_id     = user_id
+    @receiver_id = receiver_id
   end
 
   def create
-    self.content      = @content
-    self.priority     = @priority
-    self.user_id      = @user_id
-    self.receiver_id  = @receiver_id
+    self.content     = @content
+    self.priority    = @priority
+    self.user_id     = @user_id
+    self.receiver_id = @receiver_id
     self.save ? true : self.errors.each { |error| error }
   end
 end
 
-DataMapper.finalize
+#DataMapper.finalize
 DataMapper.auto_upgrade!
 
 # Controller
@@ -111,6 +117,18 @@ helpers do
       {login: false}
     end
   end
+
+	def add_new_user(login, password, firstname, lastname)
+
+		user = User.new(login, password, firstname, lastname)
+		if login.empty? || password.empty? || firstname.empty? || lastname.empty?
+			{registration: false}
+		elsif user.register
+			{registration: true}
+		else
+			{registration: user.register}
+		end
+	end
 
   def add_new_task(content, priority, user_id)
     user_id     = User.first(login: user_id)
