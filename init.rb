@@ -147,7 +147,7 @@ end
 # Routes
 
 post '/registration' do
-	if login_exists?
+	if login_exists?(params[:login])
 		{registration: 'false'}
 	else
 		add_new_user(params[:login], params[:password],	params[:firstname],	params[:lastname])
