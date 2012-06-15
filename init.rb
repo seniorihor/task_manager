@@ -88,6 +88,15 @@ end
 #DataMapper.finalize
 DataMapper.auto_upgrade!
 
+
+class Token
+
+  def self.generate
+    chars = ['A'..'Z', 'a'..'z', '0'..'9'].map{|r|r.to_a}.flatten
+    Array.new(10).map{chars[rand(chars.size)]}.join
+  end
+end
+
 # Controller
 use Rack::Session::Pool, expire_after: 2592000
 
@@ -104,31 +113,31 @@ end
 helpers do
 
   def login_exists?(login)
-    User.first(login: login).nil? ? {login_exists: false} : {login_exists: true}
+    User.first(login: login).nil? ? false : true
   end
 
   def login(login, password)
     user = User.new(login, password)
     if user.authentication?
       user = User.first(login: login)
-      session[:current_user] = user
+      session[user] = Token.generate
       {login: true}
     else
       {login: false}
     end
   end
 
-	def add_new_user(login, password, firstname, lastname)
+  def add_new_user(login, password, firstname, lastname)
 
-		user = User.new(login, password, firstname, lastname)
-		if login.empty? || password.empty? || firstname.empty? || lastname.empty?
-			{registration: false}
-		elsif user.register
-			{registration: true}
-		else
-			{registration: user.register}
-		end
-	end
+    user = User.new(login, password, firstname, lastname)
+    if login.empty? || password.empty? || firstname.empty? || lastname.empty?
+      {registration: false}
+    elsif user.register
+      {registration: true}
+    else
+      {registration: user.register}
+    end
+  end
 
   def add_new_task(content, priority, user_id)
     user_id     = User.first(login: user_id)
