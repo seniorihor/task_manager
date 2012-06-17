@@ -137,7 +137,6 @@ end
 
 
 # Routes
-
 post '/registration/?' do
   hash = to_hash(params[:data])
   if login_exists?(hash["login"])
