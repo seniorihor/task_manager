@@ -32,26 +32,6 @@ class User
   property :created_at, DateTime
 
   has n,   :tasks
-
-  def initialize(login, password, firstname = nil, lastname = nil)
-    @login     = login
-    @password  = password
-    @firstname = firstname
-    @lastname  = lastname
-  end
-
-  def register
-    self.login     = @login
-    self.password  = @password
-    self.firstname = @firstname
-    self.lastname  = @lastname
-    self.save ? true : self.errors.each { |error| error }
-  end
-
-  def authentication?
-    user = User.first(login: @login)
-    user.nil? ? false : password == user.password
-  end
 end
 
 
@@ -68,25 +48,18 @@ class Task
   property   :receiver_id,  Integer
 
   belongs_to :user
-
-  def initialize(content, priority, user_id, receiver_id)
-    @content     = content
-    @priority    = priority
-    @user_id     = user_id
-    @receiver_id = receiver_id
-  end
-
-  def create
-    self.content     = @content
-    self.priority    = @priority
-    self.user_id     = @user_id
-    self.receiver_id = @receiver_id
-    self.save ? true : self.errors.each { |error| error }
-  end
 end
 
 #DataMapper.finalize
 DataMapper.auto_upgrade!
+
+class Token
+
+  def self.generate
+    chars = ['A'..'Z', 'a'..'z', '0'..'9'].map{|r|r.to_a}.flatten
+    Array.new(10).map{chars[rand(chars.size)]}.join
+  end
+end
 
 # Controller
 use Rack::Session::Pool, expire_after: 2592000
@@ -97,15 +70,15 @@ before do
 end
 
 before '/protected/*/?' do
-    hash = to_hash(params[:data])
-    @auth = User.first(token: hash["token"]).nil? ? false : true
+  hash = to_hash(params[:data])
+  @auth = User.first(token: hash["token"]).nil? ? false : true
 end
 
 # Helpers
 helpers do
 
   def to_hash(json_data)
-     return JSON.parse(json_data)
+    return JSON.parse(json_data)
   end
 
   def login_exists?(login)
@@ -113,9 +86,9 @@ helpers do
   end
 
   def login(login, password)
-    user = User.new(login, password)
-    if user.authentication?
-      user = User.first(login: login)
+    user = User.first(login: login)
+    false if user.nil?
+    if password == user.password
       token = Token.generate
       user.token = token
       session[user] = token
@@ -126,29 +99,38 @@ helpers do
     end
   end
 
-	def add_new_user(login, password, firstname, lastname)
+  def add_new_user(login, password, firstname, lastname)
 
-		user = User.new(login, password, firstname, lastname)
-		if login.empty? || password.empty? || firstname.empty? || lastname.empty?
-			{registration: false}
-		elsif user.register
-			{registration: true}
-		else
-			{registration: user.register}
-		end
-	end
+    return {registration: false} if login.empty? || password.empty? || firstname.empty? || lastname.empty?
+
+    user           = User.new
+    user.login     = login
+    user.password  = password
+    user.firstname = firstname
+    user.lastname  = lastname
+    if user.save
+      {registration: true}
+    else
+      error = user.errors.each { |error| error }
+      {registration: error}
+    end
+  end
 
   def add_new_task(content, priority, receiver_id, token)
-    receiver_id = User.first(id: receiver_id)
-    user = User.first(token: token)
-    user_id = user.id
-    task = Task.new(content, priority, user_id, receiver_id)
-    if content.empty? || priority.empty?
-      {newtask: false}
-    elsif task.create
+
+    return {newtask: false} if content.empty? || priority.empty?
+
+    task             = Task.new
+    task.content     = content
+    task.priority    = priority
+    task.user_id     = user.id
+    task.receiver_id = User.first(id: receiver_id)
+
+    if task.save
       {newtask: true}
     else
-      {newtask: task.create}
+      error = task.errors.each { |error| error }
+      {newtask: error}
     end
   end
 end
