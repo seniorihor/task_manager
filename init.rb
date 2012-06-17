@@ -96,7 +96,7 @@ before do
   content_type :json
 end
 
-before '/protected/*/?' do
+before '/protected/*' do
     hash = to_hash(params[:data])
     @auth = User.first(token: hash["token"]).nil? ? false : true
 end
@@ -156,7 +156,7 @@ end
 
 # Routes
 
-post '/registration/?' do
+post '/registration' do
   hash = to_hash(params[:data])
   if login_exists?(hash["login"])
     {registration: 'false'}
@@ -170,7 +170,7 @@ get '/login/?' do
   login(hash["login"], hash["password"])
 end
 
-post '/protected/newtask/?' do
+post '/protected/newtask' do
 	if @auth
     hash = to_hash(params[:data])
     add_new_task(hash["content"], hash["priority"], hash["receiver_id"], hash["token"])
