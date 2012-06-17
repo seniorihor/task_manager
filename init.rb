@@ -165,7 +165,7 @@ post '/registration' do
   end
 end
 
-get '/login/?' do
+post '/login' do
   hash = to_hash(params[:data])
   login(hash["login"], hash["password"])
 end
@@ -179,7 +179,7 @@ post '/protected/newtask' do
   end
 end
 
-get '/protected/logout/?' do
+post '/protected/logout' do
   if @auth
     hash = to_hash(params[:data])
     user = User.first(token: hash["token"])
