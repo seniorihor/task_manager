@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 require 'sinatra'
-require 'sinatra/reloader'
 require 'bundler/setup'
+require 'sinatra/reloader'
 require 'dm-core'
 require 'dm-sqlite-adapter'
 require 'dm-validations'
@@ -88,15 +88,6 @@ end
 #DataMapper.finalize
 DataMapper.auto_upgrade!
 
-
-class Token
-
-  def self.generate
-    chars = ['A'..'Z', 'a'..'z', '0'..'9'].map{|r|r.to_a}.flatten
-    Array.new(10).map{chars[rand(chars.size)]}.join
-  end
-end
-
 # Controller
 use Rack::Session::Pool, expire_after: 2592000
 
@@ -105,12 +96,17 @@ before do
   content_type :json
 end
 
-before '/protected/*' do
-  @auth = session[:current_user].nil? ? false : true
+before '/protected/*/?' do
+    hash = to_hash(params[:data])
+    @auth = User.first(token: hash["token"]).nil? ? false : true
 end
 
 # Helpers
 helpers do
+
+  def to_hash(json_data)
+     return JSON.parse(json_data)
+  end
 
   def login_exists?(login)
     User.first(login: login).nil? ? false : true
@@ -120,34 +116,39 @@ helpers do
     user = User.new(login, password)
     if user.authentication?
       user = User.first(login: login)
-      session[user] = Token.generate
-      {login: true}
+      token = Token.generate
+      user.token = token
+      session[user] = token
+      user.save
+      {login: true, token: token}
     else
       {login: false}
     end
   end
 
-  def add_new_user(login, password, firstname, lastname)
+	def add_new_user(login, password, firstname, lastname)
 
-    user = User.new(login, password, firstname, lastname)
-    if login.empty? || password.empty? || firstname.empty? || lastname.empty?
-      {registration: false}
-    elsif user.register
-      {registration: true}
-    else
-      {registration: user.register}
-    end
-  end
+		user = User.new(login, password, firstname, lastname)
+		if login.empty? || password.empty? || firstname.empty? || lastname.empty?
+			{registration: false}
+		elsif user.register
+			{registration: true}
+		else
+			{registration: user.register}
+		end
+	end
 
-  def add_new_task(content, priority, user_id)
-    user_id     = User.first(login: user_id)
-    receiver_id = session[:current_user]
+  def add_new_task(content, priority, receiver_id, token)
+    receiver_id = User.first(id: receiver_id)
+    user = User.first(token: token)
+    user_id = user.id
+    task = Task.new(content, priority, user_id, receiver_id)
     if content.empty? || priority.empty?
       {newtask: false}
-    else
-      task = Task.new(content, priority, user_id, receiver_id)
-      task.create
+    elsif task.create
       {newtask: true}
+    else
+      {newtask: task.create}
     end
   end
 end
@@ -155,29 +156,34 @@ end
 
 # Routes
 
-post '/registration' do
-	if login_exists?(params[:login])
-		{registration: 'false'}
-	else
-		add_new_user(params[:login], params[:password],	params[:firstname],	params[:lastname])
-	end
+post '/registration/?' do
+  hash = to_hash(params[:data])
+  if login_exists?(hash["login"])
+    {registration: 'false'}
+  else
+    add_new_user(hash["login"], hash["password"], hash["firstname"], hash["lastname"])
+  end
 end
 
-get '/login' do
-  login(params[:login], params[:password])
+get '/login/?' do
+  hash = to_hash(params[:data])
+  login(hash["login"], hash["password"])
 end
 
-post '/protected/newtask' do
+post '/protected/newtask/?' do
 	if @auth
-    add_new_task(params[:content], params[:priority], params[:user_id])
+    hash = to_hash(params[:data])
+    add_new_task(hash["content"], hash["priority"], hash["receiver_id"], hash["token"])
   else
     {auth: false}
   end
 end
 
-get '/protected/logout' do
+get '/protected/logout/?' do
   if @auth
-    session.clear
+    hash = to_hash(params[:data])
+    user = User.first(token: hash["token"])
+    session[user].clear
     {logout: true}
   else
     {auth: false}
