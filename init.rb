@@ -103,28 +103,28 @@ helpers do
 
     return {registration: false} if login.empty? || password.empty? || firstname.empty? || lastname.empty?
 
-    user           = User.new
-    user.login     = login
-    user.password  = password
-    user.firstname = firstname
-    user.lastname  = lastname
-    if user.save
+    @user           = User.new
+    @user.login     = login
+    @user.password  = password
+    @user.firstname = firstname
+    @user.lastname  = lastname
+    if @user.save
       {registration: true}
     else
-      error = user.errors.each { |error| error }
+      error = @user.errors.each { |error| error }
       {registration: error}
     end
   end
 
   def add_new_task(content, priority, receiver_id, token)
 
-    return {newtask: false} if content.empty? || priority.empty?
+    return {newtask: false} if content.empty? || priority.nil?
 
     task             = Task.new
     task.content     = content
     task.priority    = priority
-    task.user_id     = user.id
-    task.receiver_id = User.first(id: receiver_id)
+    task.user_id     = @user.id
+    task.receiver_id = User.first(id: receiver_id).id
 
     if task.save
       {newtask: true}
