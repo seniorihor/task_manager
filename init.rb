@@ -70,7 +70,7 @@ before do
 end
 
 before '/protected/*/?' do
-  hash = to_hash(params[:data])
+  hash  = to_hash(params[:data])
   @auth = User.first(token: hash["token"]).nil? ? false : true
 end
 
@@ -152,7 +152,7 @@ get '/login/?' do
 end
 
 post '/protected/newtask/?' do
-	if @auth
+  if @auth
     hash = to_hash(params[:data])
     add_new_task(hash["content"], hash["priority"], hash["receiver_id"], hash["token"])
   else
