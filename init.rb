@@ -151,9 +151,9 @@ post '/login' do
   p hash = to_hash(request.body.read)
   #login(hash["login"], hash["password"])
   if hash['taskmanager']['login'] == 'qwerty' && hash['taskmanager']['password'] == '123'
-    {"error":"Success"}
+    {"error": "Success"}
   else
-    {"error":"Some Error"}
+    {"error": "Some Error"}
   end
 end
 
