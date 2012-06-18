@@ -174,7 +174,7 @@ post '/protected/get_task' do
   if @auth
     hash = to_hash(request.body.read)
     user = session.key(hash["taskmanager"]["auth_token"])
-    tasks = user.tasks.all(read: false, receiver_login: user.login)
+    tasks = Task.all(read: false, receiver_login: user.login)
     if tasks.nil?
       {get_task: {error: "No messages"}}.to_json
     else
