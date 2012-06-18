@@ -22,10 +22,10 @@ class User
   include DataMapper::Resource
 
   property :id,         Serial
-  property :login,      String, required: true, length: 2..20, format: /[a-zA-Z]/, unique: true
-  property :password,   String, required: true, length: 6..20, format: /[a-zA-Z]/
-  property :firstname,  String, required: true, length: 2..20
-  property :lastname,   String, required: true, length: 2..20
+  property :login,      String,  required: true, length: 2..20, format: /[a-zA-Z]/, unique: true
+  property :password,   String,  required: true, length: 6..20, format: /[a-zA-Z]/
+  property :firstname,  String,  required: true, length: 2..20
+  property :lastname,   String,  required: true, length: 2..20
   property :created_at, DateTime
 
   has n,   :tasks
@@ -34,13 +34,13 @@ end
 class Task
   include DataMapper::Resource
 
-  property   :id,           Serial
-  property   :content,      Text, required: true
-  property   :priority,     Enum[1, 2, 3]
-  property   :created_at,   DateTime
-  property   :user_id,      Integer
-  property   :receiver_id,  Integer
-  property   :read,         Boolean, default: false
+  property :id,             Serial
+  property :content,        Text,         required: true
+  property :priority,       Enum[1, 2, 3]
+  property :created_at,     DateTime
+  property :user_id,        Integer
+  property :receiver_login, String,       required: true, length: 2..20, format: /[a-zA-Z]/, unique: true
+  property :read,           Boolean,      default: false
 
   belongs_to :user
 end
@@ -113,11 +113,11 @@ helpers do
     user = session.key(auth_token)
     return {newtask: {error: "Empty fields"}}.to_json if content.empty? || priority.nil?
 
-    task             = Task.new
-    task.content     = content
-    task.priority    = priority
-    task.user_id     = user.id
-    task.receiver_id = User.first(login: receiver_login).id
+    task                = Task.new
+    task.content        = content
+    task.priority       = priority
+    task.user_id        = user.id
+    task.receiver_login = User.first(login: receiver_login).login
 
     if task.save
       {newtask: {error: "Success"}}.to_json
@@ -134,10 +134,10 @@ post '/registration' do
   if login_exists?(hash["taskmanager"]["login"])
     {registration: {error: "Login exists"}}.to_json
   else
-    add_new_user( hash["taskmanager"]["login"],
-                  hash["taskmanager"]["password"],
-                  hash["taskmanager"]["firstname"],
-                  hash["taskmanager"]["lastname"])
+    add_new_user(hash["taskmanager"]["login"],
+                 hash["taskmanager"]["password"],
+                 hash["taskmanager"]["firstname"],
+                 hash["taskmanager"]["lastname"])
   end
 end
 
@@ -150,10 +150,10 @@ end
 post '/protected/newtask' do
   if @auth
     hash = to_hash(request.body.read)
-    add_new_task( hash["taskmanager"]["content"],
-                  hash["taskmanager"]["priority"],
-                  hash["taskmanager"]["receiver_login"],
-                  hash["taskmanager"]["auth_token"])
+    add_new_task(hash["taskmanager"]["content"],
+                 hash["taskmanager"]["priority"],
+                 hash["taskmanager"]["receiver_login"],
+                 hash["taskmanager"]["auth_token"])
   else
     {session: {error: "403 Forbidden"}}.to_json
   end
