@@ -40,6 +40,7 @@ class Task
   property   :created_at,   DateTime
   property   :user_id,      Integer
   property   :receiver_id,  Integer
+  property   :read,         Boolean, default: false
 
   belongs_to :user
 end
