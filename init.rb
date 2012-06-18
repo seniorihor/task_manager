@@ -151,9 +151,9 @@ post '/login' do
   p hash = to_hash(request.body.read)
   #login(hash["login"], hash["password"])
   if hash['taskmanager']['login'] == 'qwerty' && hash['taskmanager']['password'] == '123'
-    {error: "Success"}.to_json
+    {error: "Success"}
   else
-    {error: "Some Error"}.to_json
+    {error: "Some Error"}
   end
 end
 
