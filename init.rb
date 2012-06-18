@@ -169,3 +169,28 @@ post '/protected/logout' do
     {session: {error: "403 Forbidden"}}.to_json
   end
 end
+
+post '/protected/get_task' do
+  if @auth
+    hash = to_hash(request.body.read)
+    user = session.key(hash["taskmanager"]["auth_token"])
+    tasks = user.tasks.all(:read => false)
+    if tasks.nil?
+      {get_task: {error: "No messages"}}
+    else
+      tasks.each  do |task| 
+          task.read = true 
+          task.save 
+      end
+      tasks.map! do |task| {:get_task => {:error => "Success", 
+                                          :content => task.content,
+                                          :priority => task.priority,
+                                          :receiver_login => task.receiver_login,
+                                          :time => task.created_at}}
+      end
+      tasks.to_json
+    end  
+  else
+    {session: {error: "403 Forbidden"}}.to_json
+  end  
+end  
