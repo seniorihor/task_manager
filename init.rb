@@ -154,7 +154,7 @@ post '/protected/newtask' do
                   hash["taskmanager"]["receiver_login"],
                   hash["taskmanager"]["auth_token"])
   else
-    {session: {error: "403 Forbidden"}.to_json
+    {session: {error: "403 Forbidden"}}.to_json
   end
 end
 
@@ -165,6 +165,6 @@ post '/protected/logout' do
     session[user].clear
     {logout: {error: "Success"}}.to_json
   else
-    {session: {error: "403 Forbidden"}.to_json
+    {session: {error: "403 Forbidden"}}.to_json
   end
 end
