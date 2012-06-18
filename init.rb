@@ -176,7 +176,7 @@ post '/protected/get_task' do
     user = session.key(hash["taskmanager"]["auth_token"])
     tasks = user.tasks.all(:read => false)
     if tasks.nil?
-      {get_task: {error: "No messages"}}
+      {get_task: {error: "No messages"}}.to_json
     else
       tasks.each  do |task| 
           task.read = true 
