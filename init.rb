@@ -12,7 +12,7 @@ require 'dm-types'
 require 'dm-serializer/to_json'
 
 # Database
-DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/db.sqlite3")
+DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/database.sqlite3")
 DataMapper::Property::String.length(20)
 DataMapper::Property::Text.length(140)
 
@@ -50,7 +50,7 @@ class Task
   belongs_to :user
 end
 
-#DataMapper.finalize
+DataMapper.finalize
 DataMapper.auto_upgrade!
 
 class Token
