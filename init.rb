@@ -22,28 +22,21 @@ class User
   include DataMapper::Resource
 
   property :id,         Serial
-  property :login,      String, required: true, length: 2..20, format: /[a-zA-Z]/, unique: true,
-                    messages: { presence: 1,    length: 2,     format: 3,          is_unique: 4}
-  property :password,   String, required: true, length: 6..20, format: /[a-zA-Z]/,
-                    messages: { presence: 1,    length: 2,     format: 3}
-  property :firstname,  String, required: true, length: 2..20,
-                    messages: { presence: 1,    length: 2}
-  property :lastname,   String, required: true, length: 2..20,
-                    messages: { presence: 1,    length: 2}
+  property :login,      String, required: true, length: 2..20, format: /[a-zA-Z]/, unique: true
+  property :password,   String, required: true, length: 6..20, format: /[a-zA-Z]/
+  property :firstname,  String, required: true, length: 2..20
+  property :lastname,   String, required: true, length: 2..20
   property :created_at, DateTime
 
   has n,   :tasks
 end
 
-
 class Task
   include DataMapper::Resource
 
   property   :id,           Serial
-  property   :content,      Text, required: true,
-                      messages: { presence: 1,    length: 2 }
-  property   :priority,     Enum[1, 2, 3],
-                      messages: { check_enum: 5 } # fix it
+  property   :content,      Text, required: true
+  property   :priority,     Enum[1, 2, 3]
   property   :created_at,   DateTime
   property   :user_id,      Integer
   property   :receiver_id,  Integer
@@ -70,9 +63,9 @@ before do
   content_type :json
 end
 
-before '/protected/*/?' do
-  hash  = to_hash(params[:data])
-  @auth = User.first(token: hash["token"]).nil? ? false : true
+before '/protected/*' do
+  hash  = to_hash(request.body.read)
+  @auth = session.has_value?(hash["taskmanager"]["auth_token"]) ? true : false
 end
 
 # Helpers
@@ -88,91 +81,90 @@ helpers do
 
   def login(login, password)
     user = User.first(login: login)
-    false if user.nil?
+    return {login: {error: "Invalid login or password"}}.to_json if user.nil?
     if password == user.password
-      token = Token.generate
-      user.token = token
-      session[user] = token
-      user.save
-      {login: true, token: token}
+      auth_token = Token.generate
+      session[user] = auth_token
+      {login: {error: "Success",auth_token: auth_token}}.to_json
     else
-      {login: false}
+      {login: {error: "Invalid login or password"}}.to_json
     end
   end
 
   def add_new_user(login, password, firstname, lastname)
 
-    return {registration: false} if login.empty? || password.empty? || firstname.empty? || lastname.empty?
-
-    @user           = User.new
-    @user.login     = login
-    @user.password  = password
-    @user.firstname = firstname
-    @user.lastname  = lastname
-    if @user.save
-      {registration: true}
+    return {registration: {error: "Empty fields"}}.to_json if login.empty? || password.empty? || firstname.empty? || lastname.empty?
+    user           = User.new
+    user.login     = login
+    user.password  = password
+    user.firstname = firstname
+    user.lastname  = lastname
+    if user.save
+      {registration: {error: "Success"}}.to_json
     else
-      error = @user.errors.each { |error| error }
-      {registration: error}
+      error = user.errors.each { |error| error }
+      {registration: error}.to_json
     end
   end
 
-  def add_new_task(content, priority, receiver_id, token)
+  def add_new_task(content, priority, receiver_login, auth_token)
 
-    return {newtask: false} if content.empty? || priority.nil?
+    user = session.key(auth_token)
+    return {newtask: {error: "Empty fields"}}.to_json if content.empty? || priority.nil?
 
     task             = Task.new
     task.content     = content
     task.priority    = priority
-    task.user_id     = @user.id
-    task.receiver_id = User.first(id: receiver_id).id
+    task.user_id     = user.id
+    task.receiver_id = User.first(login: receiver_login).id
 
     if task.save
-      {newtask: true}
+      {newtask: {error: "Success"}}.to_json
     else
       error = task.errors.each { |error| error }
-      {newtask: error}
+      {newtask: error}.to_json
     end
   end
 end
 
-
 # Routes
-post '/registration/?' do
-  hash = to_hash(params[:data])
-  if login_exists?(hash["login"])
-    {registration: 'false'}
+post '/registration' do
+  hash = to_hash(request.body.read)
+  if login_exists?(hash["taskmanager"]["login"])
+    {registration: {error: "Login exists"}}.to_json
   else
-    add_new_user(hash["login"], hash["password"], hash["firstname"], hash["lastname"])
+    add_new_user( hash["taskmanager"]["login"],
+                  hash["taskmanager"]["password"],
+                  hash["taskmanager"]["firstname"],
+                  hash["taskmanager"]["lastname"])
   end
 end
 
 post '/login' do
-  p hash = to_hash(request.body.read)
-  #login(hash["login"], hash["password"])
-  if hash['taskmanager']['login'] == 'qwerty' && hash['taskmanager']['password'] == '123'
-    {"error" => "Success"}
+  hash = to_hash(request.body.read)
+  login(hash["taskmanager"]["login"],
+        hash["taskmanager"]["password"])
+end
+
+post '/protected/newtask' do
+  if @auth
+    hash = to_hash(request.body.read)
+    add_new_task( hash["taskmanager"]["content"],
+                  hash["taskmanager"]["priority"],
+                  hash["taskmanager"]["receiver_login"],
+                  hash["taskmanager"]["auth_token"])
   else
-    {"error" => "Some Error"}
+    {session: {error: "403 Forbidden"}.to_json
   end
 end
 
-post '/protected/newtask/?' do
+post '/protected/logout' do
   if @auth
-    hash = to_hash(params[:data])
-    add_new_task(hash["content"], hash["priority"], hash["receiver_id"], hash["token"])
-  else
-    {auth: false}
-  end
-end
-
-get '/protected/logout/?' do
-  if @auth
-    hash = to_hash(params[:data])
-    user = User.first(token: hash["token"])
+    hash = to_hash(request.body.read)
+    user = session.key(hash["taskmanager"]["auth_token"])
     session[user].clear
-    {logout: true}
+    {logout: {error: "Success"}}.to_json
   else
-    {auth: false}
+    {session: {error: "403 Forbidden"}.to_json
   end
 end
