@@ -10,6 +10,7 @@ require 'dm-migrations'
 require 'dm-timestamps'
 require 'dm-types'
 require 'dm-serializer/to_json'
+require 'json'
 
 # Database
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/database.sqlite3")
@@ -146,9 +147,14 @@ post '/registration/?' do
   end
 end
 
-get '/login/?' do
-  hash = to_hash(params[:data])
-  login(hash["login"], hash["password"])
+post '/login' do
+  p hash = to_hash(request.body.read)
+  #login(hash["login"], hash["password"])
+  if hash['taskmanager']['login'] == 'qwerty' && hash['taskmanager']['password'] == '123'
+    {"error":"Success"}
+  else
+    {"error":"Some Error"}
+  end
 end
 
 post '/protected/newtask/?' do
