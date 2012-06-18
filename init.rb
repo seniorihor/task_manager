@@ -186,7 +186,7 @@ post '/protected/get_task' do
                                        content:        task.content,
                                        priority:       task.priority,
                                        receiver_login: task.receiver_login,
-                                       time:           task.created_at}}.to_json
+                                       time:           task.created_at}}
       end
       tasks.to_json
     end
