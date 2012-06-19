@@ -85,6 +85,7 @@ helpers do
     if password == user.password
       auth_token = Token.generate
       user.token = auth_token
+      user.save
       {login: {error: "Success",auth_token: auth_token}}.to_json
     else
       {login: {error: "Invalid login or password"}}.to_json
