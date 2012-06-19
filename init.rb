@@ -27,7 +27,7 @@ class User
   property :firstname,  String,  required: true, length: 2..20
   property :lastname,   String,  required: true, length: 2..20
   property :created_at, DateTime
-
+  
   has n,   :tasks
 end
 
@@ -57,7 +57,6 @@ class Token
 end
 
 # Controller
-use Rack::Session::Pool, expire_after: 2592000
 
 # Filters
 before do
@@ -65,8 +64,8 @@ before do
 end
 
 before '/protected/*' do
-  hash  = to_hash(request.body.read)
-  @auth = session.has_value?(hash["taskmanager"]["auth_token"]) ? true : false
+  @hash  = to_hash(request.body.read)
+  @auth = User.first(token: hash["taskmanager"]["auth_token"]).nil? ? false : true
 end
 
 # Helpers
@@ -85,7 +84,7 @@ helpers do
     return {login: {error: "Invalid login or password"}}.to_json if user.nil?
     if password == user.password
       auth_token = Token.generate
-      session[user] = auth_token
+      user.token = auth_token
       {login: {error: "Success",auth_token: auth_token}}.to_json
     else
       {login: {error: "Invalid login or password"}}.to_json
@@ -110,7 +109,7 @@ helpers do
 
   def add_new_task(content, priority, receiver_login, auth_token)
 
-    user = session.key(auth_token)
+    user = User.first(token: auth_token)
     return {newtask: {error: "Empty fields"}}.to_json if content.empty? || priority.nil?
 
     task                = Task.new
@@ -149,11 +148,10 @@ end
 
 post '/protected/newtask' do
   if @auth
-    hash = to_hash(request.body.read)
-    add_new_task(hash["taskmanager"]["content"],
-                 hash["taskmanager"]["priority"],
-                 hash["taskmanager"]["receiver_login"],
-                 hash["taskmanager"]["auth_token"])
+    add_new_task(@hash["taskmanager"]["content"],
+                 @hash["taskmanager"]["priority"],
+                 @hash["taskmanager"]["receiver_login"],
+                 @hash["taskmanager"]["auth_token"])
   else
     {session: {error: "403 Forbidden"}}.to_json
   end
@@ -161,9 +159,9 @@ end
 
 post '/protected/logout' do
   if @auth
-    hash = to_hash(request.body.read)
-    user = session.key(hash["taskmanager"]["auth_token"])
-    session[user].clear
+    user = User.first(token: @hash["taskmanager"]["auth_token"])
+    user.token = nil
+    user.save
     {logout: {error: "Success"}}.to_json
   else
     {session: {error: "403 Forbidden"}}.to_json
@@ -172,17 +170,18 @@ end
 
 post '/protected/get_task' do
   if @auth
-    hash = to_hash(request.body.read)
-    user = session.key(hash["taskmanager"]["auth_token"])
+    user = User.first(token: @hash["taskmanager"]["auth_token"])
     tasks = Task.all(read: false, receiver_login: user.login)
     if tasks.nil?
       {get_task: {error: "No messages"}}.to_json
     else
+      quantity = tasks.size
       tasks.each do |task|
           task.read = true
           task.save
       end
       tasks.map! do |task| {get_task: {error:          "Success",
+                                       quantity:       quantity,
                                        content:        task.content,
                                        priority:       task.priority,
                                        receiver_login: task.receiver_login,
@@ -194,3 +193,15 @@ post '/protected/get_task' do
     {session: {error: "403 Forbidden"}}.to_json
   end
 end
+
+post '/protected/find_user' do
+  if @auth
+    find_user = User.first(login: @hash["taskmanager"]["login"])
+    {find_user: {error:       "Success", 
+                 firstname:   find_user.firstname, 
+                 lastname:    find_user.lastname, 
+                 login:       find_user.login}}
+  else
+    {session: {error: "403 Forbidden"}}.to_json
+  end  
+end  
