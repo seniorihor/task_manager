@@ -88,10 +88,11 @@ helpers do
     User.first(login: login).nil? ? false : true
   end
 
-  def login(login, password)
-    user = User.first(login: login)
+  #def login(login, password)
+  def login(hash)
+    user = User.first(login: hash["taskmanager"]["login"])
     return {login: {error: "Invalid login or password"}}.to_json if user.nil?
-    if password == user.password
+    if hash["taskmanager"]["password"] == user.password
       auth_token = Token.generate
       user.token = auth_token
       user.save
@@ -164,8 +165,10 @@ end
 
 post '/login' do
   hash = to_hash(request.body.read)
-  login(hash["taskmanager"]["login"],
-        hash["taskmanager"]["password"])
+  #login(hash["taskmanager"]["login"],
+  #      hash["taskmanager"]["password"])
+
+  login(hash)
 end
 
 post '/protected/new_task' do
