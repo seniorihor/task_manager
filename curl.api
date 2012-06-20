@@ -1,81 +1,75 @@
-url "/login"
+post "/login"
 
-request:
-	{"taskmanager":
-		{"password":"123",
-		"login":"qwerty"}
-	}
+  request:
 
-response:
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/login -d "{ \"taskmanager\" : { \"login\" : \"login123\", \"password\" : \"password\" }}"
 
-	{"login":
-		{"error":"Success", //or error description
-		"auth_token":"token"}
-	}
+  response:
 
-url: "/register"
+    {"login":{"error":"Success","auth_token":"token"}}
 
-	request:
+post "/register"
 
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/register -d "{ \"ta\", \"lastname\" : \"qwerty\", \"login\" : \"login123\", \"password\" : \"password\" }}"
+  request:
 
-	response:
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/register -d "{ \"taskmanager\" : { \"firstname\" : \"123\", \"lastname\" : \"qwerty\", \"login\" : \"login123\", \"password\" : \"password\" }}"
 
-		{"register":{"error":"Success"//or error description}}
+  response:
 
-url: "/new_task"
+    {"register":{"error":"Success"}}
 
-request:
+post "/new_task"
 
-	{"taskmanager":
-		{"auth_token": token,
-		"content" : priority,
-		"recepient" : login,
-		"content":content,
-		"time" : time}
-	}
+  request:
 
-response:
+    {"taskmanager":
+      {"auth_token": token,
+      "content" : priority,
+      "recepient" : login,
+      "content":content,
+      "time" : time}
+    }
 
-	{"new_message":
-		{"error": "Success"} //or error
-	}
+  response:
 
-url: "/get_task"
+    {"new_message":
+      {"error": "Success"} //or error
+    }
 
-request:
-	{"taskmanager" :
-		{"auth_token" : token}
-	}
+post "/get_task"
 
-response: { "get_message":
-		{"error" : "Success"
-			"quantity" : 0,1,2 //or false
-			"content" : priority,
-			"recepient" : login,
-			"content":content,
-			"time" : time
-		}
-}
+  request:
+    {"taskmanager" :
+      {"auth_token" : token}
+    }
 
-url: "/find_user"
+  response: { "get_message":
+      {"error" : "Success"
+        "quantity" : 0,1,2 //or false
+        "content" : priority,
+        "recepient" : login,
+        "content":content,
+        "time" : time
+      }
+  }
 
-request:
+post "/find_user"
 
-	{"taskmanager" :
-		{"auth_token" : token}
-		{"login": firstname}
-	}
+  request:
 
-response: { "get_message":
-		{	"error" : "Success"
-		 	"quantity" : 0,1,2
-			 "users" : [
-					{"firstname":"123",
-					"lastname":"qwerty"
-					"login":"login"
-					}
-				]
-		}
-}
+    {"taskmanager" :
+      {"auth_token" : token}
+      {"login": firstname}
+    }
 
+  response: { "get_message":
+      {	"error" : "Success"
+        "quantity" : 0,1,2
+         "users" : [
+            {"firstname":"123",
+            "lastname":"qwerty"
+            "login":"login"
+            }
+          ]
+      }
+  }
