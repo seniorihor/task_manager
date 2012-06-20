@@ -140,10 +140,10 @@ end
 # Routes
 post '/register' do
   hash = to_hash(request.body.read)
-  puts "Login: #{hash["taskmanager"]["login"]},
-  Password: #{hash["taskmanager"]["password"]},
-  Firstname: #{hash["taskmanager"]["firstname"]},
-  Lastname: #{hash["taskmanager"]["lastname"]}"
+  puts "Login: #{hash["taskmanager"]["login"]},"
+  puts "Password: #{hash["taskmanager"]["password"]},"
+  puts "Firstname: #{hash["taskmanager"]["firstname"]},"
+  puts "Lastname: #{hash["taskmanager"]["lastname"]}"
   if login_exists?(hash["taskmanager"]["login"])
     {:register => {error: "Login exists"}}.to_json
   else
