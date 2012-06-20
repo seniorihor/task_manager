@@ -17,18 +17,11 @@ url: "/register"
 
 	request:
 
-		{"taskmanager":
-			{"firstname":"123",
-			"latname":"qwerty"
-			"login":"login"
-			"password":"password"
-			}
-		}
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/register -d "{ \"ta\", \"lastname\" : \"qwerty\", \"login\" : \"login123\", \"password\" : \"password\" }}"
 
 	response:
-		{"register":
-			{"error":"Success"//or error description}
-		}
+
+		{"register":{"error":"Success"//or error description}}
 
 url: "/new_task"
 

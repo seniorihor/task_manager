@@ -103,7 +103,7 @@ helpers do
 
   def add_new_user(login, password, firstname, lastname)
 
-    return {registration: {error: "Empty fields"}}.to_json if login.empty? || password.empty? || firstname.empty? || lastname.empty?
+    return {:register => {error: "Empty fields"}}.to_json if login.empty? || password.empty? || firstname.empty? || lastname.empty?
     user           = User.new
     user.login     = login
     user.password  = password
@@ -141,7 +141,7 @@ end
 post '/register' do
   hash = to_hash(request.body.read)
   if login_exists?(hash["taskmanager"]["login"])
-    {registration: {error: "Login exists"}}.to_json
+    {:register => {error: "Login exists"}}.to_json
   else
     add_new_user(hash["taskmanager"]["login"],
                  hash["taskmanager"]["password"],

@@ -102,6 +102,7 @@ DEPENDENCIES
   dm-timestamps
   dm-types
   dm-validations
+  json
   rack
   rack-test
   rspec
