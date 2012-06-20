@@ -93,10 +93,9 @@ helpers do
     user = User.first(login: hash["taskmanager"]["login"])
     return {login: {error: "Invalid login or password"}}.to_json if user.nil?
     if hash["taskmanager"]["password"] == user.password
-      auth_token = Token.generate
-      user.token = auth_token
+      user.token = Token.generate
       user.save
-      {login: {error: "Success", auth_token: auth_token}}.to_json
+      {login: {error: "Success", auth_token: user.token}}.to_json
     else
       {login: {error: "Invalid login or password"}}.to_json
     end
@@ -105,13 +104,14 @@ helpers do
   #def add_new_user(login, password, firstname, lastname)
   def add_new_user(hash)
 
-    return {testregister: {error: "Empty fields"}}.to_json if login.empty? || password.empty? || firstname.empty? || lastname.empty?
+    #return {testregister: {error: "Empty fields"}}.to_json if login.empty? || password.empty? || firstname.empty? || lastname.empty?
     #user           = User.new
     #user.login     = login
     #user.password  = password
     #user.firstname = firstname
     #user.lastname  = lastname
 
+    return {testregister: {error: "Empty fields"}}.to_json if hash["taskmanager"]["login"].empty? || hash["taskmanager"]["password"].empty? || hash["taskmanager"]["firstname"].empty? || hash["taskmanager"]["lastname"].empty?
     user           = User.new
     user.login     = hash["taskmanager"]["login"]
     user.password  = hash["taskmanager"]["password"]
