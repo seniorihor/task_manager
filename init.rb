@@ -110,7 +110,8 @@ helpers do
     user.firstname = firstname
     user.lastname  = lastname
     if user.save
-      {testregister: {error: "Success"}}.to_json
+      #{testregister: {error: "Success"}}.to_json
+      puts 'All is good!'
     else
       error = user.errors.each { |error| error }
       {testregister: error}.to_json
