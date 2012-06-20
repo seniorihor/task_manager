@@ -101,14 +101,21 @@ helpers do
     end
   end
 
-  def add_new_user(login, password, firstname, lastname)
+  #def add_new_user(login, password, firstname, lastname)
+  def add_new_user(hash)
 
     return {testregister: {error: "Empty fields"}}.to_json if login.empty? || password.empty? || firstname.empty? || lastname.empty?
+    #user           = User.new
+    #user.login     = login
+    #user.password  = password
+    #user.firstname = firstname
+    #user.lastname  = lastname
+
     user           = User.new
-    user.login     = login
-    user.password  = password
-    user.firstname = firstname
-    user.lastname  = lastname
+    user.login     = hash["taskmanager"]["login"]
+    user.password  = hash["taskmanager"]["password"]
+    user.firstname = hash["taskmanager"]["firstname"]
+    user.lastname  = hash["taskmanager"]["lastname"]
     if user.save
       {testregister: {error: "Success"}}.to_json
     else
@@ -147,10 +154,11 @@ post '/register' do
   if login_exists?(hash["taskmanager"]["login"])
     {:register => {error: "Login exists"}}.to_json
   else
-    add_new_user(hash["taskmanager"]["login"],
-                 hash["taskmanager"]["password"],
-                 hash["taskmanager"]["firstname"],
-                 hash["taskmanager"]["lastname"])
+#    add_new_user(hash["taskmanager"]["login"],
+#                 hash["taskmanager"]["password"],
+#                 hash["taskmanager"]["firstname"],
+#                 hash["taskmanager"]["lastname"])
+    add_new_user(hash)
   end
 end
 
