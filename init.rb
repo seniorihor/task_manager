@@ -28,10 +28,11 @@ class User
   property :lastname,   String,  required: true, length: 2..20
   property :created_at, DateTime
 
-  has n,   :tasks
-
-  has n,   :friendships,   :child_key => [ :source_id ]
+  has n,   :friendships,   :child_key => [:source_id]
   has n,   :friends, self, :through   => :friendships, :via => :target
+
+  has n,   :taskings
+  has n,   :tasks,         :through   => :taskings
 end
 
 class Task
@@ -45,7 +46,8 @@ class Task
   property :receiver_login, String,       required: true, length: 2..20, format: /[a-zA-Z]/, unique: true
   property :read,           Boolean,      default: false
 
-  belongs_to :user
+  has n, :taskings
+  has n, :users, :through => :taskings
 end
 
 class Friendship
@@ -53,6 +55,13 @@ class Friendship
 
   belongs_to :source, 'User', :key => true
   belongs_to :target, 'User', :key => true
+end
+
+class Tasking
+  include DataMapper::Resource
+
+  belongs_to :task, :key => true
+  belongs_to :user, :key => true
 end
 
 DataMapper.finalize
