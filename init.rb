@@ -27,8 +27,11 @@ class User
   property :firstname,  String,  required: true, length: 2..20
   property :lastname,   String,  required: true, length: 2..20
   property :created_at, DateTime
-  
+
   has n,   :tasks
+
+  has n,   :friendships,   :child_key => [ :source_id ]
+  has n,   :friends, self, :through   => :friendships, :via => :target
 end
 
 class Task
@@ -43,6 +46,13 @@ class Task
   property :read,           Boolean,      default: false
 
   belongs_to :user
+end
+
+class Friendship
+  include DataMapper::Resource
+
+  belongs_to :source, 'User', :key => true
+  belongs_to :target, 'User', :key => true
 end
 
 DataMapper.finalize
@@ -198,11 +208,11 @@ end
 post '/protected/find_user' do
   if @auth
     find_user = User.first(login: @hash["taskmanager"]["login"])
-    {find_user: {error:       "Success", 
-                 firstname:   find_user.firstname, 
-                 lastname:    find_user.lastname, 
+    {find_user: {error:       "Success",
+                 firstname:   find_user.firstname,
+                 lastname:    find_user.lastname,
                  login:       find_user.login}}
   else
     {session: {error: "403 Forbidden"}}.to_json
-  end  
-end  
+  end
+end
