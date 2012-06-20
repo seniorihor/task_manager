@@ -156,7 +156,7 @@ post '/login' do
         hash["taskmanager"]["password"])
 end
 
-post '/protected/newtask' do
+post '/protected/new_task' do
   if @auth
     add_new_task(@protected_hash["taskmanager"]["content"],
                  @protected_hash["taskmanager"]["priority"],
