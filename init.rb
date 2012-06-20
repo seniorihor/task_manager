@@ -159,7 +159,7 @@ post '/register' do
 #                 hash["taskmanager"]["password"],
 #                 hash["taskmanager"]["firstname"],
 #                 hash["taskmanager"]["lastname"])
-    add_new_user(hash)
+    puts add_new_user(hash)
   end
 end
 
