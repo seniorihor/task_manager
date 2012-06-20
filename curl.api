@@ -18,23 +18,15 @@ post "/register"
 
     {"register":{"error":"Success"}}
 
-post "/new_task"
+post "/protected/new_task"
 
   request:
 
-    {"taskmanager":
-      {"auth_token": token,
-      "content" : priority,
-      "recepient" : login,
-      "content":content,
-      "time" : time}
-    }
+  curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/protected/new_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"content\", "priority" : 1, \"receiver\" : \"login\" }}"
 
   response:
 
-    {"new_message":
-      {"error": "Success"} //or error
-    }
+    {"new_task":{"error":"Success"}}
 
 post "/get_task"
 
