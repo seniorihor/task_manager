@@ -45,3 +45,4 @@ post "/find_user"
 
   response:
     {"get_message":{"error":"Success","quantity":1,"users":[{"login":"login","firstname":"firstname","lastname":"lastname"}]}}
+end
