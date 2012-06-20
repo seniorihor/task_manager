@@ -117,10 +117,10 @@ helpers do
     user.firstname = firstname
     user.lastname  = lastname
     if user.save
-      {registration: {error: "Success"}}.to_json
+      {:register => {error: "Success"}}.to_json
     else
       error = user.errors.each { |error| error }
-      {registration: error}.to_json
+      {:register => error}.to_json
     end
   end
 
