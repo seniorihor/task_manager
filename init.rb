@@ -13,7 +13,8 @@ require 'dm-serializer/to_json'
 require 'json'
 
 # Database
-DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/database.sqlite3")
+#DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/database.sqlite3")
+DataMapper.setup(:default, ENV['DATABASE_URL'] || 'postgres://user:password@hostname/mydatabase.db')
 DataMapper::Property::String.length(20)
 DataMapper::Property::Text.length(140)
 
