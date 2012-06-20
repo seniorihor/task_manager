@@ -138,7 +138,7 @@ helpers do
 end
 
 # Routes
-post '/register' do
+get '/register' do
   hash = to_hash(request.body.read)
   if login_exists?(hash["taskmanager"]["login"])
     {:register => {error: "Login exists"}}.to_json
