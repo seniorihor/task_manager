@@ -103,23 +103,17 @@ helpers do
 
   def add_new_user(login, password, firstname, lastname)
 
-    #return {test_register: {error: "Empty fields"}}.to_json if login.empty? || password.empty? || firstname.empty? || lastname.empty?
-    if login.empty? || password.empty? || firstname.empty? || lastname.empty?
-      puts '{test_register: {error: "Empty fields"}}.to_json'
+    return {testregister: {error: "Empty fields"}}.to_json if login.empty? || password.empty? || firstname.empty? || lastname.empty?
+    user           = User.new
+    user.login     = login
+    user.password  = password
+    user.firstname = firstname
+    user.lastname  = lastname
+    if user.save
+      {testregister: {error: "Success"}}.to_json
     else
-      user           = User.new
-      user.login     = login
-      user.password  = password
-      user.firstname = firstname
-      user.lastname  = lastname
-      if user.save
-        #{testregister: {error: "Success"}}.to_json
-        puts '{testregister: {error: "Success"}}.to_json}'
-      else
-        error = user.errors.each { |error| error }
-        #{testregister: error}.to_json
-        puts '{testregister: error}.to_json'
-      end
+      error = user.errors.each { |error| error }
+      {testregister: error}.to_json
     end
   end
 
@@ -145,7 +139,7 @@ end
 
 # Routes
 post '/register' do
-  hash = to_hash(request.body.read)
+  puts hash = to_hash(request.body.read)
   if login_exists?(hash["taskmanager"]["login"])
     {:register => {error: "Login exists"}}.to_json
   else
