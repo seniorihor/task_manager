@@ -1,67 +1,47 @@
 post "/login"
 
   request:
-
     curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/login -d "{ \"taskmanager\" : { \"login\" : \"login123\", \"password\" : \"password\" }}"
 
   response:
-
     {"login":{"error":"Success","auth_token":"token"}}
+end
+
 
 post "/register"
 
   request:
-
     curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/register -d "{ \"taskmanager\" : { \"firstname\" : \"123\", \"lastname\" : \"qwerty\", \"login\" : \"login123\", \"password\" : \"password\" }}"
 
   response:
-
     {"register":{"error":"Success"}}
+end
+
 
 post "/protected/new_task"
 
   request:
-
-  curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/protected/new_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"content\", "priority" : 1, \"receiver\" : \"login\" }}"
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/protected/new_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"content\", "priority" : 1, \"receiver\" : \"login\" }}"
 
   response:
-
     {"new_task":{"error":"Success"}}
+end
+
 
 post "/get_task"
 
   request:
-    {"taskmanager" :
-      {"auth_token" : token}
-    }
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/get_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
 
-  response: { "get_message":
-      {"error" : "Success"
-        "quantity" : 0,1,2 //or false
-        "content" : priority,
-        "recepient" : login,
-        "content":content,
-        "time" : time
-      }
-  }
+  response:
+    {"get_message":{"error":"Success","quantity":1,"content":"content","priority":1,"receiver":"login:,"time":"time"}}
+end
+
 
 post "/find_user"
 
   request:
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/find_user -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"login\" : \"login\" }}"
 
-    {"taskmanager" :
-      {"auth_token" : token}
-      {"login": firstname}
-    }
-
-  response: { "get_message":
-      {	"error" : "Success"
-        "quantity" : 0,1,2
-         "users" : [
-            {"firstname":"123",
-            "lastname":"qwerty"
-            "login":"login"
-            }
-          ]
-      }
-  }
+  response:
+    {"get_message":{"error":"Success","quantity":1,"users":[{"login":"login","firstname":"firstname","lastname":"lastname"}]}}
