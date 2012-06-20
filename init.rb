@@ -138,7 +138,7 @@ helpers do
 end
 
 # Routes
-post '/registration' do
+post '/register' do
   hash = to_hash(request.body.read)
   if login_exists?(hash["taskmanager"]["login"])
     {registration: {error: "Login exists"}}.to_json
