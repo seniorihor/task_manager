@@ -12,13 +12,11 @@ require 'dm-types'
 require 'dm-serializer/to_json'
 require 'json'
 
-# Database
-#DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/database.sqlite3")
-DataMapper.setup(:default, ENV['DATABASE_URL'] || 'postgres://user:password@hostname/mydatabase.db')
+# A Sqlite3 connection to a persistent database
+DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/database.sqlite3")
 DataMapper::Property::String.length(20)
 DataMapper::Property::Text.length(140)
 
-# Model
 class User
   include DataMapper::Resource
 
@@ -55,9 +53,6 @@ class Friendship
   belongs_to :target, 'User', :key => true
 end
 
-DataMapper.finalize
-DataMapper.auto_upgrade!
-
 class Token
 
   def self.generate
@@ -65,8 +60,6 @@ class Token
     Array.new(10).map{chars[rand(chars.size)]}.join
   end
 end
-
-# Controller
 
 # Filters
 before do
@@ -89,11 +82,10 @@ helpers do
     User.first(login: login).nil? ? false : true
   end
 
-  #def login(login, password)
-  def login(hash)
-    user = User.first(login: hash["taskmanager"]["login"])
+  def login(login, password)
+    user = User.first(login: login)
     return {login: {error: "Invalid login or password"}}.to_json if user.nil?
-    if hash["taskmanager"]["password"] == user.password
+    if password == user.password
       user.token = Token.generate
       user.save
       {login: {error: "Success", auth_token: user.token}}.to_json
@@ -102,22 +94,15 @@ helpers do
     end
   end
 
-  #def add_new_user(login, password, firstname, lastname)
-  def add_new_user(hash)
+  def add_new_user(login, password, firstname, lastname)
 
-    #return {testregister: {error: "Empty fields"}}.to_json if login.empty? || password.empty? || firstname.empty? || lastname.empty?
-    #user           = User.new
-    #user.login     = login
-    #user.password  = password
-    #user.firstname = firstname
-    #user.lastname  = lastname
-
-    return {testregister: {error: "Empty fields"}}.to_json if hash["taskmanager"]["login"].empty? || hash["taskmanager"]["password"].empty? || hash["taskmanager"]["firstname"].empty? || hash["taskmanager"]["lastname"].empty?
+    return {testregister: {error: "Empty fields"}}.to_json if login.empty? || password.empty? || firstname.empty? || lastname.empty?
     user           = User.new
-    user.login     = hash["taskmanager"]["login"]
-    user.password  = hash["taskmanager"]["password"]
-    user.firstname = hash["taskmanager"]["firstname"]
-    user.lastname  = hash["taskmanager"]["lastname"]
+    user.login     = login
+    user.password  = password
+    user.firstname = firstname
+    user.lastname  = lastname
+
     if user.save
       {testregister: {error: "Success"}}.to_json
     else
@@ -146,32 +131,28 @@ helpers do
   end
 end
 
-# Routes
+# Register
 post '/register' do
   hash = to_hash(request.body.read)
-#  puts "Login: #{hash["taskmanager"]["login"]},"
-#  puts "Password: #{hash["taskmanager"]["password"]},"
-#  puts "Firstname: #{hash["taskmanager"]["firstname"]},"
-#  puts "Lastname: #{hash["taskmanager"]["lastname"]}"
+
   if login_exists?(hash["taskmanager"]["login"])
     {testregister: {error: "Login exists"}}.to_json
   else
-#    add_new_user(hash["taskmanager"]["login"],
-#                 hash["taskmanager"]["password"],
-#                 hash["taskmanager"]["firstname"],
-#                 hash["taskmanager"]["lastname"])
-    puts add_new_user(hash)
+    add_new_user(hash["taskmanager"]["login"],
+                 hash["taskmanager"]["password"],
+                 hash["taskmanager"]["firstname"],
+                 hash["taskmanager"]["lastname"])
   end
 end
 
+# Login
 post '/login' do
   hash = to_hash(request.body.read)
-  #login(hash["taskmanager"]["login"],
-  #      hash["taskmanager"]["password"])
-
-  login(hash)
+  login(hash["taskmanager"]["login"],
+        hash["taskmanager"]["password"])
 end
 
+# Create new task
 post '/protected/new_task' do
   if @auth
     add_new_task(@protected_hash["taskmanager"]["content"],
@@ -183,6 +164,7 @@ post '/protected/new_task' do
   end
 end
 
+# Logout
 post '/protected/logout' do
   if @auth
     user = User.first(token: @protected_hash["taskmanager"]["auth_token"])
@@ -194,6 +176,7 @@ post '/protected/logout' do
   end
 end
 
+# List all tasks
 post '/protected/get_task' do
   if @auth
     user = User.first(token: @protected_hash["taskmanager"]["auth_token"])
@@ -220,6 +203,7 @@ post '/protected/get_task' do
   end
 end
 
+# Find user
 post '/protected/find_user' do
   if @auth
     find_user = User.first(login: @protected_hash["taskmanager"]["login"])
@@ -231,3 +215,5 @@ post '/protected/find_user' do
     {session: {error: "403 Forbidden"}}.to_json
   end
 end
+
+DataMapper.auto_upgrade!
