@@ -1,5 +1,1 @@
-TaskManager - a program for devices based on Android for task management.
-The server component is written in Sinatra.
-The client part is written in Java.
-TaskManager will be your indispensable assistant in any situation.
-Have a nice day!
+TaskManager — a program for devices based on Android for task management.
