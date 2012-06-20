@@ -31,8 +31,7 @@ class User
   has n,   :friendships,   :child_key => [:source_id]
   has n,   :friends, self, :through   => :friendships, :via => :target
 
-  has n,   :taskings
-  has n,   :tasks,         :through   => :taskings
+  has n,   :tasks
 end
 
 class Task
@@ -42,12 +41,10 @@ class Task
   property :content,        Text,         required: true
   property :priority,       Enum[1, 2, 3]
   property :created_at,     DateTime
-  property :user_id,        Integer
   property :receiver_login, String,       required: true, length: 2..20, format: /[a-zA-Z]/, unique: true
   property :read,           Boolean,      default: false
 
-  has n, :taskings
-  has n, :users, :through => :taskings
+  belongs_to :user
 end
 
 class Friendship
@@ -57,12 +54,8 @@ class Friendship
   belongs_to :target, 'User', :key => true
 end
 
-class Tasking
-  include DataMapper::Resource
-
-  belongs_to :task, :key => true
-  belongs_to :user, :key => true
-end
+DataMapper.finalize
+DataMapper.auto_upgrade!
 
 class Token
 
