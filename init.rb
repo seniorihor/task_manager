@@ -95,7 +95,7 @@ helpers do
       auth_token = Token.generate
       user.token = auth_token
       user.save
-      {login: {error: "Success",auth_token: auth_token}}.to_json
+      {login: {error: "Success", auth_token: auth_token}}.to_json
     else
       {login: {error: "Invalid login or password"}}.to_json
     end
@@ -103,17 +103,17 @@ helpers do
 
   def add_new_user(login, password, firstname, lastname)
 
-    return {:register => {error: "Empty fields"}}.to_json if login.empty? || password.empty? || firstname.empty? || lastname.empty?
+    return {test_register: {error: "Empty fields"}}.to_json if login.empty? || password.empty? || firstname.empty? || lastname.empty?
     user           = User.new
     user.login     = login
     user.password  = password
     user.firstname = firstname
     user.lastname  = lastname
     if user.save
-      {:register => {error: "Success"}}.to_json
+      {testregister: {error: "Success"}}.to_json
     else
       error = user.errors.each { |error| error }
-      {:register => error}.to_json
+      {testregister: error}.to_json
     end
   end
 
