@@ -25,6 +25,7 @@ class User
   property :password,   String,  required: true, length: 6..20, format: /[a-zA-Z]/
   property :firstname,  String,  required: true, length: 2..20
   property :lastname,   String,  required: true, length: 2..20
+  property :token,      String,  length: 10
   property :created_at, DateTime
 
   has n,   :friendships,   :child_key => [:source_id]
