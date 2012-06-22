@@ -28,9 +28,8 @@ class User
   property :token,      String,  length: 10
   property :created_at, DateTime
 
-  has n,   :friendships,   :child_key => [:source_id]
-  has n,   :friends, self, :through   => :friendships, :via => :target
-
+  has n,   :friendships,   child_key: [:source_id]
+  has n,   :friends, self, through:   :friendships, via: :target
   has n,   :tasks
 end
 
@@ -50,8 +49,8 @@ end
 class Friendship
   include DataMapper::Resource
 
-  belongs_to :source, 'User', :key => true
-  belongs_to :target, 'User', :key => true
+  belongs_to :source, 'User', key: true
+  belongs_to :target, 'User', key: true
 end
 
 class Token
@@ -97,7 +96,7 @@ helpers do
 
   def add_new_user(login, password, firstname, lastname)
 
-    return {testregister: {error: "Empty fields"}}.to_json if login.empty? || password.empty? || firstname.empty? || lastname.empty?
+    return {register: {error: "Empty fields"}}.to_json if login.empty? || password.empty? || firstname.empty? || lastname.empty?
     user           = User.new
     user.login     = login
     user.password  = password
@@ -105,10 +104,10 @@ helpers do
     user.lastname  = lastname
 
     if user.save
-      {testregister: {error: "Success"}}.to_json
+      {register: {error: "Success"}}.to_json
     else
       error = user.errors.each { |error| error }
-      {testregister: error}.to_json
+      {register: error}.to_json
     end
   end
 
@@ -134,28 +133,28 @@ end
 
 # Register
 post '/protected/register' do
-  if !@auth
+  unless @auth
     if login_exists?(@protected_hash["taskmanager"]["login"])
-      {testregister: {error: "Login exists"}}.to_json
+      {register: {error: "Login exists"}}.to_json
     else
       add_new_user(@protected_hash["taskmanager"]["login"],
                    @protected_hash["taskmanager"]["password"],
                    @protected_hash["taskmanager"]["firstname"],
                    @protected_hash["taskmanager"]["lastname"])
-  end
+    end
   else
-    {testregister: {error: "Already in session"}}.to_json
-  end 
+    {register: {error: "Already in session"}}.to_json
+  end
 end
 
 # Login
 post '/protected/login' do
-  if !@auth
+  unless @auth
     login(@protected_hash["taskmanager"]["login"],
           @protected_hash["taskmanager"]["password"])
   else
     {login: {error: "Already in session"}}.to_json
-  end  
+  end
 end
 
 # Create new task
