@@ -1,5 +1,4 @@
 post "/login"
-
   request:
     curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/login -d "{ \"taskmanager\" : { \"login\" : \"login123\", \"password\" : \"password\" }}"
 
@@ -7,9 +6,7 @@ post "/login"
     {"login":{"error":"Success","auth_token":"token"}}
 end
 
-
 post "/register"
-
   request:
     curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/register -d "{ \"taskmanager\" : { \"firstname\" : \"123\", \"lastname\" : \"qwerty\", \"login\" : \"login123\", \"password\" : \"password\" }}"
 
@@ -17,9 +14,7 @@ post "/register"
     {"register":{"error":"Success"}}
 end
 
-
 post "/protected/new_task"
-
   request:
     curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/protected/new_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"content\", "priority" : 1, \"receiver\" : \"login\" }}"
 
@@ -27,9 +22,7 @@ post "/protected/new_task"
     {"new_task":{"error":"Success"}}
 end
 
-
 post "/get_task"
-
   request:
     curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/get_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
 
@@ -37,9 +30,7 @@ post "/get_task"
     {"get_message":{"error":"Success","quantity":1,"content":"content","priority":1,"receiver":"login:,"time":"time"}}
 end
 
-
 post "/find_user"
-
   request:
     curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/find_user -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"login\" : \"login\" }}"
 
