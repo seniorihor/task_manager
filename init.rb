@@ -133,24 +133,29 @@ helpers do
 end
 
 # Register
-post '/register' do
-  hash = to_hash(request.body.read)
-
-  if login_exists?(hash["taskmanager"]["login"])
-    {testregister: {error: "Login exists"}}.to_json
-  else
-    add_new_user(hash["taskmanager"]["login"],
-                 hash["taskmanager"]["password"],
-                 hash["taskmanager"]["firstname"],
-                 hash["taskmanager"]["lastname"])
+post '/protected/register' do
+  if !@auth
+    if login_exists?(@protected_hash["taskmanager"]["login"])
+      {testregister: {error: "Login exists"}}.to_json
+    else
+      add_new_user(hash["taskmanager"]["login"],
+                   hash["taskmanager"]["password"],
+                   hash["taskmanager"]["firstname"],
+                   hash["taskmanager"]["lastname"])
   end
+  else
+    {register: {error: "Already in session"}}.to_json
+  end 
 end
 
 # Login
-post '/login' do
-  hash = to_hash(request.body.read)
-  login(hash["taskmanager"]["login"],
-        hash["taskmanager"]["password"])
+post '/protected/login' do
+  if !@auth
+    login(@protected_hash["taskmanager"]["login"],
+          @protected_hash["taskmanager"]["password"])
+  else
+    {register: {error: "Already in session"}}.to_json
+  end  
 end
 
 # Create new task
