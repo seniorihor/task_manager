@@ -61,12 +61,9 @@ class Token
   end
 end
 
-# Filters
+# Filter
 before do
   content_type :json
-end
-
-before '/*' do
   @hash = to_hash(request.body.read)
   @auth = User.first(token: @hash["taskmanager"]["auth_token"]).nil? ? false : true
 end
