@@ -66,9 +66,9 @@ before do
   content_type :json
 end
 
-before '/protected/*' do
-  @protected_hash  = to_hash(request.body.read)
-  @auth = User.first(token: @protected_hash["taskmanager"]["auth_token"]).nil? ? false : true
+before '/*' do
+  @hash = to_hash(request.body.read)
+  @auth = User.first(token: @hash["taskmanager"]["auth_token"]).nil? ? false : true
 end
 
 # Helpers
@@ -132,15 +132,15 @@ helpers do
 end
 
 # Register
-post '/protected/register' do
+post '/register' do
   unless @auth
-    if login_exists?(@protected_hash["taskmanager"]["login"])
+    if login_exists?(@hash["taskmanager"]["login"])
       {register: {error: "Login exists"}}.to_json
     else
-      add_new_user(@protected_hash["taskmanager"]["login"],
-                   @protected_hash["taskmanager"]["password"],
-                   @protected_hash["taskmanager"]["firstname"],
-                   @protected_hash["taskmanager"]["lastname"])
+      add_new_user(@hash["taskmanager"]["login"],
+                   @hash["taskmanager"]["password"],
+                   @hash["taskmanager"]["firstname"],
+                   @hash["taskmanager"]["lastname"])
     end
   else
     {register: {error: "Already in session"}}.to_json
@@ -148,31 +148,31 @@ post '/protected/register' do
 end
 
 # Login
-post '/protected/login' do
+post '/login' do
   unless @auth
-    login(@protected_hash["taskmanager"]["login"],
-          @protected_hash["taskmanager"]["password"])
+    login(@hash["taskmanager"]["login"],
+          @hash["taskmanager"]["password"])
   else
     {login: {error: "Already in session"}}.to_json
   end
 end
 
 # Create new task
-post '/protected/new_task' do
+post '/new_task' do
   if @auth
-    add_new_task(@protected_hash["taskmanager"]["content"],
-                 @protected_hash["taskmanager"]["priority"],
-                 @protected_hash["taskmanager"]["receiver_login"],
-                 @protected_hash["taskmanager"]["auth_token"])
+    add_new_task(@hash["taskmanager"]["content"],
+                 @hash["taskmanager"]["priority"],
+                 @hash["taskmanager"]["receiver_login"],
+                 @hash["taskmanager"]["auth_token"])
   else
     {session: {error: "403 Forbidden"}}.to_json
   end
 end
 
 # Logout
-post '/protected/logout' do
+post '/logout' do
   if @auth
-    user = User.first(token: @protected_hash["taskmanager"]["auth_token"])
+    user       = User.first(token: @hash["taskmanager"]["auth_token"])
     user.token = nil
     user.save
     {logout: {error: "Success"}}.to_json
@@ -182,9 +182,9 @@ post '/protected/logout' do
 end
 
 # List all tasks
-post '/protected/get_task' do
+post '/get_task' do
   if @auth
-    user = User.first(token: @protected_hash["taskmanager"]["auth_token"])
+    user = User.first(token: @hash["taskmanager"]["auth_token"])
     tasks = Task.all(read: false, receiver_login: user.login)
     if tasks.nil?
       {get_task: {error: "No messages"}}.to_json
@@ -209,9 +209,9 @@ post '/protected/get_task' do
 end
 
 # Find user
-post '/protected/find_user' do
+post '/find_user' do
   if @auth
-    find_user = User.first(login: @protected_hash["taskmanager"]["login"])
+    find_user = User.first(login: @hash["taskmanager"]["login"])
     {find_user: {error:       "Success",
                  firstname:   find_user.firstname,
                  lastname:    find_user.lastname,

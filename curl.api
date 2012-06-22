@@ -14,7 +14,7 @@ post "/register"
     {"register":{"error":"Success"}}
 end
 
-post "/protected/new_task"
+post "/new_task"
   request:
     curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/protected/new_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"content\", "priority" : 1, \"receiver\" : \"login\" }}"
 
