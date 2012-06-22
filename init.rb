@@ -41,7 +41,7 @@ class Task
   property :priority,       Enum[1, 2, 3]
   property :created_at,     DateTime
   property :receiver_login, String,       required: true, length: 2..20, format: /[a-zA-Z]/, unique: true
-  property :read,           Boolean,      default: false
+  property :read,           Boolean,      default:  false
 
   belongs_to :user
 end
