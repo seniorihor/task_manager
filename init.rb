@@ -40,7 +40,7 @@ class Task
   property :content,        Text,         required: true
   property :priority,       Enum[1, 2, 3]
   property :created_at,     DateTime
-  property :receiver_login, String,       required: true, length: 2..20, format: /[a-zA-Z]/#, unique: true
+  property :receiver_login, String,       required: true, length: 2..20, format: /[a-zA-Z]/
   property :read,           Boolean,      default:  false
 
   belongs_to :user
