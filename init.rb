@@ -150,7 +150,7 @@ post '/login' do
     login(@hash["taskmanager"]["login"],
           @hash["taskmanager"]["password"])
   else
-    {login: {error: "Already in session"}}#.to_json
+    {login: {error: "Already in session"}}.to_json
   end
 end
 
