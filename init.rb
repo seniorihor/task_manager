@@ -138,13 +138,13 @@ post '/protected/register' do
     if login_exists?(@protected_hash["taskmanager"]["login"])
       {testregister: {error: "Login exists"}}.to_json
     else
-      add_new_user(hash["taskmanager"]["login"],
-                   hash["taskmanager"]["password"],
-                   hash["taskmanager"]["firstname"],
-                   hash["taskmanager"]["lastname"])
+      add_new_user(@protected_hash["taskmanager"]["login"],
+                   @protected_hash["taskmanager"]["password"],
+                   @protected_hash["taskmanager"]["firstname"],
+                   @protected_hash["taskmanager"]["lastname"])
   end
   else
-    {register: {error: "Already in session"}}.to_json
+    {testregister: {error: "Already in session"}}.to_json
   end 
 end
 
@@ -154,7 +154,7 @@ post '/protected/login' do
     login(@protected_hash["taskmanager"]["login"],
           @protected_hash["taskmanager"]["password"])
   else
-    {register: {error: "Already in session"}}.to_json
+    {login: {error: "Already in session"}}.to_json
   end  
 end
 
