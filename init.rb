@@ -40,7 +40,7 @@ class Task
   property :content,        Text,         required: true
   property :priority,       Enum[1, 2, 3]
   property :created_at,     DateTime
-  property :receiver_login, String,       required: true, length: 2..20, format: /[a-zA-Z]/, unique: true
+  property :receiver_login, String,       required: true, length: 2..20, format: /[a-zA-Z]/#, unique: true
   property :read,           Boolean,      default:  false
 
   belongs_to :user
@@ -183,7 +183,7 @@ post '/get_task' do
   if @auth
     user = User.first(token: @hash["taskmanager"]["auth_token"])
     tasks = Task.all(read: false, receiver_login: user.login)
-    if tasks.nil?
+    if tasks.empty?
       {get_task: {error: "No messages"}}.to_json
     else
       quantity = tasks.size
@@ -191,12 +191,13 @@ post '/get_task' do
           task.read = true
           task.save
       end
-      tasks.map! do |task| {get_task: {error:          "Success",
-                                       quantity:       quantity,
+      #tasks.map! do |task| {get_task: {error:          "Success",
+      tasks.map! do |task| {#error:          "Success",
+                                       #quantity:       quantity,
                                        content:        task.content,
                                        priority:       task.priority,
                                        receiver_login: task.receiver_login,
-                                       time:           task.created_at}}
+                                       created_at:     task.created_at}#}
       end
       tasks.to_json
     end
