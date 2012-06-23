@@ -61,8 +61,7 @@ class Token
   end
 end
 
-# Filter
-
+# Filters
 before do
   content_type :json
 end
