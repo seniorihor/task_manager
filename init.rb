@@ -67,7 +67,7 @@ before do
   content_type :json
 end
 
-before '/protected/*'  
+before '/protected/*'  do
   @protected_hash = to_hash(request.body.read)
   @auth = User.first(token: @protected_hash["taskmanager"]["auth_token"]).nil? ? false : true
 end
@@ -126,8 +126,8 @@ helpers do
     if task.save
       {newtask: {error: "Success"}}.to_json
     else
-      error = task.errors.each { |error| error }
-      {newtask: error}.to_json
+      #error = task.errors.each { |error| error }
+      {newtask: "bad"}.to_json
     end
   end
 end
@@ -189,22 +189,22 @@ end
 post '/protected/get_task' do
   if @auth
     user = User.first(token: @protected_hash["taskmanager"]["auth_token"])
-    tasks = Task.all(read: false, receiver_login: user.login)
-    if tasks.empty?
-      {get_task: {error: "No messages"}}.to_json
-    else
-      quantity = tasks.size
-      tasks.each do |task|
-          task.read = true
-          task.save
-      end
-      tasks.map! do |task| {content:        task.content,
-                            priority:       task.priority,
-                            receiver_login: task.receiver_login,
-                            created_at:     task.created_at}
-      end
-      tasks.to_json
+    collection = Task.all(read: false, receiver_login: user.login)
+    return {get_task: {error: "No messages"}}.to_json if collection.empty?
+    
+    tasks = Array.new(collection)
+    quantity = tasks.size
+
+    tasks.each do |task|
+         task.read = true
+         task.save
     end
+    tasks.map! {|task|     {:content =>        task.content,
+                            :priority =>       task.priority,
+                            :receiver_login => task.receiver_login,
+                            :created_at =>     task.created_at}}
+
+    {get_task: {error: "Success", quantity: quantity, tasks: tasks}}.to_json
   else
     {session: {error: "403 Forbidden"}}.to_json
   end
