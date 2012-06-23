@@ -28,7 +28,7 @@ post "/protected/get_task"
 
 
   response:
-    {"get_message":{"error":"Success","quantity":1,"content":"content","priority":1,"receiver":"login","time":"time"}}
+    {"get_message":{"error":"Success","quantity":1,"content":"content","priority":1,"receiver_login":"login","created_at":Date}}
 end
 
 post "/protected/find_user"
@@ -38,12 +38,3 @@ post "/protected/find_user"
   response:
     {"get_message":{"error":"Success","quantity":1,"users":[{"login":"login","firstname":"firstname","lastname":"lastname"}]}}
 end
-
-
-
-
-
-
-
-
-
