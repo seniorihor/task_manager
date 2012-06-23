@@ -62,10 +62,14 @@ class Token
 end
 
 # Filter
+
 before do
   content_type :json
-  @hash = to_hash(request.body.read)
-  @auth = User.first(token: @hash["taskmanager"]["auth_token"]).nil? ? false : true
+end
+
+before '/protected/*'  
+  @protected_hash = to_hash(request.body.read)
+  @auth = User.first(token: @protected_hash["taskmanager"]["auth_token"]).nil? ? false : true
 end
 
 # Helpers
@@ -129,7 +133,9 @@ helpers do
 end
 
 # Register
+
 post '/register' do
+  @hash = to_hash(request.body.read)
   unless @auth
     if login_exists?(@hash["taskmanager"]["login"])
       {register: {error: "Login exists"}}.to_json
@@ -146,6 +152,7 @@ end
 
 # Login
 post '/login' do
+  @hash = to_hash(request.body.read)
   unless @auth
     login(@hash["taskmanager"]["login"],
           @hash["taskmanager"]["password"])
@@ -155,21 +162,21 @@ post '/login' do
 end
 
 # Create new task
-post '/new_task' do
+post '/protected/new_task' do
   if @auth
-    add_new_task(@hash["taskmanager"]["content"],
-                 @hash["taskmanager"]["priority"],
-                 @hash["taskmanager"]["receiver_login"],
-                 @hash["taskmanager"]["auth_token"])
+    add_new_task(@protected_hash["taskmanager"]["content"],
+                 @protected_hash["taskmanager"]["priority"],
+                 @protected_hash["taskmanager"]["receiver_login"],
+                 @protected_hash["taskmanager"]["auth_token"])
   else
     {session: {error: "403 Forbidden"}}.to_json
   end
 end
 
 # Logout
-post '/logout' do
+post '/protected/logout' do
   if @auth
-    user       = User.first(token: @hash["taskmanager"]["auth_token"])
+    user       = User.first(token: @protected_hash["taskmanager"]["auth_token"])
     user.token = nil
     user.save
     {logout: {error: "Success"}}.to_json
@@ -179,9 +186,9 @@ post '/logout' do
 end
 
 # List all tasks
-post '/get_task' do
+post '/protected/get_task' do
   if @auth
-    user = User.first(token: @hash["taskmanager"]["auth_token"])
+    user = User.first(token: @protected_hash["taskmanager"]["auth_token"])
     tasks = Task.all(read: false, receiver_login: user.login)
     if tasks.empty?
       {get_task: {error: "No messages"}}.to_json
@@ -191,13 +198,10 @@ post '/get_task' do
           task.read = true
           task.save
       end
-      #tasks.map! do |task| {get_task: {error:          "Success",
-      tasks.map! do |task| {#error:          "Success",
-                                       #quantity:       quantity,
-                                       content:        task.content,
-                                       priority:       task.priority,
-                                       receiver_login: task.receiver_login,
-                                       created_at:     task.created_at}#}
+      tasks.map! do |task| {content:        task.content,
+                            priority:       task.priority,
+                            receiver_login: task.receiver_login,
+                            created_at:     task.created_at}
       end
       tasks.to_json
     end
@@ -207,13 +211,13 @@ post '/get_task' do
 end
 
 # Find user
-post '/find_user' do
+post '/protected/find_user' do
   if @auth
-    find_user = User.first(login: @hash["taskmanager"]["login"])
+    find_user = User.first(login: @protected_hash["taskmanager"]["login"])
     {find_user: {error:       "Success",
                  firstname:   find_user.firstname,
                  lastname:    find_user.lastname,
-                 login:       find_user.login}}
+                 login:       find_user.login}}.to_json
   else
     {session: {error: "403 Forbidden"}}.to_json
   end
