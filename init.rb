@@ -191,7 +191,7 @@ post '/protected/get_task' do
     user = User.first(token: @protected_hash["taskmanager"]["auth_token"])
     collection = Task.all(read: false, receiver_login: user.login)
     return {get_task: {error: "No messages"}}.to_json if collection.empty?
-    
+
     tasks = Array.new(collection)
     quantity = tasks.size
 
@@ -199,10 +199,10 @@ post '/protected/get_task' do
          task.read = true
          task.save
     end
-    tasks.map! {|task|     {:content =>        task.content,
-                            :priority =>       task.priority,
-                            :receiver_login => task.receiver_login,
-                            :created_at =>     task.created_at}}
+    tasks.map! {|task| {content:        task.content,
+                        priority:       task.priority,
+                        receiver_login: task.receiver_login,
+                        created_at:     task.created_at}}
 
     {get_task: {error: "Success", quantity: quantity, tasks: tasks}}.to_json
   else
