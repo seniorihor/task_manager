@@ -1,29 +1,28 @@
 post "/login"
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/login -d "{ \"taskmanager\" : { \"login\" : \"ihor\", \"password\" : \"password\", \"auth_token\" : \"auth_token\" }}"
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/login -d "{ \"taskmanager\" : { \"login\" : \"login\", \"password\" : \"password\"}}"
 
   response:
     {"login":{"error":"Success","auth_token":"token"}}
 end
-# taras token a7sKbFfC16
-# ihor token  z1iXV8QbxZ
+
 post "/register"
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/register -d "{ \"taskmanager\" : { \"firstname\" : \"123\", \"lastname\" : \"qwerty\", \"login\" : \"ihor\", \"password\" : \"password\", \"auth_token\" : \"auth_token\" }}"
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/register -d "{ \"taskmanager\" : { \"firstname\" : \"123\", \"lastname\" : \"qwerty\", \"login\" : \"ihor\", \"password\" : \"password\"}}"
 
   response:
     {"register":{"error":"Success"}}
 end
 
-post "/new_task"
+post "/protected/new_task"
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/new_task -d "{ \"taskmanager\" : { \"auth_token\" : \"z1iXV8QbxZ\", \"content\" : \"conten1\", \"priority\" : 1, \"receiver_login\" : \"taras\" }}"
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/protected/new_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"conten1\", \"priority\" : 1, \"receiver_login\" : \"login\" }}"
 
   response:
     {"new_task":{"error":"Success"}}
 end
 
-post "/get_task"
+post "/protected/get_task"
   request:
     curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/get_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
 
@@ -31,7 +30,7 @@ post "/get_task"
     {"get_message":{"error":"Success","quantity":1,"content":"content","priority":1,"receiver":"login","time":"time"}}
 end
 
-post "/find_user"
+post "/protected/find_user"
   request:
     curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/find_user -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"login\" : \"login\" }}"
 
