@@ -193,7 +193,6 @@ post '/protected/get_task' do
     end
     tasks.map! {|task| {content:        task.content,
                         priority:       task.priority,
-                        receiver_login: task.receiver_login,
                         user_login:     User.get(task.user_id).login,
                         created_at:     task.created_at}}
 
