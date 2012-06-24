@@ -2,7 +2,6 @@ source :rubygems
 
 group :development, :test do
   gem 'sqlite3'
-  gem 'dm-sqlite-adapter'
 end
 
 group :production do
@@ -17,7 +16,7 @@ gem 'dm-timestamps'
 gem 'dm-validations'
 gem 'dm-migrations'
 gem 'dm-types'
-#gem 'dm-sqlite-adapter'
+gem 'dm-sqlite-adapter'
 #gem 'dm-postgres-adapter'
 gem 'dm-serializer'
 gem 'rspec'
