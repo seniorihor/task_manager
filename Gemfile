@@ -14,11 +14,12 @@ gem 'dm-postgres-adapter'
 gem 'dm-serializer'
 
 group :development do
+  gem 'sqlite3'
   gem 'dm-sqlite-adapter'
-  gem 'sqlite3-ruby'
 end
 
 group :test do
+  gem 'sqlite3'
   gem 'rspec'
   gem 'rack'
   gem 'rack-test'
@@ -27,6 +28,6 @@ group :test do
 end
 
 group :production do
-  gem 'dm-postgres-adapter'
   gem 'pg'
+  gem 'dm-postgres-adapter'
 end
