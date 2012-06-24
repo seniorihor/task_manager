@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+group :production do
+  gem 'dm-postgres-adapter'
+end
+
 require 'sinatra'
 require 'bundler/setup'
 require 'sinatra/reloader'
@@ -13,7 +17,7 @@ require 'dm-serializer/to_json'
 require 'json'
 
 # A Sqlite3 connection to a persistent database
-DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/database.sqlite3")
+DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/development.sqlite3")
 #DataMapper::Property::String.length(20)
 #DataMapper::Property::Text.length(140)
 
