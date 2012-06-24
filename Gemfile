@@ -1,17 +1,6 @@
 source :rubygems
 
-group :development do
-  gem 'dm-sqlite-adapter'
-  gem "sqlite3-ruby"
-end
-
-group :production do
-  gem 'dm-postgres-adapter'
-  gem 'pg'
-end
-
 gem 'sinatra'
-gem 'sinatra-reloader'
 gem 'thin'
 gem 'dm-core'
 gem 'dm-timestamps'
@@ -21,9 +10,20 @@ gem 'dm-types'
 gem 'dm-sqlite-adapter'
 gem 'dm-postgres-adapter'
 gem 'dm-serializer'
-gem 'rspec'
-gem 'rack'
-gem 'rack-test'
-gem 'autotest-growl'
-gem 'autotest-fsevent'
 gem 'json'
+
+group :development do
+  gem 'dm-sqlite-adapter'
+  gem "sqlite3-ruby"
+  gem 'sinatra-reloader'
+  gem 'rspec'
+  gem 'rack'
+  gem 'rack-test'
+  gem 'autotest-growl'
+  gem 'autotest-fsevent'
+end
+
+group :production do
+  gem 'dm-postgres-adapter'
+  gem 'pg'
+end
