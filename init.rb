@@ -191,10 +191,10 @@ post '/protected/get_task' do
          task.read = true
          task.save
     end
-    tasks.map! {|task| {content:        task.content,
-                        priority:       task.priority,
-                        user_login:     User.get(task.user_id).login,
-                        created_at:     task.created_at}}
+    tasks.map! {|task| {content:    task.content,
+                        priority:   task.priority,
+                        user_login: User.get(task.user_id).login,
+                        created_at: task.created_at}}
 
     {get_task: {error: "Success", quantity: quantity, tasks: tasks}}.to_json
   else
