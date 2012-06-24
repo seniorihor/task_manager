@@ -13,9 +13,9 @@ require 'dm-serializer/to_json'
 require 'json'
 
 # A Sqlite3 connection to a persistent database
-DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/development.sqlite3")
-#DataMapper::Property::String.length(20)
-#DataMapper::Property::Text.length(140)
+DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite://#{Dir.pwd}/development.db")
+DataMapper::Property::String.length(20)
+DataMapper::Property::Text.length(140)
 
 class User
   include DataMapper::Resource
@@ -26,10 +26,10 @@ class User
   property :firstname,  String,  required: true, length: 2..20
   property :lastname,   String,  required: true, length: 2..20
   property :token,      String,  length:   10
-#  property :created_at, DateTime
+  property :created_at, DateTime
 
-#  has n,   :friendships, child_key: [:source_id]
-#  has n,   :friends,     self,      through: :friendships, via: :target
+  has n,   :friendships, child_key: [:source_id]
+  has n,   :friends,     self,      through: :friendships, via: :target
   has n,   :tasks
 end
 
@@ -38,20 +38,20 @@ class Task
 
   property :id,             Serial
   property :content,        Text,         required: true
-#  property :priority,       Enum[1, 2, 3]
-#  property :created_at,     DateTime
+  property :priority,       Enum[1, 2, 3]
+  property :created_at,     DateTime
   property :receiver_login, String,       required: true, length: 2..20, format: /[a-zA-Z]/
-#  property :read,           Boolean,      default:  false
+  property :read,           Boolean,      default:  false
 
   belongs_to :user
 end
 
-#class Friendship
-#  include DataMapper::Resource
-#
-#  belongs_to :source, 'User', key: true
-#  belongs_to :target, 'User', key: true
-#end
+class Friendship
+  include DataMapper::Resource
+
+  belongs_to :source, 'User', key: true
+  belongs_to :target, 'User', key: true
+end
 
 class Token
 
