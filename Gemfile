@@ -9,6 +9,7 @@ gem 'dm-migrations'
 gem 'dm-types'
 gem 'dm-serializer'
 gem 'dm-postgres-adapter'
+gem 'dm-sqlite-adapter'
 gem 'rspec'
 gem 'rack'
 gem 'rack-test'
@@ -18,5 +19,4 @@ gem 'json'
 
 group :development, :test do
   gem 'sqlite3'
-  gem 'dm-sqlite-adapter'
 end
