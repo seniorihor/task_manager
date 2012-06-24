@@ -29,8 +29,8 @@ class User
   property :token,      String,  length:   10
 #  property :created_at, DateTime
 
-  has n,   :friendships, child_key: [:source_id]
-  has n,   :friends,     self,      through: :friendships, via: :target
+#  has n,   :friendships, child_key: [:source_id]
+#  has n,   :friends,     self,      through: :friendships, via: :target
   has n,   :tasks
 end
 
@@ -47,12 +47,12 @@ class Task
   belongs_to :user
 end
 
-class Friendship
-  include DataMapper::Resource
-
-  belongs_to :source, 'User', key: true
-  belongs_to :target, 'User', key: true
-end
+#class Friendship
+#  include DataMapper::Resource
+#
+#  belongs_to :source, 'User', key: true
+#  belongs_to :target, 'User', key: true
+#end
 
 class Token
 
