@@ -1,6 +1,7 @@
 source :rubygems
 
 group :development do
+  gem 'dm-core'
   gem 'dm-sqlite-adapter'
   gem "sqlite3-ruby"
 end
