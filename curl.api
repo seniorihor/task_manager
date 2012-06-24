@@ -26,7 +26,6 @@ post '/protected/get_task'
   request:
     curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/protected/get_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
 
-
   response:
     {"get_message":{"error":"Success","quantity":1,"content":"content","priority":1,"receiver_login":"login","created_at":Date}}
 end
