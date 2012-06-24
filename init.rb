@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
-require 'dm-postgres-adapter'
 require 'sinatra'
 require 'bundler/setup'
 require 'sinatra/reloader'
-require 'dm-core'
-require 'dm-sqlite-adapter'
-require 'dm-validations'
-require 'dm-migrations'
-require 'dm-timestamps'
-require 'dm-types'
-require 'dm-serializer/to_json'
+#require 'dm-core'
+#require 'dm-sqlite-adapter'
+#require 'dm-validations'
+#require 'dm-migrations'
+#require 'dm-timestamps'
+#require 'dm-types'
+#require 'dm-serializer/to_json'
+require 'data_mapper'
 require 'json'
 
 # A Sqlite3 connection to a persistent database

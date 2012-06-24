@@ -2,7 +2,6 @@ source :rubygems
 
 group :development, :test do
   gem 'sqlite3'
-  gem 'dm-postgres-adapter'
 end
 
 group :production do
@@ -12,14 +11,15 @@ end
 gem 'sinatra'
 gem 'sinatra-reloader'
 gem 'thin'
-gem 'dm-core'
-gem 'dm-timestamps'
-gem 'dm-validations'
-gem 'dm-migrations'
-gem 'dm-types'
-gem 'dm-sqlite-adapter'
+#gem 'dm-core'
+#gem 'dm-timestamps'
+#gem 'dm-validations'
+#gem 'dm-migrations'
+#gem 'dm-types'
+#gem 'dm-sqlite-adapter'
 #gem 'dm-postgres-adapter'
-gem 'dm-serializer'
+#gem 'dm-serializer'
+gem 'data_mapper'
 gem 'rspec'
 gem 'rack'
 gem 'rack-test'
