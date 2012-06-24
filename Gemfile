@@ -1,4 +1,9 @@
 source :rubygems
+
+group :development, :test do
+  gem 'sqlite3'
+end
+
 gem 'sinatra'
 gem 'sinatra-reloader'
 gem 'thin'
@@ -17,7 +22,3 @@ gem 'autotest-growl'
 gem 'autotest-fsevent'
 gem 'json'
 gem 'pg'
-
-#group :development, :test do
-#  gem 'sqlite3'
-#end
