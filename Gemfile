@@ -1,12 +1,7 @@
 source :rubygems
 
-group :development, :test do
-  gem 'sqlite3'
-end
-
-group :production do
-  gem 'dm-postgres-adapter'
-end
+gem "pg",           :group => :production
+gem "sqlite3-ruby", :group => :development
 
 gem 'sinatra'
 gem 'sinatra-reloader'
