@@ -15,7 +15,10 @@ gem 'dm-serializer'
 
 group :development do
   gem 'dm-sqlite-adapter'
-  gem "sqlite3-ruby"
+  gem 'sqlite3-ruby'
+end
+
+group :test do
   gem 'rspec'
   gem 'rack'
   gem 'rack-test'
