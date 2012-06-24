@@ -28,8 +28,8 @@ class User
   property :token,      String,  length:   10
   property :created_at, DateTime
 
-  has n,   :friendships,   child_key: [:source_id]
-  has n,   :friends, self, through:   :friendships, via: :target
+  has n,   :friendships, child_key: [:source_id]
+  has n,   :friends,     self,      through: :friendships, via: :target
   has n,   :tasks
 end
 
