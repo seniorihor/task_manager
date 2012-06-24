@@ -26,7 +26,7 @@ class User
   property :firstname,  String,  required: true, length: 2..20
   property :lastname,   String,  required: true, length: 2..20
   property :token,      String,  length:   10
-  property :created_at, DateTime
+#  property :created_at, DateTime
 
   has n,   :friendships, child_key: [:source_id]
   has n,   :friends,     self,      through: :friendships, via: :target
@@ -38,10 +38,10 @@ class Task
 
   property :id,             Serial
   property :content,        Text,         required: true
-  property :priority,       Enum[1, 2, 3]
-  property :created_at,     DateTime
+#  property :priority,       Enum[1, 2, 3]
+#  property :created_at,     DateTime
   property :receiver_login, String,       required: true, length: 2..20, format: /[a-zA-Z]/
-  property :read,           Boolean,      default:  false
+#  property :read,           Boolean,      default:  false
 
   belongs_to :user
 end
