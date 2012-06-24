@@ -25,7 +25,7 @@ class User
   property :password,   String,  required: true, length: 6..20, format: /[a-zA-Z]/
   property :firstname,  String,  required: true, length: 2..20
   property :lastname,   String,  required: true, length: 2..20
-  property :token,      String,  length: 10
+  property :token,      String,  length:   10
   property :created_at, DateTime
 
   has n,   :friendships,   child_key: [:source_id]
@@ -132,9 +132,9 @@ helpers do
 end
 
 # Register
-
 post '/register' do
   @hash = to_hash(request.body.read)
+
   unless @auth
     if login_exists?(@hash["taskmanager"]["login"])
       {register: {error: "Login exists"}}.to_json
@@ -152,6 +152,7 @@ end
 # Login
 post '/login' do
   @hash = to_hash(request.body.read)
+
   unless @auth
     login(@hash["taskmanager"]["login"],
           @hash["taskmanager"]["password"])
