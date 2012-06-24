@@ -1,6 +1,7 @@
 source :rubygems
 
 gem 'sinatra'
+gem 'sinatra-reloader'
 gem 'thin'
 gem 'dm-core'
 gem 'dm-timestamps'
@@ -15,7 +16,6 @@ gem 'json'
 group :development do
   gem 'dm-sqlite-adapter'
   gem "sqlite3-ruby"
-  gem 'sinatra-reloader'
   gem 'rspec'
   gem 'rack'
   gem 'rack-test'
