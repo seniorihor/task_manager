@@ -135,17 +135,13 @@ end
 post '/register' do
   @hash = to_hash(request.body.read)
 
-  unless @auth
-    if login_exists?(@hash["taskmanager"]["login"])
-      {register: {error: "Login exists"}}.to_json
-    else
-      add_new_user(@hash["taskmanager"]["login"],
-                   @hash["taskmanager"]["password"],
-                   @hash["taskmanager"]["firstname"],
-                   @hash["taskmanager"]["lastname"])
-    end
+  if login_exists?(@hash["taskmanager"]["login"])
+    {register: {error: "Login exists"}}.to_json
   else
-    {register: {error: "Already in session"}}.to_json
+    add_new_user(@hash["taskmanager"]["login"],
+                 @hash["taskmanager"]["password"],
+                 @hash["taskmanager"]["firstname"],
+                 @hash["taskmanager"]["lastname"])
   end
 end
 
@@ -153,12 +149,8 @@ end
 post '/login' do
   @hash = to_hash(request.body.read)
 
-  unless @auth
-    login(@hash["taskmanager"]["login"],
-          @hash["taskmanager"]["password"])
-  else
-    {login: {error: "Already in session"}}.to_json
-  end
+  login(@hash["taskmanager"]["login"],
+        @hash["taskmanager"]["password"])
 end
 
 # Create new task
