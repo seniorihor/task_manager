@@ -18,6 +18,6 @@ gem 'autotest-fsevent'
 gem 'json'
 gem 'pg'
 
-group :development, :test do
-  gem 'sqlite3'
-end
+#group :development, :test do
+#  gem 'sqlite3'
+#end

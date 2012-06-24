@@ -14,8 +14,8 @@ require 'json'
 
 # A Sqlite3 connection to a persistent database
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/database.sqlite3")
-DataMapper::Property::String.length(20)
-DataMapper::Property::Text.length(140)
+#DataMapper::Property::String.length(20)
+#DataMapper::Property::Text.length(140)
 
 class User
   include DataMapper::Resource
