@@ -38,3 +38,11 @@ post "/protected/find_user"
   response:
     {"get_message":{"error":"Success","quantity":1,"users":[{"login":"login","firstname":"firstname","lastname":"lastname"}]}}
 end
+
+post '/protected/logout'
+  request:
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/protected/logout -d "{ \"taskmanager\" : { \"auth_token\" : \"FEx9F0QX4E\" }}"
+
+  response:
+    {"logout":{"error":"Success"}}
+end
