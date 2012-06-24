@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
-group :production do
-  gem 'dm-postgres-adapter'
-end
-
+require 'dm-postgres-adapter'
 require 'sinatra'
 require 'bundler/setup'
 require 'sinatra/reloader'
