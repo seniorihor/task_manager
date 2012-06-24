@@ -1,10 +1,8 @@
 source :rubygems
 
 group :development do
-  #gem 'dm-sqlite-adapter'
-  #gem "sqlite3-ruby"
-  gem 'dm-postgres-adapter'
-  gem 'pg'
+  gem 'dm-sqlite-adapter'
+  gem "sqlite3-ruby"
 end
 
 group :production do
@@ -20,8 +18,8 @@ gem 'dm-timestamps'
 gem 'dm-validations'
 gem 'dm-migrations'
 gem 'dm-types'
-#gem 'dm-sqlite-adapter'
-#gem 'dm-postgres-adapter'
+gem 'dm-sqlite-adapter'
+gem 'dm-postgres-adapter'
 gem 'dm-serializer'
 gem 'rspec'
 gem 'rack'
