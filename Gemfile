@@ -1,9 +1,10 @@
 source :rubygems
 
 group :development do
-  gem 'dm-core'
-  gem 'dm-sqlite-adapter'
-  gem "sqlite3-ruby"
+  #gem 'dm-sqlite-adapter'
+  #gem "sqlite3-ruby"
+  gem 'dm-postgres-adapter'
+  gem 'pg'
 end
 
 group :production do
