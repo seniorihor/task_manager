@@ -206,10 +206,10 @@ end
 post '/protected/find_user' do
   if @auth
     find_user = User.first(login: @protected_hash["taskmanager"]["login"])
-    {find_user: {error:       "Success",
-                 firstname:   find_user.firstname,
-                 lastname:    find_user.lastname,
-                 login:       find_user.login}}.to_json
+    {find_user: {error:     "Success",
+                 firstname: find_user.firstname,
+                 lastname:  find_user.lastname,
+                 login:     find_user.login}}.to_json
   else
     {session: {error: "403 Forbidden"}}.to_json
   end
