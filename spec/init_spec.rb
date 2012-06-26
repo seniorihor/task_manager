@@ -10,8 +10,8 @@ end
 describe 'TaskManager' do
   include Rack::Test::Methods
 
-  it 'should load login user' do
+  it 'should not load login page' do
     get '/login'
-    last_response.status.should == 200
+    last_response.status.should == 404
   end
 end
