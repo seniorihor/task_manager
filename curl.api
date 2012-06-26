@@ -8,7 +8,7 @@ end
 
 post '/register'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/register -d "{ \"taskmanager\" : { \"firstname\" : \"123\", \"lastname\" : \"qwerty\", \"login\" : \"login\", \"password\" : \"password\" }}"
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/register -d "{ \"taskmanager\" : { \"firstname\" : \"firstname\", \"lastname\" : \"lastname\", \"login\" : \"login\", \"password\" : \"password\" }}"
 
   response:
     {"register":{"error":"Success"}}
@@ -27,7 +27,7 @@ post '/protected/get_task'
     curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/get_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
 
   response:
-    {"get_message":{"error":"Success","quantity":1,"content":"content","priority":1,"receiver_login":"login","created_at":Date}}
+    {"get_message":{"error":"Success","quantity":1,"content":"content","priority":1,"receiver_login":"login","created_at":"Date"}}
 end
 
 post '/protected/find_user'
