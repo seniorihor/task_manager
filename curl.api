@@ -1,6 +1,6 @@
 post '/login'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/login -d "{ \"taskmanager\" : { \"login\" : \"login\", \"password\" : \"password\"}}"
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/login -d "{ \"taskmanager\" : { \"login\" : \"login\", \"password\" : \"password\"}}"
 
   response:
     {"login":{"error":"Success","auth_token":"token"}}
@@ -8,7 +8,7 @@ end
 
 post '/register'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/register -d "{ \"taskmanager\" : { \"firstname\" : \"123\", \"lastname\" : \"qwerty\", \"login\" : \"login\", \"password\" : \"password\"}}"
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/register -d "{ \"taskmanager\" : { \"firstname\" : \"123\", \"lastname\" : \"qwerty\", \"login\" : \"login\", \"password\" : \"password\" }}"
 
   response:
     {"register":{"error":"Success"}}
@@ -16,7 +16,7 @@ end
 
 post '/protected/new_task'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/protected/new_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"content\", \"priority\" : 1, \"receiver_login\" : \"receiver_login\" }}"
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/new_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"content\", \"priority\" : 1, \"receiver_login\" : \"login\" }}"
 
   response:
     {"new_task":{"error":"Success"}}
@@ -24,7 +24,7 @@ end
 
 post '/protected/get_task'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/protected/get_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/get_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
 
   response:
     {"get_message":{"error":"Success","quantity":1,"content":"content","priority":1,"receiver_login":"login","created_at":Date}}
@@ -32,7 +32,7 @@ end
 
 post '/protected/find_user'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/protected/find_user -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"login\" : \"login\" }}"
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/find_user -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"login\" : \"login\" }}"
 
   response:
     {"get_message":{"error":"Success","quantity":1,"users":[{"login":"login","firstname":"firstname","lastname":"lastname"}]}}
@@ -40,7 +40,7 @@ end
 
 post '/protected/logout'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:4567/protected/logout -d "{ \"taskmanager\" : { \"auth_token\" : \"FEx9F0QX4E\" }}"
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/logout -d "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
 
   response:
     {"logout":{"error":"Success"}}
