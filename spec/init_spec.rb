@@ -3,12 +3,17 @@ require 'rack/test'
 
 set :environment, :test
 
-def app
-  Sinatra::Application
+RSpec.configure do |conf|
+  conf.include Rack::Test::Methods
+  DataMapper.finalize
+  DataMapper.auto_migrate!
 end
 
 describe 'TaskManager' do
-  include Rack::Test::Methods
+
+  def app
+    Sinatra::Application
+  end
 
   it 'should not load login page' do
     get '/login'

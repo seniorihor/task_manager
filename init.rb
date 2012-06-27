@@ -12,8 +12,22 @@ require 'dm-types'
 require 'dm-serializer/to_json'
 require 'json'
 
+# Connection to a persistent database
+configure :production do
+  DataMapper.setup(:default, ENV['DATABASE_URL'])
+end
+
+configure :development do
+  DataMapper.setup("sqlite://#{Dir.pwd}/development.db")
+  DataMapper::Logger.new($stdout, :debug)
+end
+
+configure :test do
+  DataMapper.setup(:default, "sqlite::memory:")
+end
+
 # A Sqlite3 connection to a persistent database
-DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite://#{Dir.pwd}/development.db")
+#DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite://#{Dir.pwd}/development.db")
 DataMapper::Property::String.length(20)
 DataMapper::Property::Text.length(140)
 
@@ -27,6 +41,7 @@ class User
   property :lastname,   String,  required: true, length: 2..20
   property :token,      String,  length:   10
   property :created_at, DateTime
+  property :online,     Boolean, required: true, default: true
 
   has n,   :friendships, child_key: [:source_id]
   has n,   :friends,     self,      through: :friendships, via: :target
@@ -38,10 +53,10 @@ class Task
 
   property :id,             Serial
   property :content,        Text,         required: true
-  property :priority,       Enum[1, 2, 3]
+  property :priority,       Enum[0, 1, 2, 3]
   property :created_at,     DateTime
-  property :receiver_login, String,       required: true, length: 2..20, format: /[a-zA-Z]/
-  property :read,           Boolean,      default:  false
+  property :receiver_login, String,       required: true, length:  2..20, format: /[a-zA-Z]/
+  property :read,           Boolean,      required: true, default: false
 
   belongs_to :user
 end
@@ -52,6 +67,9 @@ class Friendship
   belongs_to :source, 'User', key: true
   belongs_to :target, 'User', key: true
 end
+
+DataMapper.finalize
+DataMapper.auto_upgrade!
 
 class Token
 
@@ -214,5 +232,3 @@ post '/protected/find_user' do
     {session: {error: "403 Forbidden"}}.to_json
   end
 end
-
-DataMapper.auto_upgrade!
