@@ -12,25 +12,29 @@ require 'dm-types'
 require 'dm-serializer/to_json'
 require 'json'
 
-# Connection to a persistent database
+#set :environment, :production
+set :environment, :development
+#set :environment, :test
+
+# Configuration connection to database
 configure :production do
   DataMapper.setup(:default, ENV['DATABASE_URL'])
 end
 
 configure :development do
-  DataMapper.setup("sqlite://#{Dir.pwd}/development.db")
+  DataMapper.setup(:default, "sqlite://#{Dir.pwd}/development.db")
   DataMapper::Logger.new($stdout, :debug)
 end
 
 configure :test do
-  DataMapper.setup(:default, "sqlite::memory:")
+  #DataMapper.setup(:default, 'sqlite::memory:')
+  DataMapper.setup(:default, "sqlite://#{Dir.pwd}/test.db")
 end
 
-# A Sqlite3 connection to a persistent database
-#DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite://#{Dir.pwd}/development.db")
 DataMapper::Property::String.length(20)
 DataMapper::Property::Text.length(140)
 
+# Model
 class User
   include DataMapper::Resource
 
@@ -41,7 +45,7 @@ class User
   property :lastname,   String,  required: true, length: 2..20
   property :token,      String,  length:   10
   property :created_at, DateTime
-  property :online,     Boolean, required: true, default: true
+  property :online,     Boolean, required: true, default: false
 
   has n,   :friendships, child_key: [:source_id]
   has n,   :friends,     self,      through: :friendships, via: :target
@@ -234,18 +238,18 @@ post '/protected/find_user' do
 end
 
 # Add friend
-post 'protected/add_friend' do 
+post 'protected/add_friend' do
   if @auth
     friend = User.first(token: @protected_hash["taskmanager"]["auth_token"])
     user = User.first(login: @protected_hash["taskmanager"]["receiver_login"])
     if @protected_hash["taskmanager"]["invite"]
       friend.friends << user
-      user.friends << friend
+      user.friends   << friend
       user.friends.save
       friend.friends.save
-      add_new_task("true",0,user.login,friend.token)
+      add_new_task('true',  0, user.login, friend.token)
     else
-      add_new_task("false",0,user.login,friend.token)
+      add_new_task('false', 0, user.login, friend.token)
     end
   else
      {session: {error: "403 Forbidden"}}.to_json
