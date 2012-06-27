@@ -232,3 +232,22 @@ post '/protected/find_user' do
     {session: {error: "403 Forbidden"}}.to_json
   end
 end
+
+# Add friend
+post 'protected/add_friend' do 
+  if @auth
+    friend = User.first(token: @protected_hash["taskmanager"]["auth_token"])
+    user = User.first(login: @protected_hash["taskmanager"]["receiver_login"])
+    if @protected_hash["taskmanager"]["invite"]
+      friend.friends << user
+      user.friends << friend
+      user.friends.save
+      friend.friends.save
+      add_new_task("true",0,user.login,friend.token)
+    else
+      add_new_task("false",0,user.login,friend.token)
+    end
+  else
+     {session: {error: "403 Forbidden"}}.to_json
+  end
+end
