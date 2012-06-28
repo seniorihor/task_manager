@@ -27,8 +27,7 @@ configure :development do
 end
 
 configure :test do
-  #DataMapper.setup(:default, 'sqlite::memory:')
-  DataMapper.setup(:default, "sqlite://#{Dir.pwd}/test.db")
+  DataMapper.setup(:default, 'sqlite::memory:')
 end
 
 DataMapper::Property::String.length(20)
