@@ -145,7 +145,7 @@ helpers do
       {newtask: {error: "Success"}}.to_json
     else
       #error = task.errors.each { |error| error }
-      {newtask: "bad"}.to_json
+      {newtask: {error: "Bad"}}.to_json
     end
   end
 end
@@ -238,7 +238,7 @@ end
 post '/protected/add_friend' do
   if @auth
     friend = User.first(token: @protected_hash["taskmanager"]["auth_token"])
-    user = User.first(login: @protected_hash["taskmanager"]["receiver_login"])
+    user   = User.first(login: @protected_hash["taskmanager"]["receiver_login"])
     if @protected_hash["taskmanager"]["invite"]
       friend.friends << user
       user.friends   << friend
