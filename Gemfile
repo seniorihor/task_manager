@@ -13,6 +13,7 @@ gem 'dm-serializer'
 gem 'dm-sqlite-adapter'
 
 group :development, :test do
+  gem 'sqlite3'
   gem 'rspec'
   gem 'rack'
   gem 'rack-test'
