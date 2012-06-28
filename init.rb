@@ -235,7 +235,7 @@ post '/protected/find_user' do
 end
 
 # Add friend
-post 'protected/add_friend' do
+post '/protected/add_friend' do
   if @auth
     friend = User.first(token: @protected_hash["taskmanager"]["auth_token"])
     user = User.first(login: @protected_hash["taskmanager"]["receiver_login"])
