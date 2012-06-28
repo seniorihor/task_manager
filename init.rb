@@ -87,7 +87,7 @@ end
 
 before '/protected/*'  do
   @protected_hash = to_hash(request.body.read)
-  @auth = User.first(token: @protected_hash["taskmanager"]["auth_token"]).nil? ? false : true
+  @auth = User.first(token: @protected_hash['taskmanager']['auth_token']).nil? ? false : true
 end
 
 # Helpers
@@ -144,8 +144,8 @@ helpers do
     if task.save
       {newtask: {error: "Success"}}.to_json
     else
-      #error = task.errors.each { |error| error }
-      {newtask: {error: "Bad"}}.to_json
+      error = task.errors.each { |error| error }
+      {newtask: {error: error}}.to_json
     end
   end
 end
@@ -154,13 +154,13 @@ end
 post '/register' do
   @hash = to_hash(request.body.read)
 
-  if login_exists?(@hash["taskmanager"]["login"])
+  if login_exists?(@hash['taskmanager']['login'])
     {register: {error: "Login exists"}}.to_json
   else
-    add_new_user(@hash["taskmanager"]["login"],
-                 @hash["taskmanager"]["password"],
-                 @hash["taskmanager"]["firstname"],
-                 @hash["taskmanager"]["lastname"])
+    add_new_user(@hash['taskmanager']['login'],
+                 @hash['taskmanager']['password'],
+                 @hash['taskmanager']['firstname'],
+                 @hash['taskmanager']['lastname'])
   end
 end
 
@@ -168,17 +168,17 @@ end
 post '/login' do
   @hash = to_hash(request.body.read)
 
-  login(@hash["taskmanager"]["login"],
-        @hash["taskmanager"]["password"])
+  login(@hash['taskmanager']['login'],
+        @hash['taskmanager']['password'])
 end
 
 # Create new task
 post '/protected/new_task' do
   if @auth
-    add_new_task(@protected_hash["taskmanager"]["content"],
-                 @protected_hash["taskmanager"]["priority"],
-                 @protected_hash["taskmanager"]["receiver_login"],
-                 @protected_hash["taskmanager"]["auth_token"])
+    add_new_task(@protected_hash['taskmanager']['content'],
+                 @protected_hash['taskmanager']['priority'],
+                 @protected_hash['taskmanager']['receiver_login'],
+                 @protected_hash['taskmanager']['auth_token'])
   else
     {session: {error: "403 Forbidden"}}.to_json
   end
@@ -187,7 +187,7 @@ end
 # Logout
 post '/protected/logout' do
   if @auth
-    user       = User.first(token: @protected_hash["taskmanager"]["auth_token"])
+    user       = User.first(token: @protected_hash['taskmanager']['auth_token'])
     user.token = nil
     user.save
     {logout: {error: "Success"}}.to_json
@@ -199,7 +199,7 @@ end
 # List all tasks
 post '/protected/get_task' do
   if @auth
-    user = User.first(token: @protected_hash["taskmanager"]["auth_token"])
+    user       = User.first(token: @protected_hash['taskmanager']['auth_token'])
     collection = Task.all(read: false, receiver_login: user.login)
     return {get_task: {error: "No messages"}}.to_json if collection.empty?
 
@@ -224,7 +224,7 @@ end
 # Find user
 post '/protected/find_user' do
   if @auth
-    find_user = User.first(login: @protected_hash["taskmanager"]["login"])
+    find_user = User.first(login: @protected_hash['taskmanager']['login'])
     {find_user: {error:     "Success",
                  firstname: find_user.firstname,
                  lastname:  find_user.lastname,
@@ -237,16 +237,16 @@ end
 # Add friend
 post '/protected/add_friend' do
   if @auth
-    friend = User.first(token: @protected_hash["taskmanager"]["auth_token"])
-    user   = User.first(login: @protected_hash["taskmanager"]["receiver_login"])
-    if @protected_hash["taskmanager"]["invite"]
-      friend.friends << user
-      user.friends   << friend
-      user.friends.save
-      friend.friends.save
-      add_new_task('true',  0, user.login, friend.token)
+    first_user  = User.first(token: @protected_hash['taskmanager']['auth_token'])
+    second_user = User.first(login: @protected_hash['taskmanager']['receiver_login'])
+    if @protected_hash['taskmanager']['invite']
+      first_user.friends  << second_user
+      second_user.friends << first_user
+      first_user.friends.save
+      second_user.friends.save
+      add_new_task('true',  0, second_user.login, first_user.token)
     else
-      add_new_task('false', 0, user.login, friend.token)
+      add_new_task('false', 0, second_user.login, first_user.token)
     end
   else
      {session: {error: "403 Forbidden"}}.to_json
