@@ -10,10 +10,11 @@ gem 'dm-validations'
 gem 'dm-migrations'
 gem 'dm-types'
 gem 'dm-serializer'
+gem 'dm-sqlite-adapter'
 
 group :development, :test do
-  gem 'sqlite3'
-  gem 'dm-sqlite-adapter'
+#  gem 'sqlite3'
+#  gem 'dm-sqlite-adapter'
   gem 'rspec'
   gem 'rack'
   gem 'rack-test'
