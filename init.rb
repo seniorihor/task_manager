@@ -13,7 +13,7 @@ require 'dm-serializer/to_json'
 require 'json'
 
 #set :environment, :production
-#set :environment, :development
+set :environment, :development
 #set :environment, :test
 
 # Configuration connection to database
