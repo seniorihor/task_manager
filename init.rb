@@ -154,10 +154,9 @@ end
 
     return {delete_task: {error: "Empty fields"}}.to_json if task_id.nil?
     user = User.first(token: auth_token)
-    task = Task.first(id: task_id, receiver_login: user.login)
+    task = Task.all(receiver_login: user.login).get(task_id)
     return {delete_task: {error: "Empty task"}}.to_json if task.nil?
     if task.destroy!
-      user.tasks.save
       {delete_task: {error: "Success"}}.to_json
     else
       {delete_task: {error: "Some error"}}.to_json
