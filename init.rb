@@ -31,6 +31,7 @@ end
 DataMapper::Property::String.length(20)
 DataMapper::Property::Text.length(140)
 
+
 # Model
 class User
   include DataMapper::Resource
@@ -73,6 +74,7 @@ end
 DataMapper.finalize
 DataMapper.auto_upgrade!
 
+
 class Token
 
   def self.generate
@@ -80,6 +82,7 @@ class Token
     Array.new(10).map{chars[rand(chars.size)]}.join
   end
 end
+
 
 # Filters
 before do
@@ -90,6 +93,7 @@ before '/protected/*'  do
   @protected_hash = to_hash(request.body.read)
   @auth = User.first(token: @protected_hash['taskmanager']['auth_token']).nil? ? false : true
 end
+
 
 # Helpers
 helpers do
@@ -185,6 +189,7 @@ end
       {delete_task: {error: "Some error"}}.to_json
     end
   end
+
 
 # Register user
 post '/register' do
