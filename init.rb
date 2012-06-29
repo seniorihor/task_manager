@@ -237,16 +237,16 @@ end
 # Add friend
 post '/protected/add_friend' do
   if @auth
-    first_user  = User.first(token: @protected_hash['taskmanager']['auth_token'])
-    second_user = User.first(login: @protected_hash['taskmanager']['receiver_login'])
+    user   = User.first(token: @protected_hash['taskmanager']['auth_token'])
+    friend = User.first(login: @protected_hash['taskmanager']['receiver_login'])
     if @protected_hash['taskmanager']['invite']
-      first_user.friends  << second_user
-      second_user.friends << first_user
-      first_user.friends.save
-      second_user.friends.save
-      add_new_task('true',  0, second_user.login, first_user.token)
+      user.friends   << friend
+      friend.friends << user
+      user.friends.save
+      friend.friends.save
+      add_new_task('true',  0, friend.login, user.token)
     else
-      add_new_task('false', 0, second_user.login, first_user.token)
+      add_new_task('false', 0, friend.login, user.token)
     end
   else
      {session: {error: "403 Forbidden"}}.to_json
