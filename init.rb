@@ -150,6 +150,21 @@ helpers do
   end
 end
 
+  def delete_task(auth_token, task_id)
+
+    return {delete_task: {error: "Empty fields"}}.to_json if task_id.nil?
+    user       = User.first(token: auth_token)
+    collection = Task.all(id: task_id, user_id: user.id)
+    task       = # fix it
+    return {delete_task: {error: "Empty task"}}.to_json if task.nil?
+    if task.destroy!
+      user.tasks.save
+      {delete_task: {error: "Success"}}.to_json
+    else
+      {delete_task: {error: "Some error"}}.to_json
+    end
+  end
+
 # Register
 post '/register' do
   @hash = to_hash(request.body.read)
@@ -184,6 +199,15 @@ post '/protected/new_task' do
   end
 end
 
+post '/protected/delete_task' do
+  if @auth
+    delete_task(@protected_hash['taskmanager']['auth_token'],
+                @protected_hash['taskmanager']['task_id'])
+  else
+    {session: {error: "403 Forbidden"}}.to_json
+  end
+end
+
 # Logout
 post '/protected/logout' do
   if @auth
@@ -203,7 +227,7 @@ post '/protected/get_task' do
     collection = Task.all(read: false, receiver_login: user.login)
     return {get_task: {error: "No messages"}}.to_json if collection.empty?
 
-    tasks = Array.new(collection)
+    tasks    = Array.new(collection)
     quantity = tasks.size
 
     tasks.each do |task|
