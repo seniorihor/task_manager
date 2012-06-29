@@ -48,7 +48,7 @@ end
 
 post '/protected/add_friend'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/add_friend -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"receiver_login\" : \"login\" }}"
+    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/add_friend -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"receiver_login\" : \"login\", \"invite\" : true or false }}"
 
   response:
     {"add_friend":{"error":"Success"}}
