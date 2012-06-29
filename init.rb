@@ -43,6 +43,7 @@ class User
   property :token,      String,  length:   10
   property :created_at, DateTime
   property :online,     Boolean, required: true, default: false
+  property :deleted,    Boolean, required: true, default: false
 
   has n,   :friendships, child_key: [:source_id]
   has n,   :friends,     self,      through: :friendships, via: :target
@@ -130,10 +131,32 @@ helpers do
     end
   end
 
+  def delete_user(auth_token)
+
+    user = User.first(token: auth_token)
+    user.deleted = true
+    if user.save
+      {delete_user: {error: "Success"}}.to_json
+    else
+      error = user.errors.each { |error| error }
+      {delete_user: error}.to_json
+  end
+
+  def restore_user(auth_token)
+
+    user = User.first(token: auth_token)
+    user.deleted = false
+    if user.save
+      {restore_user: {error: "Success"}}.to_json
+    else
+      error = user.errors.each { |error| error }
+      {restore_user: error}.to_json
+  end
+
   def add_new_task(content, priority, receiver_login, auth_token)
 
     user = User.first(token: auth_token)
-    return {newtask: {error: "Empty fields"}}.to_json if content.empty? || priority.nil?
+    return {new_task: {error: "Empty fields"}}.to_json if content.empty? || priority.nil?
 
     task                = Task.new
     task.content        = content
@@ -142,10 +165,10 @@ helpers do
     task.receiver_login = User.first(login: receiver_login).login
 
     if task.save
-      {newtask: {error: "Success"}}.to_json
+      {new_task: {error: "Success"}}.to_json
     else
       error = task.errors.each { |error| error }
-      {newtask: {error: error}}.to_json
+      {new_task: {error: error}}.to_json
     end
   end
 end
@@ -155,7 +178,7 @@ end
     return {delete_task: {error: "Empty fields"}}.to_json if task_id.nil?
     user = User.first(token: auth_token)
     task = Task.all(receiver_login: user.login).get(task_id)
-    return {delete_task: {error: "Empty task"}}.to_json if task.nil?
+    return {delete_task: {error: "Task doesn't exist"}}.to_json if task.nil?
     if task.destroy!
       {delete_task: {error: "Success"}}.to_json
     else
@@ -163,7 +186,7 @@ end
     end
   end
 
-# Register
+# Register user
 post '/register' do
   @hash = to_hash(request.body.read)
 
@@ -177,7 +200,25 @@ post '/register' do
   end
 end
 
-# Login
+# Delete user
+post '/protected/delete_user'
+  if @auth
+    delete_user(@protected_hash['taskmanager']['auth_token'])
+  else
+    {session: {error: "403 Forbidden"}}.to_json
+  end
+end
+
+# Restore user
+post '/protected/restore_user'
+  if @auth
+    restore_user(@protected_hash['taskmanager']['auth_token'])
+  else
+    {session: {error: "403 Forbidden"}}.to_json
+  end
+end
+
+# Login user
 post '/login' do
   @hash = to_hash(request.body.read)
 
@@ -197,6 +238,7 @@ post '/protected/new_task' do
   end
 end
 
+# Delete task
 post '/protected/delete_task' do
   if @auth
     delete_task(@protected_hash['taskmanager']['auth_token'],
@@ -206,7 +248,7 @@ post '/protected/delete_task' do
   end
 end
 
-# Logout
+# Logout user
 post '/protected/logout' do
   if @auth
     user       = User.first(token: @protected_hash['taskmanager']['auth_token'])
