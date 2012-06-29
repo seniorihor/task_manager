@@ -153,9 +153,8 @@ end
   def delete_task(auth_token, task_id)
 
     return {delete_task: {error: "Empty fields"}}.to_json if task_id.nil?
-    user       = User.first(token: auth_token)
-    collection = Task.all(id: task_id, user_id: user.id)
-    task       = # fix it
+    user = User.first(token: auth_token)
+    task = Task.first(id: task_id, receiver_login: user.login)
     return {delete_task: {error: "Empty task"}}.to_json if task.nil?
     if task.destroy!
       user.tasks.save
@@ -269,8 +268,12 @@ post '/protected/add_friend' do
       user.friends.save
       friend.friends.save
       add_new_task('true',  0, friend.login, user.token)
+      {add_friend: {error:      "Success",
+                    friendship: true}}.to_json
     else
       add_new_task('false', 0, friend.login, user.token)
+      {add_friend: {error:      "Success",
+                    friendship: false}}.to_json
     end
   else
      {session: {error: "403 Forbidden"}}.to_json
