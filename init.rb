@@ -168,15 +168,15 @@ helpers do
     end
   end
 
-  def find_user(auth_token, search_value)
+  def find_user(auth_token, login = nil, firstname = nil, lastname = nil)
 
-    users = User.all(:login.like => search_value) | User.all(:firstname.like => search_value) | User.all(:lastname.like => search_value)
+
     return {find_user: {error: "User doesn't exist"}}.to_json if users.empty?
-    users.map! { |user|  {login:     user.login,
-                          firstname: user.firstname,
-                          lastname:  user.lastname}}
-    {find_user: {error:     "Success",
-                 users:     users}}.to_json
+    users.map! { |user| {login:     user.login,
+                         firstname: user.firstname,
+                         lastname:  user.lastname}}
+    {find_user: {error: "Success",
+                 users: users}}.to_json
   end
 
   def add_friend(auth_token, receiver_login, invite)
@@ -221,7 +221,12 @@ helpers do
     return {new_task: {error: "Empty fields"}}.to_json if content.empty? || priority.nil?
 
     friend = User.first(login: receiver_login)
-    invite_task = User.first(login: receiver_login).tasks.last(priority: 0, user_id: friend.id)
+    #invite_task = User.first(login: receiver_login).tasks.last(priority: 0, user_id: friend.id)
+    user_task   = User.first(login: receiver_login)
+    task_user   = user_task.tasks
+    invite_task = task_user.last(user_id: friend.id, priority: 0)
+
+    puts "invite_task: #{invite_task}"
     return {new_task: {error: "Invite exists"}}.to_json if invite_task
     task                = Task.new
     task.content        = content
