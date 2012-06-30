@@ -300,7 +300,7 @@ post '/register' do
 end
 
 # Delete user
-post '/protected/delete_user'
+post '/protected/delete_user' do
   if @auth
     delete_user(@protected_hash['taskmanager']['auth_token'])
   else
@@ -309,7 +309,7 @@ post '/protected/delete_user'
 end
 
 # Restore user
-post '/protected/restore_user'
+post '/protected/restore_user' do
   if @auth
     restore_user(@protected_hash['taskmanager']['auth_token'])
   else
@@ -339,7 +339,7 @@ post '/protected/add_friend' do
 end
 
 # Delete friend
-post '/protected/delete_friend'
+post '/protected/delete_friend' do
   if @auth
     delete_friend(@protected_hash['auth_token'],
                   @protected_hash['receiver_login'])
