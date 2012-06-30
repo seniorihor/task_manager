@@ -196,6 +196,7 @@ helpers do
 
     user        = User.first(token: auth_token)
     friend      = User.first(login: receiver_login)
+    return {new_task: {error: "Already friend"}}.to_json if user.friends.include?(friend)
     invite_task = friend.tasks.all(receiver_login: user.login).last(priority: 4)
     return {add_friend: {error: "Invite doesn't exist"}}.to_json if invite_task.nil?
 
