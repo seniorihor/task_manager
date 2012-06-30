@@ -153,7 +153,8 @@ helpers do
     else
       error = user.errors.each { |error| error }
       {delete_user: error}.to_json
-  end
+    end
+  end 
 
   def restore_user(auth_token)
 
@@ -164,14 +165,15 @@ helpers do
     else
       error = user.errors.each { |error| error }
       {restore_user: error}.to_json
-  end
+    end
+  end  
 
   def find_user(auth_token, login)
 
     users = User.all(:login.like => search_value) | User.all(:firstname.like => search_value) | User.all(:lastname.like => search_value)
     return {find_user: {error: "User doesn't exist"}}.to_json if users.empty?
-    users.map! { |user|  {login:     user.login
-                          firstname: user.firstname
+    users.map! { |user|  {login:     user.login,
+                          firstname: user.firstname,
                           lastname:  user.lastname}}
     {find_user: {error:     "Success",
                  users:     users}}.to_json
