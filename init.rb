@@ -168,13 +168,13 @@ helpers do
 
   def find_user(auth_token, login)
 
-    user = User.first(login: login)
-
-    return {find_user: {error: "User doesn't exist"}}.to_json if user.nil?
+    users = User.all(:login.like => search_value) | User.all(:firstname.like => search_value) | User.all(:lastname.like => search_value)
+    return {find_user: {error: "User doesn't exist"}}.to_json if users.empty?
+    users.map! { |user|  {login:     user.login
+                          firstname: user.firstname
+                          lastname:  user.lastname}}
     {find_user: {error:     "Success",
-                 firstname: user.firstname,
-                 lastname:  user.lastname,
-                 login:     user.login}}.to_json
+                 users:     users}}.to_json
   end
 
   def add_friend(auth_token, receiver_login, invite)
