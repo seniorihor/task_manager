@@ -222,7 +222,7 @@ helpers do
     user   = User.first(token: auth_token)
     friend = User.first(login: receiver_login)
 
-    return {delete_friend: {error: "User doesn't exist"}}.to_json if friend.nil?
+    return {delete_friend: {error: "User doesn't exist"}}.to_json unless friend || user.friends.include?(friend)
     user.friends.delete(friend)
     friend.friends.delete(user)
     user.friends.save
