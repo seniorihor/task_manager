@@ -222,7 +222,8 @@ helpers do
     user   = User.first(token: auth_token)
     friend = User.first(login: receiver_login)
 
-    return {delete_friend: {error: "User doesn't exist"}}.to_json unless friend || user.friends.include?(friend)
+    return {delete_friend: {error: "User doesn't exist"}}.to_json if friend.nil?
+    return {delete_friend: {error: "This is not your friend"}}.to_json unless user.friends.include?(friend)
     user.friends.delete(friend)
     friend.friends.delete(user)
     user.friends.save
@@ -285,7 +286,7 @@ helpers do
                         created_at: task.created_at}}
 
     # Delete all response tasks
-    collection.all(priority: 5).each { |task| task.destroy! }
+    [collection.all(priority: 5)].each { |task| task.destroy! } unless collection.all(priority: 5).empty?
 
     {get_task: {error:    "Success",
                 quantity: quantity,
