@@ -196,6 +196,7 @@ helpers do
 
     user   = User.first(token: auth_token)
     friend = User.first(login: receiver_login)
+    puts "user: #{user}\nfriend: #{friend}"
 
     return {add_friend: {error: "User doesn't exist"}}.to_json if friend.nil?
     if invite
@@ -352,9 +353,9 @@ end
 # Add friend
 post '/protected/add_friend' do
   if @auth
-    add_friend(@protected_hash['auth_token'],
-               @protected_hash['receiver_login'],
-               @protected_hash['invite'])
+    add_friend(@protected_hash['taskmanager']['auth_token'],
+               @protected_hash['taskmanager']['receiver_login'],
+               @protected_hash['taskmanager']['invite'])
   else
      {session: {error: "403 Forbidden"}}.to_json
   end
@@ -363,8 +364,8 @@ end
 # Delete friend
 post '/protected/delete_friend' do
   if @auth
-    delete_friend(@protected_hash['auth_token'],
-                  @protected_hash['receiver_login'])
+    delete_friend(@protected_hash['taskmanager']['auth_token'],
+                  @protected_hash['taskmanager']['receiver_login'])
   else
      {session: {error: "403 Forbidden"}}.to_json
   end
