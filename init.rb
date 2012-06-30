@@ -236,7 +236,7 @@ helpers do
     return {new_task: {error: "Empty fields"}}.to_json if content.empty? || priority.nil?
     user        = User.first(token: auth_token)
     friend      = User.first(login: receiver_login)
-    return {new_task: {error: "Already friend"}}.to_json if user.friends.include?(friend)
+    return {new_task: {error: "Already friend"}}.to_json if user.friends.include?(friend) && priority == 4
     invite_task = user.tasks.all(receiver_login: friend.login).last(priority: 4)
 
     return {new_task: {error: "Invite exists"}}.to_json if invite_task
@@ -259,7 +259,7 @@ helpers do
     return {delete_task: {error: "Empty fields"}}.to_json if task_id.nil?
     user = User.first(token: auth_token)
     task = Task.all(receiver_login: user.login).get(task_id)
-    return {delete_task: {error: "Task doesn't exist"}}.to_json if task.empty?
+    return {delete_task: {error: "Task doesn't exist"}}.to_json if task.nil?
     if task.destroy!
       {delete_task: {error: "Success"}}.to_json
     else
@@ -288,8 +288,6 @@ helpers do
     # Delete all response tasks
     to_delete = Array.new(Task.all(priority: 5, receiver_login: user.login, read: true))
     to_delete.each { |task| task.destroy! } unless to_delete.empty?
-    #to_delete = Array.new(collection.all(priority: 5))
-    #to_delete.each { |task| task.destroy! }
 
     {get_task: {error:    "Success",
                 quantity: quantity,
