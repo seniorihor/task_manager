@@ -196,7 +196,6 @@ helpers do
 
     user   = User.first(token: auth_token)
     friend = User.first(login: receiver_login)
-    puts "user: #{user}\nfriend: #{friend}"
 
     return {add_friend: {error: "User doesn't exist"}}.to_json if friend.nil?
     if invite
