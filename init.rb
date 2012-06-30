@@ -55,7 +55,7 @@ class Task
 
   property :id,             Serial
   property :content,        Text,    required: true
-  property :priority,       Enum[0, 1, 2, 3, 4] # 0 - invite; 4 - response; 1-3 - priority
+  property :priority,       Enum[1, 2, 3, 4, 5] # 1-3 - priority, 4 - invite; 5 - response;
   property :created_at,     DateTime
   property :receiver_login, String,  required: true, length:  2..20, format: /[a-zA-Z]/
   property :read,           Boolean, required: true, default: false
@@ -194,8 +194,10 @@ helpers do
 
   def add_friend(auth_token, receiver_login, invite)
 
-    user   = User.first(token: auth_token)
-    friend = User.first(login: receiver_login)
+    user        = User.first(token: auth_token)
+    friend      = User.first(login: receiver_login)
+    invite_task = friend.tasks.all(receiver_login: user.login).last(priority: 4)
+    return {add_friend: {error: "Invite doesn't exist"}}.to_json if invite_task.nil?
 
     return {add_friend: {error: "User doesn't exist"}}.to_json if friend.nil?
     if invite
@@ -203,16 +205,13 @@ helpers do
       friend.friends << user
       user.friends.save
       friend.friends.save
-      add_new_task('true', 10, friend.login, user.token)
-
-      invite_task = friend.tasks.all(receiver_login: user.login).last(priority: 0)
-      invite_task.destroy! if invite_task
+      add_new_task('true', 5, friend.login, user.token)
+      invite_task.destroy!
       {add_friend: {error:      "Success",
                     friendship: true}}.to_json
     else
-      invite_task = friend.tasks.all(receiver_login: user.login).last(priority: 0)
-      invite_task.destroy! if invite_task
-      add_new_task('false', 10, friend.login, user.token)
+      invite_task.destroy!
+      add_new_task('false', 5, friend.login, user.token)
       {add_friend: {error:      "Success",
                     friendship: false}}.to_json
     end
@@ -236,7 +235,7 @@ helpers do
     return {new_task: {error: "Empty fields"}}.to_json if content.empty? || priority.nil?
     user        = User.first(token: auth_token)
     friend      = User.first(login: receiver_login)
-    invite_task = user.tasks.all(receiver_login: friend.login).last(priority: 0)
+    invite_task = user.tasks.all(receiver_login: friend.login).last(priority: 4)
 
     return {new_task: {error: "Invite exists"}}.to_json if invite_task
     task                = Task.new
