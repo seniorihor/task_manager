@@ -191,6 +191,9 @@ helpers do
       user.friends.save
       friend.friends.save
       add_new_task('true', 10, friend.login, user.token)
+      task = User.first(token: auth_token).last(priority: 0)
+      task.priority = 10
+      task.save
       {add_friend: {error:      "Success",
                     friendship: true}}.to_json
     else
