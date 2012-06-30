@@ -88,7 +88,7 @@ before do
   content_type :json
 end
 
-before '/protected/*'  do
+before '/protected/*' do
   @protected_hash = to_hash(request.body.read)
   @auth = User.first(token: @protected_hash['taskmanager']['auth_token']).nil? ? false : true
 end
@@ -168,10 +168,23 @@ helpers do
     end
   end
 
-  def find_user(auth_token, login = nil, firstname = nil, lastname = nil)
+  def find_user(auth_token, search_value)
 
+    users              = Array.new
+    users_by_login     = Array.new(User.all(login:     search_value))
+    users_by_firstname = Array.new(User.all(firstname: search_value))
+    users_by_lastname  = Array.new(User.all(lastname:  search_value))
 
-    return {find_user: {error: "User doesn't exist"}}.to_json if users.empty?
+    unless users_by_login.empty?
+      users_by_login.each{|user| users.push(user) }
+    end
+    unless users_by_firstname.empty?
+      users_by_firstname.each{|user| users.push(user) }
+    end
+    unless users_by_lastname.empty?
+      users_by_lastname.each{|user| users.push(user) }
+    end
+
     users.map! { |user| {login:     user.login,
                          firstname: user.firstname,
                          lastname:  user.lastname}}
