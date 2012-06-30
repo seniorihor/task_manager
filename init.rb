@@ -168,7 +168,7 @@ helpers do
     end
   end  
 
-  def find_user(auth_token, login)
+  def find_user(auth_token, search_value)
 
     users = User.all(:login.like => search_value) | User.all(:firstname.like => search_value) | User.all(:lastname.like => search_value)
     return {find_user: {error: "User doesn't exist"}}.to_json if users.empty?
