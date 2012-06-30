@@ -43,7 +43,6 @@ class User
   property :lastname,   String,  required: true, length: 2..20
   property :token,      String,  length:   10
   property :created_at, DateTime
-  property :online,     Boolean, required: true, default: false
   property :deleted,    Boolean, required: true, default: false
 
   has n,   :friendships, child_key: [:source_id]
@@ -187,11 +186,11 @@ helpers do
       friend.friends << user
       user.friends.save
       friend.friends.save
-      add_new_task('true', 0, friend.login, user.token)
+      add_new_task('true', 10, friend.login, user.token)
       {add_friend: {error:      "Success",
                     friendship: true}}.to_json
     else
-      add_new_task('false', 0, friend.login, user.token)
+      add_new_task('false', 10, friend.login, user.token)
       {add_friend: {error:      "Success",
                     friendship: false}}.to_json
     end
