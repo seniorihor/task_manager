@@ -55,7 +55,7 @@ class Task
 
   property :id,             Serial
   property :content,        Text,    required: true
-  property :priority,       Enum[0, 10, 1, 2, 3] # 0 - invite; 10 - response; 1-3 - priority
+  property :priority,       Enum[0, 1, 2, 3, 4] # 0 - invite; 4 - response; 1-3 - priority
   property :created_at,     DateTime
   property :receiver_login, String,  required: true, length:  2..20, format: /[a-zA-Z]/
   property :read,           Boolean, required: true, default: false
@@ -205,12 +205,13 @@ helpers do
       friend.friends.save
       add_new_task('true', 10, friend.login, user.token)
 
-      # Delete last invite task
-      friend.tasks.all(receiver_login: user.login).last(priority: 0).destroy!
-
+      invite_task = friend.tasks.all(receiver_login: user.login).last(priority: 0)
+      invite_task.destroy! if invite_task
       {add_friend: {error:      "Success",
                     friendship: true}}.to_json
     else
+      invite_task = friend.tasks.all(receiver_login: user.login).last(priority: 0)
+      invite_task.destroy! if invite_task
       add_new_task('false', 10, friend.login, user.token)
       {add_friend: {error:      "Success",
                     friendship: false}}.to_json
