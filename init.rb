@@ -218,9 +218,9 @@ helpers do
   def add_new_task(content, priority, receiver_login, auth_token)
 
     user   = User.first(token: auth_token)
-    friend = User.first(login: receiver_login)
     return {new_task: {error: "Empty fields"}}.to_json if content.empty? || priority.nil?
 
+    friend = User.first(login: receiver_login)
     invite_task = User.first(login: receiver_login).tasks.last(priority: 0, user_id: friend.id)
     return {new_task: {error: "Invite exists"}}.to_json if invite_task
     task                = Task.new
