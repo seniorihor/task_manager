@@ -191,9 +191,8 @@ helpers do
       user.friends.save
       friend.friends.save
       add_new_task('true', 10, friend.login, user.token)
-      task = User.first(token: auth_token).last(priority: 0)
-      task.priority = 10
-      task.save
+      # Delete last invite task
+      User.first(token: auth_token).tasks.last(priority: 0, user_id: friend.id).destroy!
       {add_friend: {error:      "Success",
                     friendship: true}}.to_json
     else
@@ -218,9 +217,12 @@ helpers do
 
   def add_new_task(content, priority, receiver_login, auth_token)
 
-    user = User.first(token: auth_token)
+    user   = User.first(token: auth_token)
+    friend = User.first(login: receiver_login)
     return {new_task: {error: "Empty fields"}}.to_json if content.empty? || priority.nil?
 
+    invite_task = User.first(login: receiver_login).tasks.last(priority: 0, user_id: friend.id)
+    return {new_task: {error: "Invite exists"}}.to_json if invite_task
     task                = Task.new
     task.content        = content
     task.priority       = priority
