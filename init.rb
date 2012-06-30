@@ -98,7 +98,7 @@ end
 helpers do
 
   def to_hash(json_data)
-    return JSON.parse(json_data)
+    JSON.parse(json_data)
   end
 
   def login_exists?(login)
@@ -176,13 +176,13 @@ helpers do
     users_by_lastname  = Array.new(User.all(lastname:  search_value))
 
     unless users_by_login.empty?
-      users_by_login.each{|user| users.push(user) }
+      users_by_login.each{ |user| users << user }
     end
     unless users_by_firstname.empty?
-      users_by_firstname.each{|user| users.push(user) }
+      users_by_firstname.each{ |user| users << user }
     end
     unless users_by_lastname.empty?
-      users_by_lastname.each{|user| users.push(user) }
+      users_by_lastname.each{ |user| users << user }
     end
 
     users.map! { |user| {login:     user.login,
@@ -204,8 +204,10 @@ helpers do
       user.friends.save
       friend.friends.save
       add_new_task('true', 10, friend.login, user.token)
+
       # Delete last invite task
-      User.first(token: auth_token).tasks.last(priority: 0, user_id: friend.id).destroy!
+      friend.tasks.all(receiver_login: user.login).last(priority: 0).destroy!
+
       {add_friend: {error:      "Success",
                     friendship: true}}.to_json
     else
@@ -230,16 +232,11 @@ helpers do
 
   def add_new_task(content, priority, receiver_login, auth_token)
 
-    user   = User.first(token: auth_token)
     return {new_task: {error: "Empty fields"}}.to_json if content.empty? || priority.nil?
+    user        = User.first(token: auth_token)
+    friend      = User.first(login: receiver_login)
+    invite_task = user.tasks.all(receiver_login: friend.login).last(priority: 0)
 
-    friend = User.first(login: receiver_login)
-    #invite_task = User.first(login: receiver_login).tasks.last(priority: 0, user_id: friend.id)
-    user_task   = User.first(login: receiver_login)
-    task_user   = user_task.tasks
-    invite_task = task_user.last(user_id: friend.id, priority: 0)
-
-    puts "invite_task: #{invite_task}"
     return {new_task: {error: "Invite exists"}}.to_json if invite_task
     task                = Task.new
     task.content        = content
@@ -346,7 +343,7 @@ end
 post '/protected/find_user' do
   if @auth
     find_user(@protected_hash['taskmanager']['auth_token'],
-              @protected_hash['taskmanager']['login'])
+              @protected_hash['taskmanager']['search_value'])
   else
     {session: {error: "403 Forbidden"}}.to_json
   end
