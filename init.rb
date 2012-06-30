@@ -341,7 +341,7 @@ end
 post '/protected/find_user' do
   if @auth
     find_user(@protected_hash['taskmanager']['auth_token'],
-              @protected_hash['taskmanager']['login'])
+              @protected_hash['taskmanager']['search_value'])
   else
     {session: {error: "403 Forbidden"}}.to_json
   end
