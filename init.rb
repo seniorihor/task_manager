@@ -89,8 +89,13 @@ before do
 end
 
 before '/protected/*' do
-  @protected_hash = to_hash(request.body.read)
-  @auth = User.first(token: @protected_hash['taskmanager']['auth_token']).nil? ? false : true
+  json_data = request.body.read
+  if json_data.empty?
+    @auth = false
+  else
+    @protected_hash = to_hash(json_data)
+    @auth = User.first(token: @protected_hash['taskmanager']['auth_token']).nil? ? false : true
+  end
 end
 
 
