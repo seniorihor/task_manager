@@ -286,7 +286,10 @@ helpers do
                         created_at: task.created_at}}
 
     # Delete all response tasks
-    [collection.all(priority: 5)].each { |task| task.destroy! } unless collection.all(priority: 5).empty?
+    to_delete = Array.new(Task.all(priority: 5, receiver_login: user.login, read: true))
+    to_delete.each { |task| task.destroy! } unless to_delete.empty?
+    #to_delete = Array.new(collection.all(priority: 5))
+    #to_delete.each { |task| task.destroy! }
 
     {get_task: {error:    "Success",
                 quantity: quantity,
