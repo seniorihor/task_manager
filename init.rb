@@ -154,7 +154,7 @@ helpers do
       error = user.errors.each { |error| error }
       {delete_user: error}.to_json
     end
-  end 
+  end
 
   def restore_user(auth_token)
 
@@ -166,7 +166,7 @@ helpers do
       error = user.errors.each { |error| error }
       {restore_user: error}.to_json
     end
-  end  
+  end
 
   def find_user(auth_token, search_value)
 
