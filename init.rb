@@ -111,7 +111,9 @@ helpers do
     if password == user.password
       user.token = Token.generate
       user.save
-      {login: {error: "Success", auth_token: user.token}}.to_json
+      friends = Array.new(user.friends)
+      friends.map! { |friend| {login: friend.login}}
+      {login: {error: "Success", auth_token: user.token, friends: friends}}.to_json
     else
       {login: {error: "Invalid login or password"}}.to_json
     end
