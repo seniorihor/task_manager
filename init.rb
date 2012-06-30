@@ -236,6 +236,7 @@ helpers do
     return {new_task: {error: "Empty fields"}}.to_json if content.empty? || priority.nil?
     user        = User.first(token: auth_token)
     friend      = User.first(login: receiver_login)
+    return {new_task: {error: "Already friend"}}. to_json if user.friends.include?(friend)
     invite_task = user.tasks.all(receiver_login: friend.login).last(priority: 0)
 
     return {new_task: {error: "Invite exists"}}.to_json if invite_task
