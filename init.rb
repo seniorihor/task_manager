@@ -203,9 +203,9 @@ helpers do
     if invite
       user.friends   << friend
       friend.friends << user
+      add_new_task('true', 5, friend.login, user.token)
       user.friends.save
       friend.friends.save
-      add_new_task('true', 5, friend.login, user.token)
       invite_task.destroy!
       {add_friend: {error:      "Success",
                     friendship: true}}.to_json
@@ -266,7 +266,7 @@ helpers do
     end
   end
 
-  def get_task(auth_token, receiver_login)
+  def get_task(auth_token)
 
     user       = User.first(token: auth_token)
     collection = Task.all(read: false, receiver_login: user.login)
@@ -284,9 +284,12 @@ helpers do
                         user_login: User.get(task.user_id).login,
                         created_at: task.created_at}}
 
-    {get_task: {error: "Success",
+    # Delete all response tasks
+    collection.all(priority: 5).each { |task| task.destroy! }
+
+    {get_task: {error:    "Success",
                 quantity: quantity,
-                tasks: tasks}}.to_json
+                tasks:    tasks}}.to_json
   end
 end
 
@@ -396,8 +399,7 @@ end
 # List all tasks
 post '/protected/get_task' do
   if @auth
-    get_task(@protected_hash['taskmanager']['auth_token'],
-             @protected_hash['taskmanager']['receiver_login'])
+    get_task(@protected_hash['taskmanager']['auth_token'])
   else
     {session: {error: "403 Forbidden"}}.to_json
   end
