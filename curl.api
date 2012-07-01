@@ -68,7 +68,7 @@ post '/protected/delete_friend'
 end
 
 post '/protected/new_task'
-  request simple task:
+  request:
     "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"content\", \"priority\" : 1-3, \"receiver_login\" : \"login\" }}"
 
   response:
