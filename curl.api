@@ -53,7 +53,7 @@ post '/protected/add_friend'
     "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"greeting\", \"priority\" : 4, \"receiver_login\" : \"login\" }}"
 
   request response:
-    "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"true or false\", \"priority\" : 5, \"receiver_login\" : \"login\" }}"
+    "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"invite\" : \"true or false\", \"priority\" : 5, \"receiver_login\" : \"login\" }}"
 
   response:
     {"invite_friend":{"error":"Success"}}
