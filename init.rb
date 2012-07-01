@@ -94,7 +94,13 @@ before '/protected/*' do
     @auth = false
   else
     @protected_hash = to_hash(json_data)
-    @auth = User.first(token: @protected_hash['taskmanager']['auth_token']).nil? ? false : true
+    user  = User.first(token: @protected_hash['taskmanager']['auth_token'])
+
+    if user.nil? || user.deleted
+      @auth = false
+    else
+      @auth = true
+    end
   end
 end
 
