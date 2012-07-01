@@ -1,14 +1,16 @@
+curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/<url> -d
+
 post '/login'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/login -d "{ \"taskmanager\" : { \"login\" : \"login\", \"password\" : \"password\"}}"
+    "{ \"taskmanager\" : { \"login\" : \"login\", \"password\" : \"password\" }}"
 
   response:
-    {"login":{"error":"Success","auth_token":"token"}}
+    {"login":{"error":"Success","auth_token":"token","friends":[]}}
 end
 
 post '/protected/logout'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/logout -d "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
+    "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
 
   response:
     {"logout":{"error":"Success"}}
@@ -16,7 +18,7 @@ end
 
 post '/register'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/register -d "{ \"taskmanager\" : { \"firstname\" : \"firstname\", \"lastname\" : \"lastname\", \"login\" : \"login\", \"password\" : \"password\" }}"
+    "{ \"taskmanager\" : { \"firstname\" : \"firstname\", \"lastname\" : \"lastname\", \"login\" : \"login\", \"password\" : \"password\" }}"
 
   response:
     {"register":{"error":"Success"}}
@@ -24,47 +26,50 @@ end
 
 post '/protected/delete_user'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/delete_user -d "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
+    "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
 
   response:
-    {delete_user: {error: "Success"}}
+    {delete_user:{error:"Success"}}
 end
 
 post '/protected/restore_user'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/restore_user -d "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
+    "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
 
   response:
-    {restore_user: {error: "Success"}}
+    {restore_user:{error:"Success"}}
 end
 
 post '/protected/find_user'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/find_user -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"login\" : \"login\" }}"
+    "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"search_value\" : \"text\" }}"
 
   response:
-    {"get_message":{"error":"Success","quantity":1,"users":[{"login":"login","firstname":"firstname","lastname":"lastname"}]}}
+    {"find_user":{"error":"Success","users":[]}}
 end
 
 post '/protected/add_friend'
-  request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/add_friend -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"receiver_login\" : \"login\", \"invite\" : true or false }}"
+  request invite:
+    "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"greeting\", \"priority\" : 4, \"receiver_login\" : \"login\" }}"
+
+  request response:
+    "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"true or false\", \"priority\" : 5, \"receiver_login\" : \"login\" }}"
 
   response:
-    {"add_friend":{"error":"Success"}}
+    {"invite_friend":{"error":"Success"}}
 end
 
 post '/protected/delete_friend'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/delete_friend -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"receiver_login\" : \"login\" }}"
+    "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"receiver_login\" : \"login\" }}"
 
   response:
     {"delete_friend":{"error":"Success"}}
 end
 
 post '/protected/new_task'
-  request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/new_task -d "{ \"t\paskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"content\", \"priority\" : 1-3 or 0 for invite, \"receiver_login\" : \"login\" }}"
+  request simple task:
+    "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"content\", \"priority\" : 1-3, \"receiver_login\" : \"login\" }}"
 
   response:
     {"new_task":{"error":"Success"}}
@@ -72,16 +77,16 @@ end
 
 post '/protected/delete_task'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/delete_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"task_id\" : 1 }}"
+    "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"task_id\" : 1 }}"
 
   response:
-    {"new_task":{"error":"Success"}}
+    {"delete_task":{"error":"Success"}}
 end
 
 post '/protected/get_task'
   request:
-    curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/protected/get_task -d "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
+    "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
 
   response:
-    {"get_task":{"error":"Success","quantity":1,"content":"content","priority":1-3,"receiver_login":"login","created_at":"Date"}}
+    {"get_task":{"error":"Success","quantity":1,"content":"content","priority":1-5,"receiver_login":"login","created_at":"Date"}}
 end
