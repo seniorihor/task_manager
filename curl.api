@@ -53,10 +53,10 @@ post '/protected/add_friend'
     "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"greeting\", \"priority\" : 4, \"receiver_login\" : \"login\" }}"
 
   request response:
-    "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"invite\" : \"true or false\", \"priority\" : 5, \"receiver_login\" : \"login\" }}"
+    "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"true or false\", \"priority\" : 5, \"receiver_login\" : \"login\" }}"
 
   response:
-    {"invite_friend":{"error":"Success"}}
+    {"add_friend":{"error":"Success","friendship":"true"}}
 end
 
 post '/protected/delete_friend'
@@ -64,7 +64,7 @@ post '/protected/delete_friend'
     "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"receiver_login\" : \"login\" }}"
 
   response:
-    {"delete_friend":{"error":"Success"}}
+    {"delete_friend":{"error":"Success","deleting":"true"}}
 end
 
 post '/protected/new_task'
