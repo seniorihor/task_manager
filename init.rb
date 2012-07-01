@@ -94,10 +94,13 @@ before '/protected/*' do
     @auth = false
   else
     @protected_hash = to_hash(json_data)
-    user  = User.first(token: @protected_hash['taskmanager']['auth_token'])
+    user = User.first(token: @protected_hash['taskmanager']['auth_token'])
 
-    if user.nil? || user.deleted
+    if user.nil?
       @auth = false
+    elsif user.deleted
+      @auth = false
+      @restore_auth = true
     else
       @auth = true
     end
@@ -350,7 +353,7 @@ end
 
 # Restore user
 post '/protected/restore_user' do
-  if @auth
+  if @restore_auth
     restore_user(@protected_hash['taskmanager']['auth_token'])
   else
     {session: {error: "403 Forbidden"}}.to_json
