@@ -1,5 +1,6 @@
 require_relative '../init.rb'
 require 'rack/test'
+require 'json'
 
 set :environment, :test
 
@@ -15,8 +16,9 @@ describe 'TaskManager' do
     Sinatra::Application
   end
 
-  it 'should not load login page' do
-    get '/login'
-    last_response.status.should == 404
+  it 'should load login page' do
+
+    post 'localhost:4567/login', { "taskmanager" => { "login" => "login", "password" => "password" }}.to_json
+    response.status.should == 200
   end
 end
