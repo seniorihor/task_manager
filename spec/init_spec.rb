@@ -18,7 +18,7 @@ describe 'TaskManager' do
 
   it 'should load login page' do
 
-    post 'localhost:4567/login', { "taskmanager" => { "login" => "login", "password" => "password" }}.to_json
-    response.status.should == 200
+    post '/login', { "taskmanager" => { "login" => "login", "password" => "password" }}.to_json
+    last_response.status.should == 200
   end
 end
