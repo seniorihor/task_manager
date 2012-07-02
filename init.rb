@@ -77,15 +77,6 @@ DataMapper.finalize
 DataMapper.auto_upgrade!
 
 
-class Token
-
-  def self.generate
-    chars = ['A'..'Z', 'a'..'z', '0'..'9'].map{|r|r.to_a}.flatten
-    Array.new(10).map{chars[rand(chars.size)]}.join
-  end
-end
-
-
 # Filters
 before do
   content_type :json
@@ -114,19 +105,30 @@ end
 # Helpers
 helpers do
 
+  def new_token
+
+    chars = ['A'..'Z', 'a'..'z', '0'..'9'].map { |r| r.to_a }.flatten
+    Array.new(10).map { chars[rand(chars.size)] }.join
+  end
+
   def to_hash(json_data)
+
     JSON.parse(json_data)
   end
 
   def login_exists?(login)
+
     User.first(login: login).nil? ? false : true
   end
 
   def login(login, password)
+
     user = User.first(login: login)
+
     return {login: {error: "Invalid login or password"}}.to_json if user.nil?
+
     if password == user.password
-      user.token = Token.generate
+      user.token = new_token
       user.save
       friends = Array.new(user.friends)
       friends.map! { |friend| {login: friend.login}}
@@ -166,6 +168,7 @@ helpers do
 
     user = User.first(token: auth_token)
     user.deleted = true
+
     if user.save
       {delete_user: {error: "Success"}}.to_json
     else
@@ -178,6 +181,7 @@ helpers do
 
     user = User.first(token: auth_token)
     user.deleted = false
+
     if user.save
       {restore_user: {error: "Success"}}.to_json
     else
@@ -341,9 +345,11 @@ helpers do
                       	 user_login: User.get(task.user_id).login,
                       	 created_at: task.created_at}}
 
-    # Delete all response tasks
-    to_delete = Array.new(Task.all(priority: 5, priority: 6, receiver_login: user.login, read: true))
-    to_delete.each { |task| task.destroy! } unless to_delete.empty?
+    # Delete all temporary tasks
+    add_friend_tasks    = Array.new(Task.all(priority: 5, receiver_login: user.login, read: true))
+    delete_friend_tasks = Array.new(Task.all(priority: 6, receiver_login: user.login, read: true))
+    add_friend_tasks.each    { |task| task.destroy! } unless add_friend_tasks.empty?
+    delete_friend_tasks.each { |task| task.destroy! } unless delete_friend_tasks.empty?
 
     {get_task: {error:    "Success",
                 quantity: quantity,
@@ -371,7 +377,7 @@ end
 post '/register' do
   @hash = to_hash(request.body.read)
 
-  if login_exists?(@hash['taskmanager']['login'])
+  unless login_exists?(@hash['taskmanager']['login'])
     {register: {error: "Login exists"}}.to_json
   else
     add_new_user(@hash['taskmanager']['login'],
