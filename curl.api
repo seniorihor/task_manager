@@ -52,6 +52,9 @@ post '/protected/add_friend'
   request invite:
     "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"greeting\", \"priority\" : 4, \"receiver_login\" : \"login\" }}"
 
+  response:
+    {"add_friend":{"error":"Success"}}
+
   request response:
     "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"content\" : \"true or false\", \"priority\" : 5, \"receiver_login\" : \"login\" }}"
 
