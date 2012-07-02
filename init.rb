@@ -55,7 +55,10 @@ class Task
 
   property :id,             Serial
   property :content,        Text,    required: true
-  property :priority,       Enum[1, 2, 3, 4, 5] # 1-3 - priority, 4 - invite; 5 - response;
+  property :priority,       Enum[1, 2, 3, # task priority
+                                 4,       # invite friend
+                                 5,       # add friend
+                                 6]       # delete friend
   property :created_at,     DateTime
   property :receiver_login, String,  required: true, length:  2..20, format: /[a-zA-Z]/
   property :read,           Boolean, required: true, default: false
@@ -213,6 +216,7 @@ helpers do
 
     return {add_friend: {error: "User doesn't exist"}}.to_json                if receiver.nil?
     return {add_friend: {error: "You can't add yourself to friends"}}.to_json if sender == receiver
+    return {add_friend: {error: "User is deleted"}}.to_json                   if receiver.deleted
 
     invite_task = receiver.tasks.all(receiver_login: sender.login).last(priority: 4)
 
@@ -222,15 +226,18 @@ helpers do
       sender.friends   << receiver
       receiver.friends << sender
       if sender.friends.save && receiver.friends.save
+        add_new_task(sender.token, receiver.login, 'true', 5)
         invite_task.destroy!
         {add_friend: {error:      "Success",
                       friendship: true}}.to_json
       else
+        add_new_task(sender.token, receiver.login, 'false', 5)
         invite_task.destroy!
         {add_friend: {error:      "Success",
                       friendship: false}}.to_json
       end
     else
+      add_new_task(sender.token, receiver.login, 'false', 5)
       invite_task.destroy!
       {add_friend: {error:      "Success",
                     friendship: false}}.to_json
@@ -244,14 +251,14 @@ helpers do
     sender   = User.first(token: auth_token)
     receiver = User.first(login: receiver_login)
 
-    return {delete_friend: {error: "User doesn't exist"}}.to_json                     if receiver.nil?
-    return {delete_friend: {error: "This is not your friend"}}.to_json                unless sender.friends.include?(receiver)
-    return {delete_friend: {error: "You can't delete yourself from friends"}}.to_json if sender == receiver
+    return {delete_friend: {error: "User doesn't exist"}}.to_json      if receiver.nil?
+    return {delete_friend: {error: "This is not your friend"}}.to_json unless sender.friends.include?(receiver)
 
     sender.friends.delete(receiver)
     receiver.friends.delete(sender)
 
     if sender.friends.save && receiver.friends.save
+      add_new_task(sender.token, receiver.login, 'true', 6)
       {delete_friend: {error:    "Success",
                        deleting: true}}.to_json
     else
@@ -269,7 +276,14 @@ helpers do
 
     return {new_task: {error: "User doesn't exist"}}.to_json    if receiver.nil?
     return {new_task: {error: "You can't be receiver"}}.to_json if sender == receiver
-    return {new_task: {error: "Already friend"}}.to_json        if sender.friends.include?(receiver) && priority == 4
+    return {new_task: {error: "User is deleted"}}.to_json       if receiver.deleted
+
+    case priority
+    when 1..3
+      return {new_task: {error: "This is not your friend"}}.to_json unless sender.friends.include?(receiver)
+    end
+
+    return {add_friend: {error: "Already friend"}}.to_json if sender.friends.include?(receiver) && priority == 4
 
     invite_task = sender.tasks.all(receiver_login: receiver.login).last(priority: 4)
 
@@ -293,7 +307,7 @@ helpers do
 
   def delete_task(auth_token, task_id)
 
-    return {delete_task: {error: "Empty fields"}}.to_json       if task_id.nil?
+    return {delete_task: {error: "Empty fields"}}.to_json if task_id.nil?
 
     user = User.first(token: auth_token)
     task = Task.all(receiver_login: user.login).get(task_id)
@@ -328,7 +342,7 @@ helpers do
                       	 created_at: task.created_at}}
 
     # Delete all response tasks
-    to_delete = Array.new(Task.all(priority: 5, receiver_login: user.login, read: true))
+    to_delete = Array.new(Task.all(priority: 5, priority: 6, receiver_login: user.login, read: true))
     to_delete.each { |task| task.destroy! } unless to_delete.empty?
 
     {get_task: {error:    "Success",
