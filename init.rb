@@ -346,8 +346,8 @@ helpers do
                       	 created_at: task.created_at}}
 
     # Delete all temporary tasks
-    add_friend_tasks    = Array.new(Task.all(priority: 5, receiver_login: user.login, read: true))
-    delete_friend_tasks = Array.new(Task.all(priority: 6, receiver_login: user.login, read: true))
+    add_friend_tasks    = Array.new(Task.all(receiver_login: user.login, read: true, priority: 5))
+    delete_friend_tasks = Array.new(Task.all(receiver_login: user.login, read: true, priority: 6))
     add_friend_tasks.each    { |task| task.destroy! } unless add_friend_tasks.empty?
     delete_friend_tasks.each { |task| task.destroy! } unless delete_friend_tasks.empty?
 
