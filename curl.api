@@ -29,7 +29,7 @@ post '/protected/delete_user'
     "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
 
   response:
-    {"delete_user":{"error":"Success","deleting":"true"}}
+    {"delete_user":{"error":"Success"}}
 end
 
 post '/protected/restore_user'
@@ -37,7 +37,7 @@ post '/protected/restore_user'
     "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
 
   response:
-    {"restore_user":{"error":"Success","restoring":"true"}}
+    {"restore_user":{"error":"Success"}}
 end
 
 post '/protected/find_user'
@@ -67,7 +67,7 @@ post '/protected/delete_friend'
     "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"receiver_login\" : \"login\" }}"
 
   response:
-    {"delete_friend":{"error":"Success","deleting":"true"}}
+    {"delete_friend":{"error":"Success"}}
 end
 
 post '/protected/new_task'
@@ -83,7 +83,7 @@ post '/protected/delete_task'
     "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"task_id\" : 1 }}"
 
   response:
-    {"delete_task":{"error":"Success","deleting":"true"}}
+    {"delete_task":{"error":"Success"}}
 end
 
 post '/protected/get_task'
