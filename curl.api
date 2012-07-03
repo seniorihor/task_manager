@@ -59,7 +59,7 @@ post '/protected/add_friend'
     "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"receiver_login\" : \"login\", \"content\" : \"true or false\", \"priority\" : 5 }}"
 
   response:
-    {"add_friend":{"error":"Success","friendship":"true"}}
+    {"add_friend":{"error":"Success","friendship":true}}
 end
 
 post '/protected/delete_friend'
