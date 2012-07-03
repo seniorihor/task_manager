@@ -117,6 +117,22 @@ describe User do
     post '/protected/delete_friend', request.to_json
     last_response.body.should == response.to_json
   end
+end
+
+
+describe Task do
+
+  before do
+    @user = User.create(login: 'login', password: 'password', firstname: 'firstname', lastname: 'lastname', token: 'auth_token')
+  end
+
+  def app
+    Sinatra::Application
+  end
+
+  def to_hash(json_data)
+    JSON.parse(json_data)
+  end
 
   it 'new_task should be successful' do
     request  = { taskmanager: { auth_token:     @user.token,
