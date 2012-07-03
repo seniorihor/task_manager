@@ -105,6 +105,7 @@ end
 
 # Helpers
 helpers do
+
   def new_token
     chars = ['A'..'Z', 'a'..'z', '0'..'9'].map { |r| r.to_a }.flatten
     Array.new(10).map { chars[rand(chars.size)] }.join
@@ -341,6 +342,7 @@ helpers do
                 quantity: quantity,
                 tasks:    tasks}}.to_json
   end
+
 end
 
 
