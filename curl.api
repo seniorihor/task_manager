@@ -54,7 +54,7 @@ post '/protected/add_friend'
 
   response:
     {"add_friend":{"error":"Success"}}
-"
+
   request response:
     "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"receiver_login\" : \"login\", \"content\" : \"true or false\", \"priority\" : 5 }}"
 
