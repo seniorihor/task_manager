@@ -1,5 +1,6 @@
 require_relative '../init.rb'
 require 'rack/test'
+require 'rspec'
 require 'json'
 
 set :environment, :test
@@ -10,15 +11,18 @@ RSpec.configure do |conf|
   DataMapper.auto_migrate!
 end
 
-describe 'TaskManager' do
+describe User do
 
   def app
     Sinatra::Application
   end
 
-  it 'should load login page' do
+  it 'should get a failed response to login' do
 
-    post '/login', { "taskmanager" => { "login" => "login", "password" => "password" }}.to_json
-    last_response.status.should == 200
+    request  = { "taskmanager" => { "login" => "login", "password" => "password" }}
+    response = { "login" => { "error" => "Invalid login or password" }}
+
+    post '/login', request.to_json
+    last_response.body.should == response.to_json
   end
 end
