@@ -375,6 +375,7 @@ post '/register' do
                  @hash['taskmanager']['password'],
                  @hash['taskmanager']['firstname'],
                  @hash['taskmanager']['lastname'])
+  end
 end
 
 # Delete user
