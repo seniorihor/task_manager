@@ -12,7 +12,8 @@ require 'dm-types'
 require 'dm-serializer/to_json'
 require 'json'
 
-set :environment, ENV['RACK_ENV'] || :development # or :test
+set :environment, ENV['RACK_ENV'] || :development
+                                     #:test
 
 # Configuration connection to database
 configure :production do
