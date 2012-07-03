@@ -105,25 +105,20 @@ end
 
 # Helpers
 helpers do
-
   def new_token
-
     chars = ['A'..'Z', 'a'..'z', '0'..'9'].map { |r| r.to_a }.flatten
     Array.new(10).map { chars[rand(chars.size)] }.join
   end
 
   def to_hash(json_data)
-
     JSON.parse(json_data)
   end
 
   def login_exists?(login)
-
     User.first(login: login).nil? ? false : true
   end
 
   def login(login, password)
-
     user = User.first(login: login)
 
     return {login: {error: "Invalid login or password"}}.to_json if user.nil?
@@ -140,7 +135,6 @@ helpers do
   end
 
   def logout(auth_token)
-
     user       = User.first(token: auth_token)
     user.token = nil
     user.save
@@ -148,7 +142,6 @@ helpers do
   end
 
   def add_new_user(login, password, firstname, lastname)
-
     return {register: {error: "Empty fields"}}.to_json if login.empty? || password.empty? || firstname.empty? || lastname.empty?
 
     user           = User.new
@@ -166,7 +159,6 @@ helpers do
   end
 
   def delete_user(auth_token)
-
     user = User.first(token: auth_token)
     user.deleted = true
 
@@ -179,7 +171,6 @@ helpers do
   end
 
   def restore_user(auth_token)
-
     user = User.first(token: auth_token)
     user.deleted = false
 
@@ -192,7 +183,6 @@ helpers do
   end
 
   def find_user(auth_token, search_value)
-
     return {find_user: {error: "Empty fields"}}.to_json if search_value.empty?
 
     users              = Array.new
@@ -213,7 +203,6 @@ helpers do
   end
 
   def add_friend(auth_token, receiver_login, content)
-
     return {add_friend: {error: "Empty fields"}}.to_json if content.empty? || receiver_login.empty?
 
     sender   = User.first(token: auth_token)
@@ -250,7 +239,6 @@ helpers do
   end
 
   def delete_friend(auth_token, receiver_login)
-
     return {delete_friend: {error: "Empty fields"}}.to_json if receiver_login.empty?
 
     sender   = User.first(token: auth_token)
@@ -273,7 +261,6 @@ helpers do
   end
 
   def add_new_task(auth_token, receiver_login, content, priority)
-
     return {new_task: {error: "Empty fields"}}.to_json if content.empty? || priority.nil? || receiver_login.empty?
 
     sender   = User.first(token: auth_token)
@@ -311,7 +298,6 @@ helpers do
   end
 
   def delete_task(auth_token, task_id)
-
     return {delete_task: {error: "Empty fields"}}.to_json if task_id.nil?
 
     user = User.first(token: auth_token)
@@ -327,7 +313,6 @@ helpers do
   end
 
   def get_task(auth_token)
-
     user       = User.first(token: auth_token)
     collection = Task.all(read: false, receiver_login: user.login)
 
