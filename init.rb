@@ -138,9 +138,13 @@ helpers do
 
   def logout(auth_token)
     user       = User.first(token: auth_token)
-    user.token = nil
-    user.save
-    {logout: {error: 'Success'}}.to_json
+    user.token = nil if user
+
+    if user.save
+      {logout: {error: 'Success'}}.to_json
+    else
+      {logout: {error: 'Failure'}}.to_json
+    end
   end
 
   def add_new_user(login, password, firstname, lastname)
@@ -158,8 +162,7 @@ helpers do
     if user.save
       {register: {error: 'Success'}}.to_json
     else
-      error = user.errors.each { |error| error }
-      {register: error}.to_json
+      {register: {error: 'Failure'}}.to_json
     end
   end
 
@@ -168,11 +171,9 @@ helpers do
     user.deleted = true
 
     if user.save
-      {delete_user: {error:    'Success',
-                     deleting: true}}.to_json
+      {delete_user: {error: 'Success'}}.to_json
     else
-      {delete_user: {error:    'Success',
-                     deleting: false}}.to_json
+      {delete_user: {error: 'Failure'}}.to_json
     end
   end
 
@@ -181,11 +182,9 @@ helpers do
     user.deleted = false
 
     if user.save
-      {restore_user: {error:     'Success',
-                      restoring: true}}.to_json
+      {restore_user: {error: 'Success'}}.to_json
     else
-      {restore_user: {error: 'Success',
-                      restoring: false}}.to_json
+      {restore_user: {error: 'Failure'}}.to_json
     end
   end
 
@@ -197,10 +196,11 @@ helpers do
     users_by_firstname = Array.new(User.all(firstname: search_value))
     users_by_lastname  = Array.new(User.all(lastname:  search_value))
 
-
     users_by_login.each     { |user| users << user } unless users_by_login.empty?
     users_by_firstname.each { |user| users << user } unless users_by_firstname.empty?
     users_by_lastname.each  { |user| users << user } unless users_by_lastname.empty?
+
+    return {find_user: {error: 'No matching users'}}.to_json if users.empty?
 
     users.map! { |user| {login:     user.login,
                          firstname: user.firstname,
@@ -262,11 +262,9 @@ helpers do
 
     if sender.friends.save && receiver.friends.save
       add_new_task(sender.token, receiver.login, 'true', 6)
-      {delete_friend: {error:    'Success',
-                       deleting: true}}.to_json
+      {delete_friend: {error: 'Success'}}.to_json
     else
-      {delete_friend: {error:    'Success',
-                       deleting: false}}.to_json
+      {delete_friend: {error: 'Failure'}}.to_json
     end
   end
 
@@ -305,8 +303,7 @@ helpers do
     elsif task.save
       {new_task: {error: 'Success'}}.to_json
     else
-      error = task.errors.each { |error| error }
-      {new_task: {error: error}}.to_json
+      {new_task: {error: 'Failure'}}.to_json
     end
   end
 
@@ -319,11 +316,9 @@ helpers do
     return {delete_task: {error: "Task doesn't exist"}}.to_json if task.nil?
 
     if task.destroy!
-      {delete_task: {error:    'Success',
-                     deleting: true}}.to_json
+      {delete_task: {error: 'Success'}}.to_json
     else
-      {delete_task: {error:    'Success',
-                     deleting: false}}.to_json
+      {delete_task: {error: 'Failure'}}.to_json
     end
   end
 
@@ -331,7 +326,7 @@ helpers do
     user       = User.first(token: auth_token)
     collection = Task.all(read: false, receiver_login: user.login)
 
-    return {get_task: {error: 'No messages'}}.to_json if collection.empty?
+    return {get_task: {error: 'No matching tasks'}}.to_json if collection.empty?
 
     tasks    = Array.new(collection)
     quantity = tasks.size
