@@ -85,6 +85,7 @@ end
 
 before '/protected/*' do
   json_data = request.body.read
+
   if json_data.empty?
     @auth = false
   else
@@ -220,6 +221,7 @@ helpers do
     if content == 'true'
       sender.friends   << receiver
       receiver.friends << sender
+
       if sender.friends.save && receiver.friends.save
         add_new_task(sender.token, receiver.login, 'true', 5)
         invite_task.destroy!
@@ -231,6 +233,7 @@ helpers do
         {add_friend: {error:      "Success",
                       friendship: false}}.to_json
       end
+
     else
       add_new_task(sender.token, receiver.login, 'false', 5)
       invite_task.destroy!
@@ -365,14 +368,13 @@ end
 post '/register' do
   @hash = to_hash(request.body.read)
 
-  unless login_exists?(@hash['taskmanager']['login'])
+  if login_exists?(@hash['taskmanager']['login'])
     {register: {error: "Login exists"}}.to_json
   else
     add_new_user(@hash['taskmanager']['login'],
                  @hash['taskmanager']['password'],
                  @hash['taskmanager']['firstname'],
                  @hash['taskmanager']['lastname'])
-  end
 end
 
 # Delete user
