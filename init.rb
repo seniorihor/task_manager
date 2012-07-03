@@ -171,7 +171,7 @@ helpers do
       {delete_user: {error:    'Success',
                      deleting: true}}.to_json
     else
-      {delete_user: {error:    'Success'
+      {delete_user: {error:    'Success',
                      deleting: false}}.to_json
     end
   end
