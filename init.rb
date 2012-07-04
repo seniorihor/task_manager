@@ -273,8 +273,8 @@ helpers do
 
   def add_new_task(auth_token, receiver_login, content, priority)
     return { new_task: { error: 'Empty fields' }}.to_json if content.empty? ||
-                                                          priority.nil?  ||
-                                                          receiver_login.empty?
+                                                             priority.nil?  ||
+                                                             receiver_login.empty?
 
     sender   = User.first(token: auth_token)
     receiver = User.first(login: receiver_login)
@@ -289,7 +289,7 @@ helpers do
     end
 
     return { add_friend: { error: 'Already friend' }}.to_json if sender.friends.include?(receiver) &&
-                                                              priority == 4
+                                                                 priority == 4
 
     invite_task = sender.tasks.all(receiver_login: receiver.login).last(priority: 4)
 
