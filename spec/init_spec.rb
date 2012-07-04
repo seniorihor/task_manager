@@ -36,10 +36,6 @@ describe 'TaskManager' do
     Sinatra::Application
   end
 
-  def to_hash(json_data)
-    JSON.parse(json_data)
-  end
-
   it 'logout should be successful' do
     request  = { taskmanager: { auth_token: @user0.token }}
     response = { logout: { error: 'Success' }}
