@@ -123,16 +123,16 @@ helpers do
   def login(login, password)
     user = User.first(login: login)
 
-    return {login: {error: 'Invalid login or password'}}.to_json if user.nil?
+    return { login: { error: 'Invalid login or password' }}.to_json if user.nil?
 
     if password == user.password
       user.token = new_token
       user.save
       friends = Array.new(user.friends)
-      friends.map! { |friend| {login: friend.login}}
-      {login: {error: 'Success', auth_token: user.token, friends: friends}}.to_json
+      friends.map! { |friend| { login: friend.login }}
+      { login: { error: 'Success', auth_token: user.token, friends: friends }}.to_json
     else
-      {login: {error: 'Invalid login or password'}}.to_json
+      { login: { error: 'Invalid login or password' }}.to_json
     end
   end
 
@@ -141,14 +141,14 @@ helpers do
     user.token = nil if user
 
     if user.save
-      {logout: {error: 'Success'}}.to_json
+      { logout: { error: 'Success' }}.to_json
     else
-      {logout: {error: 'Failure'}}.to_json
+      { logout: { error: 'Failure' }}.to_json
     end
   end
 
   def add_new_user(login, password, firstname, lastname)
-    return {register: {error: 'Empty fields'}}.to_json if login.empty?     ||
+    return { register: { error: 'Empty fields' }}.to_json if login.empty?     ||
                                                           password.empty?  ||
                                                           firstname.empty? ||
                                                           lastname.empty?
@@ -160,9 +160,9 @@ helpers do
     user.lastname  = lastname
 
     if user.save
-      {register: {error: 'Success'}}.to_json
+      { register: { error: 'Success' }}.to_json
     else
-      {register: {error: 'Failure'}}.to_json
+      { register: { error: 'Failure' }}.to_json
     end
   end
 
@@ -171,9 +171,9 @@ helpers do
     user.deleted = true
 
     if user.save
-      {delete_user: {error: 'Success'}}.to_json
+      { delete_user: { error: 'Success' }}.to_json
     else
-      {delete_user: {error: 'Failure'}}.to_json
+      { delete_user: { error: 'Failure' }}.to_json
     end
   end
 
@@ -182,14 +182,14 @@ helpers do
     user.deleted = false
 
     if user.save
-      {restore_user: {error: 'Success'}}.to_json
+      { restore_user: { error: 'Success' }}.to_json
     else
-      {restore_user: {error: 'Failure'}}.to_json
+      { restore_user: { error: 'Failure' }}.to_json
     end
   end
 
   def find_user(auth_token, search_value)
-    return {find_user: {error: 'Empty fields'}}.to_json if search_value.empty?
+    return { find_user: { error: 'Empty fields' }}.to_json if search_value.empty?
 
     users              = Array.new
     users_by_login     = Array.new(User.all(login:     search_value))
@@ -200,29 +200,29 @@ helpers do
     users_by_firstname.each { |user| users << user } unless users_by_firstname.empty?
     users_by_lastname.each  { |user| users << user } unless users_by_lastname.empty?
 
-    return {find_user: {error: 'No matching users'}}.to_json if users.empty?
+    return { find_user: { error: 'No matching users' }}.to_json if users.empty?
 
-    users.map! { |user| {login:     user.login,
-                         firstname: user.firstname,
-                         lastname:  user.lastname}}
-    {find_user: {error: 'Success',
-                 users: users}}.to_json
+    users.map! { |user| { login:     user.login,
+                          firstname: user.firstname,
+                          lastname:  user.lastname }}
+    {find_user: { error: 'Success',
+                 users: users }}.to_json
   end
 
   def add_friend(auth_token, receiver_login, content)
-    return {add_friend: {error: 'Empty fields'}}.to_json if content.empty? ||
+    return { add_friend: { error: 'Empty fields' }}.to_json if content.empty? ||
                                                             receiver_login.empty?
 
     sender   = User.first(token: auth_token)
     receiver = User.first(login: receiver_login)
 
-    return {add_friend: {error: "User doesn't exist"}}.to_json                if receiver.nil?
-    return {add_friend: {error: "You can't add yourself to friends"}}.to_json if sender == receiver
-    return {add_friend: {error: 'User is deleted'}}.to_json                   if receiver.deleted
+    return { add_friend: { error: "User doesn't exist" }}.to_json                if receiver.nil?
+    return { add_friend: { error: "You can't add yourself to friends" }}.to_json if sender == receiver
+    return { add_friend: { error: 'User is deleted' }}.to_json                   if receiver.deleted
 
     invite_task = receiver.tasks.all(receiver_login: sender.login).last(priority: 4)
 
-    return {add_friend: {error: "Invite doesn't exist"}}.to_json if invite_task.nil?
+    return { add_friend: { error: "Invite doesn't exist" }}.to_json if invite_task.nil?
 
     if content == 'true'
       sender.friends   << receiver
@@ -231,66 +231,66 @@ helpers do
       if sender.friends.save && receiver.friends.save
         add_new_task(sender.token, receiver.login, 'true', 5)
         invite_task.destroy!
-        {add_friend: {error:      'Success',
-                      friendship: true}}.to_json
+        { add_friend: { error:      'Success',
+                        friendship: true }}.to_json
       else
         add_new_task(sender.token, receiver.login, 'false', 5)
         invite_task.destroy!
-        {add_friend: {error:      'Success',
-                      friendship: false}}.to_json
+        { add_friend: { error:      'Success',
+                        friendship: false }}.to_json
       end
 
     else
       add_new_task(sender.token, receiver.login, 'false', 5)
       invite_task.destroy!
-      {add_friend: {error:      'Success',
-                    friendship: false}}.to_json
+      { add_friend: { error:      'Success',
+                      friendship: false }}.to_json
     end
   end
 
   def delete_friend(auth_token, receiver_login)
-    return {delete_friend: {error: 'Empty fields'}}.to_json if receiver_login.empty?
+    return { delete_friend: { error: 'Empty fields' }}.to_json if receiver_login.empty?
 
     sender   = User.first(token: auth_token)
     receiver = User.first(login: receiver_login)
 
-    return {delete_friend: {error: "User doesn't exist"}}.to_json      if receiver.nil?
-    return {delete_friend: {error: 'This is not your friend'}}.to_json unless sender.friends.include?(receiver)
+    return { delete_friend: { error: "User doesn't exist" }}.to_json      if receiver.nil?
+    return { delete_friend: { error: 'This is not your friend' }}.to_json unless sender.friends.include?(receiver)
 
     sender.friends.delete(receiver)
     receiver.friends.delete(sender)
 
     if sender.friends.save && receiver.friends.save
       add_new_task(sender.token, receiver.login, 'true', 6)
-      {delete_friend: {error: 'Success'}}.to_json
+      { delete_friend: { error: 'Success' }}.to_json
     else
-      {delete_friend: {error: 'Failure'}}.to_json
+      { delete_friend: { error: 'Failure' }}.to_json
     end
   end
 
   def add_new_task(auth_token, receiver_login, content, priority)
-    return {new_task: {error: 'Empty fields'}}.to_json if content.empty? ||
+    return { new_task: { error: 'Empty fields' }}.to_json if content.empty? ||
                                                           priority.nil?  ||
                                                           receiver_login.empty?
 
     sender   = User.first(token: auth_token)
     receiver = User.first(login: receiver_login)
 
-    return {new_task: {error: "User doesn't exist"}}.to_json    if receiver.nil?
-    return {new_task: {error: "You can't be receiver"}}.to_json if sender == receiver
-    return {new_task: {error: 'User is deleted'}}.to_json       if receiver.deleted
+    return { new_task: { error: "User doesn't exist" }}.to_json    if receiver.nil?
+    return { new_task: { error: "You can't be receiver" }}.to_json if sender == receiver
+    return { new_task: { error: 'User is deleted' }}.to_json       if receiver.deleted
 
     case priority
     when 1..3
-      return {new_task: {error: 'This is not your friend'}}.to_json unless sender.friends.include?(receiver)
+      return { new_task: { error: 'This is not your friend' }}.to_json unless sender.friends.include?(receiver)
     end
 
-    return {add_friend: {error: 'Already friend'}}.to_json if sender.friends.include?(receiver) &&
+    return { add_friend: { error: 'Already friend' }}.to_json if sender.friends.include?(receiver) &&
                                                               priority == 4
 
     invite_task = sender.tasks.all(receiver_login: receiver.login).last(priority: 4)
 
-    return {new_task: {error: 'Invite exists'}}.to_json if invite_task
+    return { new_task: { error: 'Invite exists' }}.to_json if invite_task
 
     task                = Task.new
     task.content        = content
@@ -299,26 +299,26 @@ helpers do
     task.receiver_login = User.first(login: receiver_login).login
 
     if task.save && priority == 4
-      {add_friend: {error: 'Success'}}.to_json
+      { add_friend: { error: 'Success' }}.to_json
     elsif task.save
-      {new_task: {error: 'Success'}}.to_json
+      { new_task: { error: 'Success' }}.to_json
     else
-      {new_task: {error: 'Failure'}}.to_json
+      { new_task: { error: 'Failure' }}.to_json
     end
   end
 
   def delete_task(auth_token, task_id)
-    return {delete_task: {error: 'Empty fields'}}.to_json if task_id.nil?
+    return { delete_task: { error: 'Empty fields' }}.to_json if task_id.nil?
 
     user = User.first(token: auth_token)
     task = Task.all(receiver_login: user.login).get(task_id)
 
-    return {delete_task: {error: "Task doesn't exist"}}.to_json if task.nil?
+    return { delete_task: { error: "Task doesn't exist" }}.to_json if task.nil?
 
     if task.destroy!
-      {delete_task: {error: 'Success'}}.to_json
+      { delete_task: { error: 'Success' }}.to_json
     else
-      {delete_task: {error: 'Failure'}}.to_json
+      { delete_task: { error: 'Failure' }}.to_json
     end
   end
 
@@ -326,7 +326,7 @@ helpers do
     user       = User.first(token: auth_token)
     collection = Task.all(read: false, receiver_login: user.login)
 
-    return {get_task: {error: 'No matching tasks'}}.to_json if collection.empty?
+    return { get_task: { error: 'No matching tasks' }}.to_json if collection.empty?
 
     tasks    = Array.new(collection)
     quantity = tasks.size
@@ -336,10 +336,10 @@ helpers do
          task.save
     end
 
-    tasks.map! { |task| {content:    task.content,
-                      	 priority:   task.priority,
-                      	 user_login: User.get(task.user_id).login,
-                      	 created_at: task.created_at}}
+    tasks.map! { |task| { content:    task.content,
+                      	  priority:   task.priority,
+                      	  user_login: User.get(task.user_id).login,
+                      	  created_at: task.created_at }}
 
     # Delete all temporary tasks
     add_friend_tasks    = Array.new(Task.all(receiver_login: user.login, read: true, priority: 5))
@@ -347,9 +347,9 @@ helpers do
     add_friend_tasks.each    { |task| task.destroy! } unless add_friend_tasks.empty?
     delete_friend_tasks.each { |task| task.destroy! } unless delete_friend_tasks.empty?
 
-    {get_task: {error:    'Success',
-                quantity: quantity,
-                tasks:    tasks}}.to_json
+    { get_task: { error:    'Success',
+                  quantity: quantity,
+                  tasks:    tasks }}.to_json
   end
 end
 
@@ -364,7 +364,7 @@ end
 
 # Logout user
 post '/protected/logout' do
-  return {session: {error: '403 Forbidden'}}.to_json unless @auth
+  return { session: { error: '403 Forbidden' }}.to_json unless @auth
 
   logout(@protected_hash['taskmanager']['auth_token'])
 end
@@ -374,7 +374,7 @@ post '/register' do
   @hash = to_hash(request.body.read)
 
   if login_exists?(@hash['taskmanager']['login'])
-    {register: {error: 'Login exists'}}.to_json
+    { register: { error: 'Login exists' }}.to_json
   else
     add_new_user(@hash['taskmanager']['login'],
                  @hash['taskmanager']['password'],
@@ -385,21 +385,21 @@ end
 
 # Delete user
 post '/protected/delete_user' do
-  return {session: {error: '403 Forbidden'}}.to_json unless @auth
+  return { session: { error: '403 Forbidden' }}.to_json unless @auth
 
   delete_user(@protected_hash['taskmanager']['auth_token'])
 end
 
 # Restore user
 post '/protected/restore_user' do
-  return {session: {error: '403 Forbidden'}}.to_json unless @restore_auth
+  return { session: { error: '403 Forbidden' }}.to_json unless @restore_auth
 
   restore_user(@protected_hash['taskmanager']['auth_token'])
 end
 
 # Find user
 post '/protected/find_user' do
-  return {session: {error: '403 Forbidden'}}.to_json unless @auth
+  return { session: { error: '403 Forbidden' }}.to_json unless @auth
 
   find_user(@protected_hash['taskmanager']['auth_token'],
             @protected_hash['taskmanager']['search_value'])
@@ -407,7 +407,7 @@ end
 
 # Add friend
 post '/protected/add_friend' do
-  return {session: {error: '403 Forbidden'}}.to_json unless @auth
+  return { session: { error: '403 Forbidden' }}.to_json unless @auth
 
   case @protected_hash['taskmanager']['priority']
   when 4
@@ -420,13 +420,13 @@ post '/protected/add_friend' do
                @protected_hash['taskmanager']['receiver_login'],
                @protected_hash['taskmanager']['content'])
   else
-    {add_friend: {error: 'Wrong priority'}}.to_json
+    { add_friend: { error: 'Wrong priority' }}.to_json
   end
 end
 
 # Delete friend
 post '/protected/delete_friend' do
-  return {session: {error: '403 Forbidden'}}.to_json unless @auth
+  return { session: { error: '403 Forbidden' }}.to_json unless @auth
 
   delete_friend(@protected_hash['taskmanager']['auth_token'],
                 @protected_hash['taskmanager']['receiver_login'])
@@ -434,7 +434,7 @@ end
 
 # Create new task
 post '/protected/new_task' do
-  return {session: {error: '403 Forbidden'}}.to_json unless @auth
+  return { session: { error: '403 Forbidden' }}.to_json unless @auth
 
   add_new_task(@protected_hash['taskmanager']['auth_token'],
                @protected_hash['taskmanager']['receiver_login'],
@@ -444,7 +444,7 @@ end
 
 # Delete task
 post '/protected/delete_task' do
-  return {session: {error: '403 Forbidden'}}.to_json unless @auth
+  return { session: { error: '403 Forbidden' }}.to_json unless @auth
 
   delete_task(@protected_hash['taskmanager']['auth_token'],
               @protected_hash['taskmanager']['task_id'])
@@ -452,7 +452,7 @@ end
 
 # List all tasks
 post '/protected/get_task' do
-  return {session: {error: '403 Forbidden'}}.to_json unless @auth
+  return { session: { error: '403 Forbidden' }}.to_json unless @auth
 
   get_task(@protected_hash['taskmanager']['auth_token'])
 end
