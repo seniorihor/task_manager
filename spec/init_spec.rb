@@ -4,6 +4,7 @@ require 'json'
 
 set :environment, :test
 
+
 RSpec.configure do |conf|
   conf.include Rack::Test::Methods
   DataMapper.finalize
@@ -11,14 +12,24 @@ RSpec.configure do |conf|
 end
 
 
-describe User do
+describe 'TaskManager' do
 
   before do
-    @user = User.create(login:     'login',
-                        password:  'password',
-                        firstname: 'firstname',
-                        lastname:  'lastname',
-                        token:     'auth_token')
+    @user0 = User.create(login:     'login',
+                         password:  'password',
+                         firstname: 'firstname',
+                         lastname:  'lastname',
+                         token:     'auth_token')
+    @user1 = User.create(login:     'user1',
+                         password:  'password',
+                         firstname: 'firstname',
+                         lastname:  'lastname',
+                         token:     'user1token')
+    @user2 = User.create(login:     'user2',
+                         password:  'password',
+                         firstname: 'firstname',
+                         lastname:  'lastname',
+                         token:     'user2token')
   end
 
   def app
@@ -29,26 +40,23 @@ describe User do
     JSON.parse(json_data)
   end
 
-  it 'login should be successful' do
-    request  = { taskmanager: { login:    @user.login,
-                                password: @user.password }}
-    response = { login: { error:      'Success',
-                          auth_token: @user.token,
-                          friends:    @user.friends }}
-
-    post '/login', request.to_json
-    hash = to_hash(last_response.body)
-    hash['login']['auth_token'] = 'auth_token'
-    hash.to_json.should == response.to_json
-  end
-
   it 'logout should be successful' do
-    request  = { taskmanager: { auth_token: @user.token }}
+    request  = { taskmanager: { auth_token: @user0.token }}
     response = { logout: { error: 'Success' }}
 
     post '/protected/logout', request.to_json
-    hash = to_hash(last_response.body)
-    hash.to_json.should == response.to_json
+    last_response.body.should == response.to_json
+  end
+
+  it 'login should be successful' do
+    request  = { taskmanager: { login:    @user0.login,
+                                password: @user0.password }}
+    response = { login: { error:      'Success',
+                          auth_token: @user0.token,
+                          friends:    @user0.friends }}
+
+    post '/login', request.to_json
+    last_response.body == response.to_json
   end
 
   it 'register should be successful' do
@@ -63,7 +71,7 @@ describe User do
   end
 
   it 'delete_user should be successful' do
-    request  = { taskmanager: { auth_token: @user.token }}
+    request  = { taskmanager: { auth_token: @user1.token }}
     response = { delete_user: { error: 'Success' }}
 
     post '/protected/delete_user', request.to_json
@@ -71,7 +79,7 @@ describe User do
   end
 
   it 'restore_user should be successful' do
-    request  = { taskmanager: { auth_token: @user.token }}
+    request  = { taskmanager: { auth_token: @user1.token }}
     response = { restore_user: { error: 'Success' }}
 
     post '/protected/restore_user', request.to_json
@@ -79,22 +87,20 @@ describe User do
   end
 
   it 'find_user should be successful' do
-    request  = { taskmanager: { auth_token:   @user.token,
-                                search_value: [@user.login,
-                                               @user.firstname,
-                                               @user.lastname].rand(0..2)}}
+    request  = { taskmanager: { auth_token:   @user1.token,
+                                search_value: @user1.login }}
     response = { find_user: { error: 'Success',
-                              users: [{ login:     @user.login,
-                                        firstname: @user.firstname,
-                                        lastname:  @user.lastname }]}}
+                              users: [{ login:     @user1.login,
+                                        firstname: @user1.firstname,
+                                        lastname:  @user1.lastname }]}}
 
     post '/protected/find_user', request.to_json
     last_response.body.should == response.to_json
   end
 
   it 'add_friend (invite) should be successful' do
-    request  = { taskmanager: { auth_token:     @user.token,
-                                receiver_login: 'somebody',
+    request  = { taskmanager: { auth_token:     @user1.token,
+                                receiver_login: @user2.login,
                                 content:        'greeting',
                                 priority:       4 }}
     response = { add_friend: { error: 'Success' }}
@@ -104,8 +110,8 @@ describe User do
   end
 
   it 'add_friend (response) should be successful' do
-    request  = { taskmanager: { auth_token:     @user.token,
-                                receiver_login: 'somebody',
+    request  = { taskmanager: { auth_token:     @user2.token,
+                                receiver_login: @user1.login,
                                 content:        'true',
                                 priority:       5 }}
     response = { add_friend: { error:      'Success',
@@ -115,49 +121,33 @@ describe User do
     last_response.body.should == response.to_json
   end
 
-  it 'delete_friend should be successful' do
-    request  = { taskmanager: { auth_token:     @user.token,
-                                receiver_login: 'somebody' }}
-    response = { delete_friend: { error: 'Success' }}
-
-    post '/protected/delete_friend', request.to_json
-    last_response.body.should == response.to_json
-  end
-end
-
-
-describe Task do
-
-  before do
-    @user = User.create(login:     'login',
-                        password:  'password',
-                        firstname: 'firstname',
-                        lastname:  'lastname',
-                        token:     'auth_token')
-  end
-
-  def app
-    Sinatra::Application
-  end
-
-  def to_hash(json_data)
-    JSON.parse(json_data)
-  end
-
   it 'new_task should be successful' do
-    request  = { taskmanager: { auth_token:     @user.token,
-                                receiver_login: 'somebody',
+    request  = { taskmanager: { auth_token:     @user1.token,
+                                receiver_login: @user2.login,
                                 content:        'content',
-                                priority:       rand(1..3) }}
+                                priority:       1 }}
     response = { new_task: { error: 'Success' }}
 
     post '/protected/new_task', request.to_json
     last_response.body.should == response.to_json
   end
 
+  it 'get_task should be successful' do
+    request  = { taskmanager: { auth_token: @user2.token }}
+    response = { get_task: { error:    'Success',
+                             quantity: 1,
+                             tasks:    [{ content:    'content',
+                                          priority:   1,
+                                          user_login: @user1.login,
+                                          created_at: DateTime.now }]}}
+
+    post '/protected/get_task', request.to_json
+    last_response.body.should == response.to_json
+  end
+
   it 'delete_task should be successful' do
-    task_id  = Task.all(receiver_login: @user.login).last(read: false).id
-    request  = { taskmanager: { auth_token: @user.token,
+    task_id  = Task.all(receiver_login: @user2.login).last(read: true).id
+    request  = { taskmanager: { auth_token: @user2.token,
                                 task_id:    task_id }}
     response = { delete_task: { error: 'Success' }}
 
@@ -165,17 +155,12 @@ describe Task do
     last_response.body.should == response.to_json
   end
 
-  it 'get_task should be successful' do
-    request  = { taskmanager: { auth_token: @user.token }}
-    response = { get_task: { error: 'Success' }}
-    { get_task: { error:    'Success',
-                  quantity: Task.all.size,
-                  tasks: { content:    'content',
-                           priority:   1,
-                           user_login: 'login',
-                           created_at: Time.now }}}
+  it 'delete_friend should be successful' do
+    request  = { taskmanager: { auth_token:     @user1.token,
+                                receiver_login: @user2.login }}
+    response = { delete_friend: { error: 'Success' }}
 
-    post '/protected/get_task', request.to_json
+    post '/protected/delete_friend', request.to_json
     last_response.body.should == response.to_json
   end
 end
