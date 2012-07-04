@@ -127,10 +127,13 @@ helpers do
 
     if password == user.password
       user.token = new_token
-      user.save
-      friends = Array.new(user.friends)
-      friends.map! { |friend| { login: friend.login }}
-      { login: { error: 'Success', auth_token: user.token, friends: friends }}.to_json
+      if user.save
+        friends = Array.new(user.friends)
+        friends.map! { |friend| { login: friend.login }}
+        { login: { error: 'Success', auth_token: user.token, friends: friends }}.to_json
+      else
+        { login: { error: 'Failure' }}.to_json
+      end
     else
       { login: { error: 'Invalid login or password' }}.to_json
     end
