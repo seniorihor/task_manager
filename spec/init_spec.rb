@@ -14,7 +14,11 @@ end
 describe User do
 
   before do
-    @user = User.create(login: 'login', password: 'password', firstname: 'firstname', lastname: 'lastname', token: 'auth_token')
+    @user = User.create(login:     'login',
+                        password:  'password',
+                        firstname: 'firstname',
+                        lastname:  'lastname',
+                        token:     'auth_token')
   end
 
   def app
@@ -76,7 +80,9 @@ describe User do
 
   it 'find_user should be successful' do
     request  = { taskmanager: { auth_token:   @user.token,
-                                search_value: @user.login }}
+                                search_value: [@user.login,
+                                               @user.firstname,
+                                               @user.lastname].rand(0..2)}}
     response = { find_user: { error: 'Success',
                               users: [{ login:     @user.login,
                                         firstname: @user.firstname,
@@ -123,7 +129,11 @@ end
 describe Task do
 
   before do
-    @user = User.create(login: 'login', password: 'password', firstname: 'firstname', lastname: 'lastname', token: 'auth_token')
+    @user = User.create(login:     'login',
+                        password:  'password',
+                        firstname: 'firstname',
+                        lastname:  'lastname',
+                        token:     'auth_token')
   end
 
   def app
@@ -158,6 +168,12 @@ describe Task do
   it 'get_task should be successful' do
     request  = { taskmanager: { auth_token: @user.token }}
     response = { get_task: { error: 'Success' }}
+    { get_task: { error:    'Success',
+                  quantity: Task.all.size,
+                  tasks: { content:    'content',
+                           priority:   1,
+                           user_login: 'login',
+                           created_at: Time.now }}}
 
     post '/protected/get_task', request.to_json
     last_response.body.should == response.to_json
