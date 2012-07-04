@@ -149,9 +149,9 @@ helpers do
 
   def add_new_user(login, password, firstname, lastname)
     return { register: { error: 'Empty fields' }}.to_json if login.empty?     ||
-                                                          password.empty?  ||
-                                                          firstname.empty? ||
-                                                          lastname.empty?
+                                                             password.empty?  ||
+                                                             firstname.empty? ||
+                                                             lastname.empty?
 
     user           = User.new
     user.login     = login
