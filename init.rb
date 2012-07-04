@@ -12,8 +12,8 @@ require 'dm-types'
 require 'dm-serializer/to_json'
 require 'json'
 
-set :environment, ENV['RACK_ENV'] || :development
-                                     #:test
+set :environment, ENV['RACK_ENV'] || #:development
+                                     :test
 
 # Configuration connection to database
 configure :production do
@@ -209,7 +209,7 @@ helpers do
                           firstname: user.firstname,
                           lastname:  user.lastname }}
     {find_user: { error: 'Success',
-                 users: users }}.to_json
+                  users: users }}.to_json
   end
 
   def add_friend(auth_token, receiver_login, content)
