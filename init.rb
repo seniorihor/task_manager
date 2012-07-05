@@ -129,7 +129,7 @@ helpers do
       user.token = new_token
       if user.save
         friends = Array.new(user.friends)
-        friends.map! { |friend| { login: friend.login }}
+        friends.map! { |friend| { login: friend.login, firstname: friend.firstname, lastname: friend.lastname}}
         { login: { error: 'Success', auth_token: user.token, friends: friends }}.to_json
       else
         { login: { error: 'Failure' }}.to_json
