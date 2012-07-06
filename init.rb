@@ -209,8 +209,8 @@ helpers do
     users.map! { |user| { login:     user.login,
                           firstname: user.firstname,
                           lastname:  user.lastname }}
-    {find_user: { error: 'Success',
-                  users: users }}.to_json
+    { find_user: { error: 'Success',
+                   users: users }}.to_json
   end
 
   def add_friend(auth_token, receiver_login, content)
