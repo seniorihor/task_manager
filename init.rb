@@ -191,7 +191,7 @@ helpers do
     end
   end
 
-  def find_user(auth_token, search_value)
+  def find_user(search_value)
     return { find_user: { error: 'Empty fields' }}.to_json if search_value.empty?
 
     users              = Array.new
@@ -404,8 +404,7 @@ end
 post '/protected/find_user' do
   return { session: { error: '403 Forbidden' }}.to_json unless @auth
 
-  find_user(@protected_hash['taskmanager']['auth_token'],
-            @protected_hash['taskmanager']['search_value'])
+  find_user(@protected_hash['taskmanager']['search_value'])
 end
 
 # Add friend
