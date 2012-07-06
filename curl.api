@@ -91,5 +91,5 @@ post '/protected/get_task'
     "{ \"taskmanager\" : { \"auth_token\" : \"token\" }}"
 
   response:
-    {"get_task":{"id":1,"error":"Success","quantity":1,"tasks":[{"content":"content","priority":1-5,"user_login":"login","created_at":"Date"}]}}
+    {"get_task":{"error":"Success","quantity":1,"tasks":[{"id":1,"content":"content","priority":1-5,"user_login":"login","created_at":"Date"}]}}
 end
