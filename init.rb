@@ -124,7 +124,7 @@ helpers do
     user = User.first(login: login)
 
     return { login: { error: 'Invalid login or password' }}.to_json if user.nil?
-    return { login: { error: 'Already in system'}}.to_json if !user.token.nil?
+    return { login: { error: 'Already in system'}}.to_json          unless user.token.nil?
     if password == user.password
       user.token = new_token
       if user.save
