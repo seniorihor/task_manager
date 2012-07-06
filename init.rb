@@ -192,7 +192,8 @@ helpers do
   end
 
   def find_user(search_value)
-    return { find_user: { error: 'Empty fields' }}.to_json if search_value.empty?
+    return { find_user: { error: 'Empty fields' }}.to_json if search_value.empty? ||
+                                                              search_value.size == 1
 
     users              = Array.new
     users_by_login     = Array.new(User.all(:login.like     => "%#{search_value}%"))
@@ -214,7 +215,7 @@ helpers do
 
   def add_friend(auth_token, receiver_login, content)
     return { add_friend: { error: 'Empty fields' }}.to_json if content.empty? ||
-                                                            receiver_login.empty?
+                                                               receiver_login.empty?
 
     sender   = User.first(token: auth_token)
     receiver = User.first(login: receiver_login)
