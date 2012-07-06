@@ -195,9 +195,9 @@ helpers do
     return { find_user: { error: 'Empty fields' }}.to_json if search_value.empty?
 
     users              = Array.new
-    users_by_login     = Array.new(User.all(login:     search_value))
-    users_by_firstname = Array.new(User.all(firstname: search_value))
-    users_by_lastname  = Array.new(User.all(lastname:  search_value))
+    users_by_login     = Array.new(User.all(:login.like     => "%#{search_value}%"))
+    users_by_firstname = Array.new(User.all(:firstname.like => "%#{search_value}%"))
+    users_by_lastname  = Array.new(User.all(:lastname.like  => "%#{search_value}%"))
 
     users_by_login.each     { |user| users << user } unless users_by_login.empty?
     users_by_firstname.each { |user| users << user } unless users_by_firstname.empty?
