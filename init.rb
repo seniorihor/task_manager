@@ -191,7 +191,7 @@ helpers do
     end
   end
 
-  def find_user(search_value)
+  def find_user(auth_token, search_value)
     return { find_user: { error: 'Empty fields' }}.to_json if search_value.empty? ||
                                                               search_value.size == 1
 
@@ -203,6 +203,8 @@ helpers do
     users_by_login.each     { |user| users << user } unless users_by_login.empty?
     users_by_firstname.each { |user| users << user } unless users_by_firstname.empty?
     users_by_lastname.each  { |user| users << user } unless users_by_lastname.empty?
+
+    users.delete(User.first(token: auth_token))
 
     return { find_user: { error: 'No matching users' }}.to_json if users.empty?
 
@@ -405,7 +407,8 @@ end
 post '/protected/find_user' do
   return { session: { error: '403 Forbidden' }}.to_json unless @auth
 
-  find_user(@protected_hash['taskmanager']['search_value'])
+  find_user(@protected_hash['taskmanager']['auth_token'],
+            @protected_hash['taskmanager']['search_value'])
 end
 
 # Add friend
