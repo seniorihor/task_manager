@@ -84,11 +84,11 @@ describe 'TaskManager' do
 
   it 'find_user should be successful' do
     request  = { taskmanager: { auth_token:   @user1.token,
-                                search_value: @user1.login }}
+                                search_value: @user2.login }}
     response = { find_user: { error: 'Success',
-                              users: [{ login:     @user1.login,
-                                        firstname: @user1.firstname,
-                                        lastname:  @user1.lastname }]}}
+                              users: [{ login:     @user2.login,
+                                        firstname: @user2.firstname,
+                                        lastname:  @user2.lastname }]}}
 
     post '/protected/find_user', request.to_json
     last_response.body.should == response.to_json
@@ -121,7 +121,7 @@ describe 'TaskManager' do
     request  = { taskmanager: { auth_token:     @user1.token,
                                 receiver_login: @user2.login,
                                 content:        'content',
-                                priority:       1 }}
+                                priority:       rand(1..3) }}
     response = { new_task: { error: 'Success' }}
 
     post '/protected/new_task', request.to_json
@@ -132,10 +132,11 @@ describe 'TaskManager' do
     request  = { taskmanager: { auth_token: @user2.token }}
     response = { get_task: { error:    'Success',
                              quantity: 1,
-                             tasks:    [{ content:    'content',
-                                          priority:   1,
+                             tasks:    [{ id:         Task.last.id,
+                                          content:    Task.last.content,
+                                          priority:   Task.last.priority,
                                           user_login: @user1.login,
-                                          created_at: DateTime.now }]}}
+                                          created_at: Task.last.created_at }]}}
 
     post '/protected/get_task', request.to_json
     last_response.body.should == response.to_json
