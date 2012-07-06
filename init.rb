@@ -342,7 +342,8 @@ helpers do
          task.save
     end
 
-    tasks.map! { |task| { content:    task.content,
+    tasks.map! { |task| { id:         task.id
+                          content:    task.content,
                       	  priority:   task.priority,
                       	  user_login: User.get(task.user_id).login,
                       	  created_at: task.created_at }}
