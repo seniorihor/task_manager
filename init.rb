@@ -27,6 +27,7 @@ end
 
 configure :test do
   DataMapper.setup(:default, 'sqlite::memory:')
+  DataMapper.setup(:default, "sqlite://#{Dir.pwd}/test.db")
 end
 
 DataMapper::Property::String.length(20)
@@ -215,9 +216,9 @@ helpers do
                    users: users }}.to_json
   end
 
-  def add_friend(auth_token, receiver_login, content)
+  def add_friend(auth_token, receiver_login, friendship)
     return { add_friend: { error: 'Empty fields' }}.to_json if receiver_login.empty? ||
-                                                               content.empty?
+                                                               friendship.empty?
 
     sender   = User.first(token: auth_token)
     receiver = User.first(login: receiver_login)
@@ -230,27 +231,24 @@ helpers do
 
     return { add_friend: { error: "Invite doesn't exist" }}.to_json if invite_task.nil?
 
-    if content == 'true'
+    if friendship == 'true'
       sender.friends   << receiver
       receiver.friends << sender
 
       if sender.friends.save && receiver.friends.save
         add_new_task(sender.token, receiver.login, 'true', 5)
         invite_task.destroy!
-        { add_friend: { error:      'Success',
-                        friendship: true }}.to_json
+        { add_friend: { error: 'Success' }}.to_json
       else
         add_new_task(sender.token, receiver.login, 'false', 5)
         invite_task.destroy!
-        { add_friend: { error:      'Success',
-                        friendship: false }}.to_json
+        { add_friend: { error: 'Success' }}.to_json
       end
 
     else
       add_new_task(sender.token, receiver.login, 'false', 5)
       invite_task.destroy!
-      { add_friend: { error:      'Success',
-                      friendship: false }}.to_json
+      { add_friend: { error: 'Success' }}.to_json
     end
   end
 
@@ -423,12 +421,12 @@ post '/protected/add_friend' do
   when 4
     add_new_task(@protected_hash['taskmanager']['auth_token'],
                  @protected_hash['taskmanager']['receiver_login'],
-                 @protected_hash['taskmanager']['content'],
+                 'Add me to friends!',
                  @protected_hash['taskmanager']['priority'])
   when 5
     add_friend(@protected_hash['taskmanager']['auth_token'],
                @protected_hash['taskmanager']['receiver_login'],
-               @protected_hash['taskmanager']['content'])
+               @protected_hash['taskmanager']['friendship'])
   else
     { add_friend: { error: 'Wrong priority' }}.to_json
   end
