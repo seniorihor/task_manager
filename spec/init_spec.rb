@@ -45,11 +45,13 @@ describe 'TaskManager' do
   end
 
   it 'login should be successful' do
-    request  = { taskmanager: { login:    @user0.login,
-                                password: @user0.password }}
+    user     = User.first(login: @user0.login)
+
+    request  = { taskmanager: { login:    user.login,
+                                password: user.password }}
     response = { login: { error:      'Success',
-                          auth_token: @user0.token,
-                          friends:    @user0.friends }}
+                          auth_token: user.token,
+                          friends:    user.friends }}
 
     post '/login', request.to_json
     last_response.body == response.to_json
@@ -97,7 +99,6 @@ describe 'TaskManager' do
   it 'add_friend (invite) should be successful' do
     request  = { taskmanager: { auth_token:     @user1.token,
                                 receiver_login: @user2.login,
-                                content:        'greeting',
                                 priority:       4 }}
     response = { add_friend: { error: 'Success' }}
 
@@ -108,10 +109,9 @@ describe 'TaskManager' do
   it 'add_friend (response) should be successful' do
     request  = { taskmanager: { auth_token:     @user2.token,
                                 receiver_login: @user1.login,
-                                content:        'true',
+                                friendship:     'true',
                                 priority:       5 }}
-    response = { add_friend: { error:      'Success',
-                               friendship: true }}
+    response = { add_friend: { error: 'Success' }}
 
     post '/protected/add_friend', request.to_json
     last_response.body.should == response.to_json

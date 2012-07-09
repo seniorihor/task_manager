@@ -12,8 +12,8 @@ require 'dm-types'
 require 'dm-serializer/to_json'
 require 'json'
 
-set :environment, ENV['RACK_ENV'] || :development
-                                     #:test
+set :environment, ENV['RACK_ENV'] || #:development
+                                     :test
 
 # Configuration connection to database
 configure :production do
@@ -26,8 +26,8 @@ configure :development do
 end
 
 configure :test do
+  #DataMapper.setup(:default, "sqlite://#{Dir.pwd}/test.db")
   DataMapper.setup(:default, 'sqlite::memory:')
-  DataMapper.setup(:default, "sqlite://#{Dir.pwd}/test.db")
 end
 
 DataMapper::Property::String.length(20)
