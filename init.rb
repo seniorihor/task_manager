@@ -124,12 +124,12 @@ helpers do
     user = User.first(login: login)
 
     return { login: { error: 'Invalid login or password' }}.to_json if user.nil?
-    return { login: { error: 'Already in system'}}.to_json          unless user.token.nil?
+
     if password == user.password
       user.token = new_token
       if user.save
         friends = Array.new(user.friends)
-        friends.map! { |friend| { login: friend.login, firstname: friend.firstname, lastname: friend.lastname}}
+        friends.map! { |friend| { login: friend.login, firstname: friend.firstname, lastname: friend.lastname }}
         { login: { error: 'Success', auth_token: user.token, friends: friends }}.to_json
       else
         { login: { error: 'Failure' }}.to_json
@@ -192,8 +192,8 @@ helpers do
   end
 
   def find_user(auth_token, search_value)
-    return { find_user: { error: 'Empty fields' }}.to_json if search_value.empty? ||
-                                                              search_value.size == 1
+    return { find_user: { error: 'Empty fields' }}.to_json               if search_value.empty?
+    return { find_user: { error: 'Need at least 2 characters' }}.to_json if search_value.size == 1
 
     users              = Array.new
     users_by_login     = Array.new(User.all(:login.like     => "%#{search_value}%"))
@@ -216,8 +216,8 @@ helpers do
   end
 
   def add_friend(auth_token, receiver_login, content)
-    return { add_friend: { error: 'Empty fields' }}.to_json if content.empty? ||
-                                                               receiver_login.empty?
+    return { add_friend: { error: 'Empty fields' }}.to_json if receiver_login.empty? ||
+                                                               content.empty?
 
     sender   = User.first(token: auth_token)
     receiver = User.first(login: receiver_login)
@@ -364,6 +364,9 @@ end
 # Login user
 post '/login' do
   @hash = to_hash(request.body.read)
+  user = User.first(login: @hash['taskmanager']['login'])
+
+  return { login: { error: 'Already in system' }}.to_json if user.token
 
   login(@hash['taskmanager']['login'],
         @hash['taskmanager']['password'])
