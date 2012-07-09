@@ -50,16 +50,14 @@ end
 
 post '/protected/add_friend'
   request invite:
-    "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"receiver_login\" : \"login\", \"content\" : \"greeting\", \"priority\" : 4 }}"
-
+    "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"receiver_login\" : \"login\", \"priority\" : 4 }}"
   response:
     {"add_friend":{"error":"Success"}}
 
   request response:
-    "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"receiver_login\" : \"login\", \"content\" : \"true or false\", \"priority\" : 5 }}"
-
+    "{ \"taskmanager\" : { \"auth_token\" : \"token\", \"receiver_login\" : \"login\", \"friendship\" : \"true or false\", \"priority\" : 5 }}"
   response:
-    {"add_friend":{"error":"Success","friendship":true}}
+    {"add_friend":{"error":"Success"}}
 end
 
 post '/protected/delete_friend'
