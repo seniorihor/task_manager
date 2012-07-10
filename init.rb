@@ -44,7 +44,7 @@ class User
   property :firstname,  String,   required: true, length: 2..20
   property :lastname,   String,   required: true, length: 2..20
   property :token,      String,   length:   10
-  property :created_at, DateTime,
+  property :created_at, DateTime
   property :deleted,    Boolean,  required: true, default: false
 
   has n,   :friendships, child_key: [:source_id]
@@ -61,7 +61,7 @@ class Task
                                  4,       # invite friend
                                  5,       # add friend
                                  6]       # delete friend
-  property :created_at,     DateTime,
+  property :created_at,     DateTime
   property :receiver_login, String,       required: true, length:  2..20, format: /[a-zA-Z]/
   property :read,           Boolean,      required: true, default: false
 
