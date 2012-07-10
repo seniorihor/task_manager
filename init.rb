@@ -111,19 +111,23 @@ end
 # Helpers
 helpers do
 
+  #generating of token
   def new_token
     chars = ['A'..'Z', 'a'..'z', '0'..'9'].map { |r| r.to_a }.flatten
     Array.new(10).map { chars[rand(chars.size)] }.join
   end
 
+  #parse of JSON request
   def to_hash(json_data)
     JSON.parse(json_data)
   end
 
+  #method name explain everything
   def login_exists?(login)
     User.first(login: login).nil? ? false : true
   end
 
+  #friend.map! means that array of friends of certain user prepared to json parse
   def login(login, password)
     user = User.first(login: login)
 
@@ -146,6 +150,7 @@ helpers do
     end
   end
 
+  #when logout, token of certain user become nil
   def logout(auth_token)
     user       = User.first(token: auth_token)
     user.token = nil if user
@@ -157,6 +162,7 @@ helpers do
     end
   end
 
+  #registration
   def add_new_user(login, password, firstname, lastname)
     return { register: { error: 'Empty fields' }}.to_json if login.empty?     ||
                                                              password.empty?  ||
@@ -176,6 +182,7 @@ helpers do
     end
   end
 
+  #property deleted of certain user become true( rights of "deleted" user is limited ) 
   def delete_user(auth_token)
     user = User.first(token: auth_token)
     user.deleted = true
@@ -187,6 +194,7 @@ helpers do
     end
   end
 
+  #property deleted of certain user become false( all rights are restored ) 
   def restore_user(auth_token)
     user = User.first(token: auth_token)
     user.deleted = false
@@ -198,6 +206,7 @@ helpers do
     end
   end
 
+  #Search by certain fields in database (also can search by substring)  
   def find_user(auth_token, search_value)
     return { find_user: { error: 'Empty fields' }}.to_json               if search_value.empty?
     return { find_user: { error: 'Need at least 2 characters' }}.to_json if search_value.size == 1
@@ -224,6 +233,8 @@ helpers do
                    users: users }}.to_json
   end
 
+  #Sending massage of agree or disagree if user accept of declain friendship request
+  #There is a special priority: 5  of friendship request message 
   def add_friend(auth_token, receiver_login, friendship)
     return { add_friend: { error: 'Empty fields' }}.to_json if receiver_login.empty? ||
                                                                friendship.empty?
@@ -263,6 +274,7 @@ helpers do
     end
   end
 
+  #Delete relations from both sides of friendship
   def delete_friend(auth_token, receiver_login)
     return { delete_friend: { error: 'Empty fields' }}.to_json if receiver_login.empty?
 
@@ -282,7 +294,7 @@ helpers do
       { delete_friend: { error: 'Failure' }}.to_json
     end
   end
-
+  
   def add_new_task(auth_token, receiver_login, content, priority)
     return { new_task: { error: 'Empty fields' }}.to_json if content.empty? ||
                                                              priority.nil?  ||
@@ -337,6 +349,8 @@ helpers do
     end
   end
 
+  #A method which return only new tasks of certain user
+  #Also method delete temporary task like invites and response on them
   def get_task(auth_token)
     user       = User.first(token: auth_token)
     collection = Task.all(read: false, receiver_login: user.login)
@@ -356,7 +370,7 @@ helpers do
                           content:    task.content,
                       	  priority:   task.priority,
                       	  user_login: User.get(task.user_id).login,
-                      	  created_at: task.created_at }}
+                      	  created_at: task.created_at.strftime(%Y/%m/%d/%H/%M)}}
 
     # Delete all temporary tasks
     add_friend_tasks    = Array.new(Task.all(receiver_login: user.login, read: true, priority: 5))
