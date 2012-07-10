@@ -39,13 +39,13 @@ class User
   include DataMapper::Resource
 
   property :id,         Serial
-  property :login,      String,  required: true, length: 2..20, format: /[a-zA-Z]/, unique: true
-  property :password,   String,  required: true, length: 6..20, format: /[a-zA-Z]/
-  property :firstname,  String,  required: true, length: 2..20
-  property :lastname,   String,  required: true, length: 2..20
-  property :token,      String,  length:   10
-  property :created_at, DateTime
-  property :deleted,    Boolean, required: true, default: false
+  property :login,      String,   required: true, length: 2..20, format: /[a-zA-Z]/, unique: true
+  property :password,   String,   required: true, length: 6..20, format: /[a-zA-Z]/
+  property :firstname,  String,   required: true, length: 2..20
+  property :lastname,   String,   required: true, length: 2..20
+  property :token,      String,   length:   10
+  property :created_at, DateTime, required: true
+  property :deleted,    Boolean,  required: true, default: false
 
   has n,   :friendships, child_key: [:source_id]
   has n,   :friends,     self,      through: :friendships, via: :target
@@ -56,14 +56,14 @@ class Task
   include DataMapper::Resource
 
   property :id,             Serial
-  property :content,        Text,    required: true
+  property :content,        Text,         required: true
   property :priority,       Enum[1, 2, 3, # task priority
                                  4,       # invite friend
                                  5,       # add friend
                                  6]       # delete friend
-  property :created_at,     DateTime
-  property :receiver_login, String,  required: true, length:  2..20, format: /[a-zA-Z]/
-  property :read,           Boolean, required: true, default: false
+  property :created_at,     DateTime,     required: true
+  property :receiver_login, String,       required: true, length:  2..20, format: /[a-zA-Z]/
+  property :read,           Boolean,      required: true, default: false
 
   belongs_to :user
 end
