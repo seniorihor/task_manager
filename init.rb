@@ -131,7 +131,9 @@ helpers do
       if user.save
         friends = Array.new(user.friends)
         friends.map! { |friend| { login: friend.login, firstname: friend.firstname, lastname: friend.lastname }}
-        { login: { error: 'Success', auth_token: user.token, friends: friends }}.to_json
+        { login: { error:      'Success',
+                   auth_token: user.token,
+                   friends:    friends }}.to_json
       else
         { login: { error: 'Failure' }}.to_json
       end
@@ -294,7 +296,7 @@ helpers do
 
     invite_task = sender.tasks.all(receiver_login: receiver.login).last(priority: 4)
 
-    return { new_task: { error: 'Invite exists' }}.to_json if invite_task
+    return { add_friend: { error: 'Invite exists' }}.to_json if invite_task
 
     task                = Task.new
     task.content        = content
