@@ -182,7 +182,7 @@ helpers do
     end
   end
 
-  #property deleted of certain user become true( rights of "deleted" user is limited ) 
+  #property deleted of certain user become true( rights of "deleted" user is limited )
   def delete_user(auth_token)
     user = User.first(token: auth_token)
     user.deleted = true
@@ -194,7 +194,7 @@ helpers do
     end
   end
 
-  #property deleted of certain user become false( all rights are restored ) 
+  #property deleted of certain user become false( all rights are restored )
   def restore_user(auth_token)
     user = User.first(token: auth_token)
     user.deleted = false
@@ -206,7 +206,7 @@ helpers do
     end
   end
 
-  #Search by certain fields in database (also can search by substring)  
+  #Search by certain fields in database (also can search by substring)
   def find_user(auth_token, search_value)
     return { find_user: { error: 'Empty fields' }}.to_json               if search_value.empty?
     return { find_user: { error: 'Need at least 2 characters' }}.to_json if search_value.size == 1
@@ -234,7 +234,7 @@ helpers do
   end
 
   #Sending massage of agree or disagree if user accept of declain friendship request
-  #There is a special priority: 5  of friendship request message 
+  #There is a special priority: 5  of friendship request message
   def add_friend(auth_token, receiver_login, friendship)
     return { add_friend: { error: 'Empty fields' }}.to_json if receiver_login.empty? ||
                                                                friendship.empty?
@@ -294,7 +294,7 @@ helpers do
       { delete_friend: { error: 'Failure' }}.to_json
     end
   end
-  
+
   def add_new_task(auth_token, receiver_login, content, priority)
     return { new_task: { error: 'Empty fields' }}.to_json if content.empty? ||
                                                              priority.nil?  ||
