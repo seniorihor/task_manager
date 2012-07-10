@@ -214,7 +214,8 @@ helpers do
 
     users.map! { |user| { login:     user.login,
                           firstname: user.firstname,
-                          lastname:  user.lastname }}.uniq
+                          lastname:  user.lastname }}
+    users = users.uniq
 
     { find_user: { error: 'Success',
                    users: users }}.to_json
