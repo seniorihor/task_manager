@@ -370,7 +370,7 @@ helpers do
                           content:    task.content,
                       	  priority:   task.priority,
                       	  user_login: User.get(task.user_id).login,
-                      	  created_at: task.created_at.strftime('%d.%m.%Y %H:%M')}}
+                      	  created_at: task.created_at.strftime('%d.%m.%Y %H:%M') }}
 
     # Delete all temporary tasks
     add_friend_tasks    = Array.new(Task.all(receiver_login: user.login, read: true, priority: 5))
