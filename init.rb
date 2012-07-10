@@ -214,9 +214,10 @@ helpers do
 
     users.map! { |user| { login:     user.login,
                           firstname: user.firstname,
-                          lastname:  user.lastname }}
+                          lastname:  user.lastname }}.uniq
+
     { find_user: { error: 'Success',
-                   users: users.uniq! }}.to_json
+                   users: users }}.to_json
   end
 
   def add_friend(auth_token, receiver_login, friendship)
@@ -333,10 +334,11 @@ helpers do
     user       = User.first(token: auth_token)
     collection = Task.all(read: false, receiver_login: user.login)
 
-    return { get_task: { error: 'No matching tasks' }}.to_json if collection.empty?
-
     tasks    = Array.new(collection)
     quantity = tasks.size
+
+    return { get_task: { error:    'Success',
+                         quantity: quantity }}.to_json if quantity == 0
 
     tasks.each do |task|
          task.read = true
