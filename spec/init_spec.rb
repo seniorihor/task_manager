@@ -111,8 +111,10 @@ describe 'TaskManager' do
                                 receiver_login: @user1.login,
                                 friendship:     'true',
                                 priority:       5 }}
-    response = { add_friend: { error: 'Success' }}
-
+    response = { add_friend: { error:     'Success',
+                               login:     @user1.login,
+                               firstname: @user1.firstname,
+                               lastname:  @user1.lastname }}
     post '/protected/add_friend', request.to_json
     last_response.body.should == response.to_json
   end
@@ -136,7 +138,7 @@ describe 'TaskManager' do
                                           content:    Task.last.content,
                                           priority:   Task.last.priority,
                                           user_login: @user1.login,
-                                          created_at: Task.last.created_at }]}}
+                                          created_at: Task.last.created_at.strftime('%d.%m.%Y %H:%M') }]}}
 
     post '/protected/get_task', request.to_json
     last_response.body.should == response.to_json
