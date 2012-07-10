@@ -68,6 +68,7 @@ class Task
   belongs_to :user
 end
 
+# Join table which include relations between two users (id to id)
 class Friendship
   include DataMapper::Resource
 
@@ -84,6 +85,8 @@ before do
   content_type :json
 end
 
+# Protected means that users without rights, can't recieve response from certain methods
+# @auth ---- indicator of authentication
 before '/protected/*' do
   json_data = request.body.read
 
