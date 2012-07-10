@@ -92,29 +92,29 @@ describe 'TaskManager' do
 
   it 'delete user1 should be successful' do
     request  = { taskmanager: { auth_token: User.first.token }}
-    response = { delete_user: { error: 'Success' }}
-
     post '/protected/delete_user', request.to_json
+
+    response = { delete_user: { error: 'Success' }}
     last_response.body.should == response.to_json
   end
 
   it 'restore user1 should be successful' do
     request  = { taskmanager: { auth_token: User.first.token }}
-    response = { restore_user: { error: 'Success' }}
-
     post '/protected/restore_user', request.to_json
+
+    response = { restore_user: { error: 'Success' }}
     last_response.body.should == response.to_json
   end
 
   it 'find user2 should be successful' do
     request  = { taskmanager: { auth_token:   User.first.token,
                                 search_value: User.last.login }}
+    post '/protected/find_user', request.to_json
+
     response = { find_user: { error: 'Success',
                               users: [{ login:     User.last.login,
                                         firstname: User.last.firstname,
                                         lastname:  User.last.lastname }]}}
-
-    post '/protected/find_user', request.to_json
     last_response.body.should == response.to_json
   end
 
@@ -122,9 +122,9 @@ describe 'TaskManager' do
     request  = { taskmanager: { auth_token:     User.first.token,
                                 receiver_login: User.last.login,
                                 priority:       4 }}
-    response = { add_friend: { error: 'Success' }}
-
     post '/protected/add_friend', request.to_json
+
+    response = { add_friend: { error: 'Success' }}
     last_response.body.should == response.to_json
   end
 
@@ -133,11 +133,12 @@ describe 'TaskManager' do
                                 receiver_login: User.first.login,
                                 friendship:     'true',
                                 priority:       5 }}
+    post '/protected/add_friend', request.to_json
+
     response = { add_friend: { error:     'Success',
                                login:     User.first.login,
                                firstname: User.first.firstname,
                                lastname:  User.first.lastname }}
-    post '/protected/add_friend', request.to_json
     last_response.body.should == response.to_json
   end
 
@@ -146,9 +147,9 @@ describe 'TaskManager' do
                                 receiver_login: User.last.login,
                                 content:        'content',
                                 priority:       rand(1..3) }}
-    response = { new_task: { error: 'Success' }}
-
     post '/protected/new_task', request.to_json
+
+    response = { new_task: { error: 'Success' }}
     last_response.body.should == response.to_json
   end
 
@@ -170,18 +171,18 @@ describe 'TaskManager' do
     task_id  = Task.all(receiver_login: User.last.login).last(read: true).id
     request  = { taskmanager: { auth_token: User.last.token,
                                 task_id:    task_id }}
-    response = { delete_task: { error: 'Success' }}
-
     post '/protected/delete_task', request.to_json
+
+    response = { delete_task: { error: 'Success' }}
     last_response.body.should == response.to_json
   end
 
   it 'delete_friend should be successful' do
     request  = { taskmanager: { auth_token:     User.first.token,
                                 receiver_login: User.last.login }}
-    response = { delete_friend: { error: 'Success' }}
-
     post '/protected/delete_friend', request.to_json
+
+    response = { delete_friend: { error: 'Success' }}
     last_response.body.should == response.to_json
   end
 end
