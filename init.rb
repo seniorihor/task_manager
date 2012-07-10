@@ -216,7 +216,7 @@ helpers do
                           firstname: user.firstname,
                           lastname:  user.lastname }}
     { find_user: { error: 'Success',
-                   users: users }}.to_json
+                   users: users.uniq! }}.to_json
   end
 
   def add_friend(auth_token, receiver_login, friendship)
