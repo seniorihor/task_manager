@@ -125,6 +125,7 @@ helpers do
     user = User.first(login: login)
 
     return { login: { error: 'Invalid login or password' }}.to_json if user.nil?
+    return { login: { error: 'Already in system' }}.to_json         if user.token
 
     if password == user.password
       user.token = new_token
@@ -364,9 +365,6 @@ end
 # Login user
 post '/login' do
   @hash = to_hash(request.body.read)
-  user = User.first(login: @hash['taskmanager']['login'])
-
-  return { login: { error: 'Already in system' }}.to_json if user.token
 
   login(@hash['taskmanager']['login'],
         @hash['taskmanager']['password'])
