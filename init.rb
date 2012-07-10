@@ -85,7 +85,7 @@ before do
   content_type :json
 end
 
-# Protected means that users without rights, can't recieve response from certain methods
+# Protected means that users without rights, can't receive response from certain methods
 # @auth ---- indicator of authentication
 before '/protected/*' do
   json_data = request.body.read
@@ -127,7 +127,7 @@ helpers do
     User.first(login: login).nil? ? false : true
   end
 
-  #friend.map! means that array of friends of certain user prepared to json parse
+  #friends.map! means that array of friends of certain user prepared to json parse
   def login(login, password)
     user = User.first(login: login)
 
@@ -233,7 +233,7 @@ helpers do
                    users: users }}.to_json
   end
 
-  #Sending massage of agree or disagree if user accept of declain friendship request
+  #Sending message of agree or disagree if user accept or declain friendship request
   #There is a special priority: 5  of friendship request message
   def add_friend(auth_token, receiver_login, friendship)
     return { add_friend: { error: 'Empty fields' }}.to_json if receiver_login.empty? ||
