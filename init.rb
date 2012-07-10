@@ -255,14 +255,14 @@ helpers do
       receiver.friends << sender
 
       if sender.friends.save && receiver.friends.save
-        add_new_task(sender.token, receiver.login, 'true', 5)
+        add_new_task(sender.token, receiver.login, "#{sender.firstname} #{sender.lastname} true", 5)
         invite_task.destroy!
         { add_friend: { error:     'Success',
                         login:     receiver.login,
                         firstname: receiver.firstname,
                         lastname:  receiver.lastname }}.to_json
       else
-        add_new_task(sender.token, receiver.login, 'false', 5)
+        add_new_task(sender.token, receiver.login, "#{sender.firstname} #{sender.lastname} false", 5)
         invite_task.destroy!
         { add_friend: { error: 'Success' }}.to_json
       end
