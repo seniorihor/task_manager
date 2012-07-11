@@ -86,7 +86,7 @@ before do
 end
 
 # Protected means that users without rights, can't receive response from certain methods
-# @auth ---- indicator of authentication
+# @auth - indicator of authentication
 before '/protected/*' do
   json_data = request.body.read
 
@@ -111,23 +111,23 @@ end
 # Helpers
 helpers do
 
-  #generating of token
+  # Generating of token
   def new_token
     chars = ['A'..'Z', 'a'..'z', '0'..'9'].map { |r| r.to_a }.flatten
     Array.new(10).map { chars[rand(chars.size)] }.join
   end
 
-  #parse of JSON request
+  # Parse of JSON request
   def to_hash(json_data)
     JSON.parse(json_data)
   end
 
-  #method name explain everything
+  # Method name explain everything
   def login_exists?(login)
     User.first(login: login).nil? ? false : true
   end
 
-  #friends.map! means that array of friends of certain user prepared to json parse
+  # friends.map! means that array of friends of certain user prepared to json parse
   def login(login, password)
     user = User.first(login: login)
 
@@ -150,7 +150,7 @@ helpers do
     end
   end
 
-  #when logout, token of certain user become nil
+  # When logout, token of certain user become nil
   def logout(auth_token)
     user       = User.first(token: auth_token)
     user.token = nil if user
@@ -162,7 +162,7 @@ helpers do
     end
   end
 
-  #registration
+  # Registration
   def add_new_user(login, password, firstname, lastname)
     return { register: { error: 'Empty fields' }}.to_json if login.empty?     ||
                                                              password.empty?  ||
@@ -182,7 +182,7 @@ helpers do
     end
   end
 
-  #property deleted of certain user become true( rights of "deleted" user is limited )
+  # Property deleted of certain user become true (rights of "deleted" user is limited)
   def delete_user(auth_token)
     user = User.first(token: auth_token)
     user.deleted = true
@@ -194,7 +194,7 @@ helpers do
     end
   end
 
-  #property deleted of certain user become false( all rights are restored )
+  # Property deleted of certain user become false (all rights are restored)
   def restore_user(auth_token)
     user = User.first(token: auth_token)
     user.deleted = false
@@ -206,7 +206,7 @@ helpers do
     end
   end
 
-  #Search by certain fields in database (also can search by substring)
+  # Search by certain fields in database (also can search by substring)
   def find_user(auth_token, search_value)
     return { find_user: { error: 'Empty fields' }}.to_json               if search_value.empty?
     return { find_user: { error: 'Need at least 2 characters' }}.to_json if search_value.size == 1
@@ -233,8 +233,8 @@ helpers do
                    users: users }}.to_json
   end
 
-  #Sending message of agree or disagree if user accept or declain friendship request
-  #There is a special priority: 5  of friendship request message
+  # Sending message of agree or disagree if user accept or declain friendship request
+  # There is a special priority: 5 of friendship request message
   def add_friend(auth_token, receiver_login, friendship)
     return { add_friend: { error: 'Empty fields' }}.to_json if receiver_login.empty? ||
                                                                friendship.empty?
@@ -245,7 +245,7 @@ helpers do
     return { add_friend: { error: "User doesn't exist" }}.to_json                if receiver.nil?
     return { add_friend: { error: "You can't add yourself to friends" }}.to_json if sender == receiver
     return { add_friend: { error: 'User is deleted' }}.to_json                   if receiver.deleted
-    return { add_friend: { error: 'Already in friends'}}.to_json if sender.friends.include?(receiver)
+    return { add_friend: { error: 'Already in friends'}}.to_json                 if sender.friends.include?(receiver)
 
     invite_task = receiver.tasks.all(receiver_login: sender.login).last(priority: 4)
 
@@ -275,7 +275,7 @@ helpers do
     end
   end
 
-  #Delete relations from both sides of friendship
+  # Delete relations from both sides of friendship
   def delete_friend(auth_token, receiver_login)
     return { delete_friend: { error: 'Empty fields' }}.to_json if receiver_login.empty?
 
@@ -350,8 +350,8 @@ helpers do
     end
   end
 
-  #A method which return only new tasks of certain user
-  #Also method delete temporary task like invites and response on them
+  # A method which return only new tasks of certain user
+  # Also method delete temporary task like invites and response on them
   def get_task(auth_token)
     user       = User.first(token: auth_token)
     collection = Task.all(read: false, receiver_login: user.login)
