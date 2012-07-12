@@ -397,7 +397,7 @@ end
 
 # Logout user
 post '/protected/logout' do
-  return { session: { error: '403 Forbidden' }}.to_json unless @auth
+  return { logout: { error: '403 Forbidden' }}.to_json unless @auth
 
   logout(@protected_hash['taskmanager']['auth_token'])
 end
@@ -418,21 +418,21 @@ end
 
 # Delete user
 post '/protected/delete_user' do
-  return { session: { error: '403 Forbidden' }}.to_json unless @auth
+  return { delete_user: { error: '403 Forbidden' }}.to_json unless @auth
 
   delete_user(@protected_hash['taskmanager']['auth_token'])
 end
 
 # Restore user
 post '/protected/restore_user' do
-  return { session: { error: '403 Forbidden' }}.to_json unless @restore_auth
+  return { restore_user: { error: '403 Forbidden' }}.to_json unless @restore_auth
 
   restore_user(@protected_hash['taskmanager']['auth_token'])
 end
 
 # Find user
 post '/protected/find_user' do
-  return { session: { error: '403 Forbidden' }}.to_json unless @auth
+  return { find_user: { error: '403 Forbidden' }}.to_json unless @auth
 
   find_user(@protected_hash['taskmanager']['auth_token'],
             @protected_hash['taskmanager']['search_value'])
@@ -440,7 +440,7 @@ end
 
 # Add friend
 post '/protected/add_friend' do
-  return { session: { error: '403 Forbidden' }}.to_json unless @auth
+  return { add_friend: { error: '403 Forbidden' }}.to_json unless @auth
 
   case @protected_hash['taskmanager']['priority']
   when 4
@@ -459,7 +459,7 @@ end
 
 # Delete friend
 post '/protected/delete_friend' do
-  return { session: { error: '403 Forbidden' }}.to_json unless @auth
+  return { delete_friend: { error: '403 Forbidden' }}.to_json unless @auth
 
   delete_friend(@protected_hash['taskmanager']['auth_token'],
                 @protected_hash['taskmanager']['receiver_login'])
@@ -467,7 +467,7 @@ end
 
 # Create new task
 post '/protected/new_task' do
-  return { session: { error: '403 Forbidden' }}.to_json unless @auth
+  return { new_task: { error: '403 Forbidden' }}.to_json unless @auth
 
   add_new_task(@protected_hash['taskmanager']['auth_token'],
                @protected_hash['taskmanager']['receiver_login'],
@@ -477,7 +477,7 @@ end
 
 # Delete task
 post '/protected/delete_task' do
-  return { session: { error: '403 Forbidden' }}.to_json unless @auth
+  return { delete_task: { error: '403 Forbidden' }}.to_json unless @auth
 
   delete_task(@protected_hash['taskmanager']['auth_token'],
               @protected_hash['taskmanager']['task_id'])
@@ -485,7 +485,7 @@ end
 
 # List all tasks
 post '/protected/get_task' do
-  return { session: { error: '403 Forbidden' }}.to_json unless @auth
+  return { get_task: { error: '403 Forbidden' }}.to_json unless @auth
 
   get_task(@protected_hash['taskmanager']['auth_token'])
 end
