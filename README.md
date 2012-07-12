@@ -1,6 +1,6 @@
 # TaskManager
 
-###### Sinatra-1.3.2
+##### Sinatra-1.3.2
 
 Перед Вами сервер, який обслуговує [клієнтську частину][] програми TaskManager для Android
 [клієнтську частину]: https://github.com/paul-ihnatolia/taskmanager
@@ -11,5 +11,5 @@
     *   Можливість додавання і видалення друзів
     *   Обмін завданнями між друзями
 
-##### Для удосконалення та тестування серверу всім охочим доступне [Curl API](/seniorihor/task_manager/blob/master/curl.api)
+###### Для удосконалення та тестування серверу всім охочим доступне [Curl API](/seniorihor/task_manager/blob/master/curl.api)
 
