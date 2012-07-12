@@ -4,6 +4,7 @@
 [клієнтську частину]: https://github.com/paul-ihnatolia/taskmanager
 [Sinatra]: http://www.sinatrarb.com
 [Android]: http://www.android.com
+
 *   Можливості сервера:
     *   Реєстрація нових користувачів і видалення існуючих
     *   Багатофакторний пошук користувачів
