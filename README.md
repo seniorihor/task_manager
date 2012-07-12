@@ -1,10 +1,6 @@
 # TaskManager Beta
 
-##### Стек технологій:
-###### Ruby 1.9.3
-###### Sinatra 1.3.2
-
-Перед Вами сервер, який обслуговує [клієнтську частину][] програми TaskManager для Android 2.2 Froyo
+Перед Вами сервер, створений з використанням Sinatra-1.3.2, який обслуговує [клієнтську частину][] програми TaskManager для Android 2.2 Froyo
 [клієнтську частину]: https://github.com/paul-ihnatolia/taskmanager
 
 *   Можливості сервера:
