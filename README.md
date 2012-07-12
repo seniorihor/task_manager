@@ -1,6 +1,6 @@
 # TaskManager
 
-Sinatra-1.3.2
+## Sinatra-1.3.2
 
 Перед Вами сервер, який обслуговує [клієнтську частину][] програми TaskManager для Android
 [клієнтську частину]: https://github.com/paul-ihnatolia/taskmanager
