@@ -248,11 +248,6 @@ helpers do
 
     invite_task = receiver.tasks.all(receiver_login: sender.login).last(priority: 4)
 
-    if sender.friends.include?(receiver)
-      invite_task.destroy!
-      return { add_friend: { error: 'Already in friends'}}.to_json
-    end
-
     return { add_friend: { error: "Invite doesn't exist" }}.to_json if invite_task.nil?
 
     if friendship == 'true'
@@ -321,8 +316,10 @@ helpers do
                                                                  priority == 4
 
     invite_task = sender.tasks.all(receiver_login: receiver.login).last(priority: 4)
+    invite_task_receiver = receiver.tasks.all(receiver_login: sender.login).last(priority: 4)
 
     return { add_friend: { error: 'Invite exists' }}.to_json if invite_task
+    return { add_friend: { error: 'Invite receiver exists' }}.to_json if invite_task_receiver
 
     task                = Task.new
     task.content        = content
