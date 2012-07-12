@@ -2,8 +2,9 @@
 
 ###### Sinatra-1.3.2
 
-Перед Вами сервер, який обслуговує [клієнтську частину][] програми TaskManager для Android 2.2 Froyo
+Перед Вами сервер, який обслуговує [клієнтську частину][] ([дізнатись більше][]) програми TaskManager для Android 2.2 Froyo
 [клієнтську частину]: https://github.com/paul-ihnatolia/taskmanager
+[дізнатись більше]: https://github.com/paul-ihnatolia/taskmanager/blob/master/Readme.txt
 
 *   Можливості сервера:
     *   Реєстрація нових користувачів і видалення існуючих
