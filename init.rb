@@ -245,9 +245,13 @@ helpers do
     return { add_friend: { error: "User doesn't exist" }}.to_json                if receiver.nil?
     return { add_friend: { error: "You can't add yourself to friends" }}.to_json if sender == receiver
     return { add_friend: { error: 'User is deleted' }}.to_json                   if receiver.deleted
-    return { add_friend: { error: 'Already in friends'}}.to_json                 if sender.friends.include?(receiver)
 
     invite_task = receiver.tasks.all(receiver_login: sender.login).last(priority: 4)
+
+    if sender.friends.include?(receiver)
+      invite_task.destroy!
+      return { add_friend: { error: 'Already in friends'}}.to_json
+    end
 
     return { add_friend: { error: "Invite doesn't exist" }}.to_json if invite_task.nil?
 
