@@ -1,4 +1,4 @@
-# TaskManager Beta
+# TaskManager Server Beta
 
 Перед Вами сервер, створений з використанням Sinatra-1.3.2, який обслуговує [клієнтську частину][] програми TaskManager для Android 2.2 Froyo
 [клієнтську частину]: https://github.com/paul-ihnatolia/taskmanager
