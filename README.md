@@ -13,3 +13,4 @@
 
 ###### Для удосконалення та тестування серверу всім охочим доступне [Curl API](/seniorihor/task_manager/blob/master/curl.api)
 
+Contributors: [seniorihor](https://github.com/seniorihor) & [taras42](https://github.com/taras42)
