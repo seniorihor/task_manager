@@ -138,7 +138,9 @@ helpers do
       user.token = new_token
       if user.save
         friends = Array.new(user.friends)
-        friends.map! { |friend| { login: friend.login, firstname: friend.firstname, lastname: friend.lastname }}
+        friends.map! { |friend| { login:     friend.login,
+                                  firstname: friend.firstname,
+                                  lastname:  friend.lastname }}
         { login: { error:      'Success',
                    auth_token: user.token,
                    friends:    friends }}.to_json
@@ -268,7 +270,7 @@ helpers do
       end
 
     else
-      add_new_task(sender.token, receiver.login, 'false', 5)
+      add_new_task(sender.token, receiver.login, "#{sender.firstname} #{sender.lastname} false", 5)
       invite_task.destroy!
       { add_friend: { error: 'Success' }}.to_json
     end
@@ -295,6 +297,14 @@ helpers do
     end
   end
 
+  def friends_online(auth_token)
+    user    = User.first(token: auth_token)
+    friends = user.friends.select { |friend| friend.token }
+    friends = friends.map! { |friend| { login:     friend.login,
+                                        firstname: friend.firstname,
+                                        lastname:  friend.lastname }}
+  end
+
   def add_new_task(auth_token, receiver_login, content, priority)
     return { new_task: { error: 'Empty fields' }}.to_json if content.empty? ||
                                                              priority.nil?  ||
@@ -319,7 +329,7 @@ helpers do
     invite_task_receiver = receiver.tasks.all(receiver_login: sender.login).last(priority: 4)
 
     return { add_friend: { error: 'Invite exists' }}.to_json                  if invite_task_sender
-    return { add_friend: { error: 'You have invite from this user' }}.to_json if invite_task_receiver
+    #return { add_friend: { error: 'You have invite from this user' }}.to_json if invite_task_receiver
 
     task                = Task.new
     task.content        = content
