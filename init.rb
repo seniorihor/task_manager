@@ -303,6 +303,8 @@ helpers do
     friends = friends.map! { |friend| { login:     friend.login,
                                         firstname: friend.firstname,
                                         lastname:  friend.lastname }}
+    { friends_online: { error:   'Success',
+                        friends: friends }}.to_json
   end
 
   def add_new_task(auth_token, receiver_login, content, priority)
