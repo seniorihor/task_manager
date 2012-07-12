@@ -10,6 +10,6 @@
     *   Можливість додавання і видалення друзів
     *   Обмін завданнями між друзями
 
-    Для удосконалення та тестування серверу всім охочим доступне [Curl API](/seniorihor/task_manager/blob/master/curl.api)
+    Для удосконалення та тестування серверу всім охочим доступний [Curl API](/seniorihor/task_manager/blob/master/curl.api)
 
 > Contributors: [seniorihor](https://github.com/seniorihor) & [taras42](https://github.com/taras42)
