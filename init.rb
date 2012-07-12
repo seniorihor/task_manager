@@ -329,7 +329,8 @@ helpers do
     invite_task_receiver = receiver.tasks.all(receiver_login: sender.login).last(priority: 4)
 
     return { add_friend: { error: 'Invite exists' }}.to_json                  if invite_task_sender
-    #return { add_friend: { error: 'You have invite from this user' }}.to_json if invite_task_receiver
+    return { add_friend: { error: 'You have invite from this user' }}.to_json if invite_task_receiver &&
+                                                                                 priority == 4
 
     task                = Task.new
     task.content        = content
