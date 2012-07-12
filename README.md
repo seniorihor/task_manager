@@ -1,8 +1,9 @@
 # TaskManager Server Beta
 
-Перед Вами сервер, створений з використанням DSL Sinatra, який обслуговує [клієнтську частину][] додатку TaskManager для платформи Android
+Перед Вами сервер, створений з використанням DSL [Sinatra][], який обслуговує [клієнтську частину][] додатку TaskManager для платформи [Android][]
 [клієнтську частину]: https://github.com/paul-ihnatolia/taskmanager
-
+[Sinatra]: http://www.sinatrarb.com
+[Android]: http://www.android.com
 *   Можливості сервера:
     *   Реєстрація нових користувачів і видалення існуючих
     *   Багатофакторний пошук користувачів
