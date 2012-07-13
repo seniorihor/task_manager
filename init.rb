@@ -483,7 +483,8 @@ post '/protected/new_task' do
   return { new_task: { error: '403 Forbidden' }}.to_json  unless @auth
 
   case @protected_hash['taskmanager']['priority']
-  when 4..6
+  when 1..3
+  else
     return { new_task: { error: 'Wrong priority' }}.to_json
   end
 
