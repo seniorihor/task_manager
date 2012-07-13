@@ -480,7 +480,12 @@ end
 
 # Create new task
 post '/protected/new_task' do
-  return { new_task: { error: '403 Forbidden' }}.to_json unless @auth
+  return { new_task: { error: '403 Forbidden' }}.to_json  unless @auth
+
+  case @protected_hash['taskmanager']['priority']
+  when 4..6
+    return { new_task: { error: 'Wrong priority' }}.to_json
+  end
 
   add_new_task(@protected_hash['taskmanager']['auth_token'],
                @protected_hash['taskmanager']['receiver_login'],
