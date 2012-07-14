@@ -1,4 +1,4 @@
-curl -v -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://task-manager-project.heroku.com/<url> -d
+curl -H "Content-Type: application/json" -H "Accept: application/json" -X POST https://task-manager-project.heroku.com/<url> -d
 
 post '/login'
   request:
