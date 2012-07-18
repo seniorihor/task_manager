@@ -119,6 +119,16 @@ describe 'TaskManager' do
   end
 
   context 'logout' do
+
+    it 'of user1 should be failure becouse token is invalid' do
+      request  = { taskmanager: { auth_token: 'invalid_token' }}
+      post '/protected/logout', request.to_json
+
+      response = { logout: { error: '403 Forbidden' }}
+
+      last_response.body.should == response.to_json
+    end
+
     it 'of user1 should be successful' do
       request  = { taskmanager: { auth_token: User.first.token }}
       post '/protected/logout', request.to_json
@@ -427,18 +437,33 @@ describe 'TaskManager' do
 
       response = { delete_friend: { error: 'Empty fields' }}
       last_response.body.should == response.to_json
-    end    
+    end
+
+     it ' should be failure becouse user doesn\'t exists' do
+      request  = { taskmanager: { auth_token:     User.first.token,
+                                  receiver_login: 'nothing' }}
+      post '/protected/delete_friend', request.to_json
+
+      response = { delete_friend: { error: 'User doesn\'t exist' }}
+      last_response.body.should == response.to_json
+    end
+
+    it ' should be successful' do
+      request  = { taskmanager: { auth_token:     User.first.token,
+                                  receiver_login: User.last.login }}
+      post '/protected/delete_friend', request.to_json
+
+      response = { delete_friend: { error: 'Success' }}
+      last_response.body.should == response.to_json
+    end 
+
+    it ' should be failure becouse users aren\'t friends' do
+      request  = { taskmanager: { auth_token:     User.first.token,
+                                  receiver_login: User.last.login }}
+      post '/protected/delete_friend', request.to_json
+
+      response = { delete_friend: { error: 'This is not your friend' }}
+      last_response.body.should == response.to_json
+    end       
   end  
- 
-=begin
-
-  it 'delete_friend should be successful' do
-    request  = { taskmanager: { auth_token:     User.first.token,
-                                receiver_login: User.last.login }}
-    post '/protected/delete_friend', request.to_json
-
-    response = { delete_friend: { error: 'Success' }}
-    last_response.body.should == response.to_json
-  end
-=end  
 end
