@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 
 require 'sinatra'
-require 'bundler/setup'
-require 'sinatra/reloader'
+#require 'bundler/setup'
+#require 'sinatra/reloader'
 require 'dm-core'
 require 'dm-sqlite-adapter'
 require 'dm-validations'
 require 'dm-migrations'
 require 'dm-timestamps'
 require 'dm-types'
-require 'dm-serializer/to_json'
+#require 'dm-serializer/to_json'
 require 'json'
 
-set :environment, ENV['RACK_ENV'] || :development
+set :environment, ENV['RACK_ENV'] || :development #:test  
                                      #:test
 
 # Configuration connection to database
