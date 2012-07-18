@@ -268,7 +268,7 @@ describe 'TaskManager' do
 
     it 'on invite from user2 to user1 should be successful(false)' do
       request  = { taskmanager: { auth_token:     User.last.token,
-                                  receiver_login: User.last.login,
+                                  receiver_login: User.first.login,
                                   friendship:     'false',
                                   priority:       5 }}
       post '/protected/add_friend', request.to_json
@@ -276,46 +276,161 @@ describe 'TaskManager' do
       response = { add_friend: { error: 'Success' }}
       last_response.body.should == response.to_json
     end
+
+    it 'on invite from user2 to user1 should be successful(true)' do
+      request_invite  = { taskmanager: { auth_token:     User.first.token,
+                                         receiver_login: User.last.login,
+                                         priority:       4 }}
+      post '/protected/add_friend', request_invite.to_json
+
+      request_response  = { taskmanager: { auth_token:     User.last.token,
+                                           receiver_login: User.first.login,
+                                           friendship:     'true',
+                                           priority:       5 }}
+      post '/protected/add_friend', request_response.to_json
+
+      response = { add_friend: { error:     'Success',
+                                 login:     User.first.login,
+                                 firstname: User.first.firstname,
+                                 lastname:  User.first.lastname }}
+      last_response.body.should == response.to_json
+    end
   end  
 
+  context 'new_task' do 
+    it ' to user2 should be failure becouse of empty fields' do
+      request  = { taskmanager: { auth_token:     User.first.token,
+                                  receiver_login: User.last.login,
+                                  content:        '',
+                                  priority:       1 }}
+      post '/protected/new_task', request.to_json
+
+      response = { new_task: { error: 'Empty fields' }}
+      last_response.body.should == response.to_json
+    end
+
+    it ' to user should be failure becouse such user doesn\'t exists' do
+      request  = { taskmanager: { auth_token:     User.first.token,
+                                  receiver_login: 'nothing',
+                                  content:        'content',
+                                  priority:       1 }}
+      post '/protected/new_task', request.to_json
+
+      response = { new_task: { error: 'User doesn\'t exist' }}
+      last_response.body.should == response.to_json
+    end
+
+    it ' to user1 from user1 should be failure ' do
+      request  = { taskmanager: { auth_token:     User.first.token,
+                                  receiver_login: User.first.login,
+                                  content:        'content',
+                                  priority:       1 }}
+      post '/protected/new_task', request.to_json
+
+      response = { new_task: { error: 'You can\'t be receiver' }}
+      last_response.body.should == response.to_json
+    end
+
+    it ' to user3 from user1 should be failure becouse they aren\'t friends' do
+      User.create( login:     'login3',
+                   password:  'password3',
+                   firstname: 'firstname3',
+                   lastname:  'lastname3',
+                   token:     'user3token')
+
+      request  = { taskmanager: { auth_token:     User.first.token,
+                                  receiver_login: User.first(login: 'login3').login,
+                                  content:        'content',
+                                  priority:       1 }}
+      post '/protected/new_task', request.to_json
+
+      response = { new_task: { error: 'This is not your friend' }}
+      last_response.body.should == response.to_json
+    end
+
+    it ' to user1 from user2 should be successful ' do
+      request  = { taskmanager: { auth_token:     User.first.token,
+                                  receiver_login: User.first(login: 'login2').login,
+                                  content:        'content',
+                                  priority:       1 }}
+      post '/protected/new_task', request.to_json
+
+      response = { new_task: { error: 'Success' }}
+      last_response.body.should == response.to_json
+    end
+
+    after(:all) do 
+      User.first(login: 'login3').destroy!
+    end  
+  end
+
+  context 'get_task' do  
+    it ' user2 should be successful' do
+      request  = { taskmanager: { auth_token: User.last.token }}
+      response = { get_task: { error:    'Success',
+                               quantity: Task.all(receiver_login: User.last.login, read: false).size,
+                               tasks:    [{ id:         Task.last(receiver_login: User.last.login).id,
+                                            content:    Task.last(receiver_login: User.last.login).content,
+                                            priority:   Task.last(receiver_login: User.last.login).priority,
+                                            user_login: User.first.login,
+                                            created_at: Task.last(receiver_login: User.last.login).created_at.strftime('%d.%m.%Y %H:%M') }]}}
+
+      post '/protected/get_task', request.to_json
+      last_response.body.should == response.to_json
+    end
+
+    it ' user2 should be successful(empty)' do
+      request  = { taskmanager: { auth_token: User.last.token }}
+      response = { get_task: { error:    'Success',
+                               quantity: Task.all(receiver_login: User.last.login, read: false).size }}
+
+      post '/protected/get_task', request.to_json
+      last_response.body.should == response.to_json
+    end
+  end
+
+  context 'delete_task' do
+    it ' should be failure becouse of empty fields' do
+      request  = { taskmanager: { auth_token: User.last.token,
+                                  task_id:    nil }}
+      post '/protected/delete_task', request.to_json
+
+      response = { delete_task: { error: 'Empty fields' }}
+      last_response.body.should == response.to_json
+    end
+
+     it ' should be failure becouse task doesn\'t exists' do
+      request  = { taskmanager: { auth_token: User.last.token,
+                                  task_id:    0 }}
+      post '/protected/delete_task', request.to_json
+
+      response = { delete_task: { error: 'Task doesn\'t exist' }}
+      last_response.body.should == response.to_json
+    end
+
+    it ' should be successful' do
+      task_id  = Task.all(receiver_login: User.last.login).last(read: true).id
+      request  = { taskmanager: { auth_token: User.last.token,
+                                  task_id:    task_id }}
+      post '/protected/delete_task', request.to_json
+
+      response = { delete_task: { error: 'Success' }}
+      last_response.body.should == response.to_json
+    end
+  end
+
+  context 'delete_friend' do 
+    it ' should be failure becouse of empty fields' do
+      request  = { taskmanager: { auth_token:     User.first.token,
+                                  receiver_login: '' }}
+      post '/protected/delete_friend', request.to_json
+
+      response = { delete_friend: { error: 'Empty fields' }}
+      last_response.body.should == response.to_json
+    end    
+  end  
  
 =begin
-
-  
-  it 'new_task to user2 should be successful' do
-    request  = { taskmanager: { auth_token:     User.first.token,
-                                receiver_login: User.last.login,
-                                content:        'content',
-                                priority:       rand(1..3) }}
-    post '/protected/new_task', request.to_json
-
-    response = { new_task: { error: 'Success' }}
-    last_response.body.should == response.to_json
-  end
-
-  it 'get_task user2 should be successful' do
-    request  = { taskmanager: { auth_token: User.last.token }}
-    response = { get_task: { error:    'Success',
-                             quantity: Task.all(receiver_login: User.last.login, read: false).size,
-                             tasks:    [{ id:         Task.last(receiver_login: User.last.login).id,
-                                          content:    Task.last(receiver_login: User.last.login).content,
-                                          priority:   Task.last(receiver_login: User.last.login).priority,
-                                          user_login: User.first.login,
-                                          created_at: Task.last(receiver_login: User.last.login).created_at.strftime('%d.%m.%Y %H:%M') }]}}
-
-    post '/protected/get_task', request.to_json
-    last_response.body.should == response.to_json
-  end
-
-  it 'delete_task should be successful' do
-    task_id  = Task.all(receiver_login: User.last.login).last(read: true).id
-    request  = { taskmanager: { auth_token: User.last.token,
-                                task_id:    task_id }}
-    post '/protected/delete_task', request.to_json
-
-    response = { delete_task: { error: 'Success' }}
-    last_response.body.should == response.to_json
-  end
 
   it 'delete_friend should be successful' do
     request  = { taskmanager: { auth_token:     User.first.token,
