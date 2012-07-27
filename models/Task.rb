@@ -1,4 +1,4 @@
-require './user.rb'
+require './models/User.rb'
 
 class Task
   include DataMapper::Resource

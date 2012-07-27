@@ -1,2 +1,2 @@
-require '../api/app.rb'
+require './api/app.rb'
 run App
