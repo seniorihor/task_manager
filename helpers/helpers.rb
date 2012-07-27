@@ -1,5 +1,4 @@
 # Helpers
-helpers do
 
   # Generating of token
   def new_token
@@ -287,4 +286,3 @@ helpers do
                   quantity: quantity,
                   tasks:    tasks }}.to_json
   end
-end

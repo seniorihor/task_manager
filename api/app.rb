@@ -1,4 +1,11 @@
 require 'sinatra/base'
+require 'rubygems'
+require 'bundler/setup'
+require '../models/User.rb'
+require '../models/Task.rb'
+require '../models/Friendship.rb'
+require '../helpers/helpers.rb'
+require '../config/data_mapper.rb'
 
 class App < Sinatra::Base
 	# Filters
@@ -135,5 +142,5 @@ class App < Sinatra::Base
 
   		get_task(@protected_hash['taskmanager']['auth_token'])
 	end
-	
+
 end	
