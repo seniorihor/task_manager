@@ -1,2 +1,2 @@
-require 'api/init.rb'
-run Init
+require 'api/app.rb'
+run App
