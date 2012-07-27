@@ -1,27 +1,32 @@
 source :rubygems
 
-gem 'sinatra'
-gem 'sinatra-reloader'
-gem 'thin'
-gem 'json'
-gem 'dm-core'
-gem 'dm-timestamps'
-gem 'dm-validations'
-gem 'dm-migrations'
-gem 'dm-types'
-gem 'dm-serializer'
+# Server requirements
+# gem 'thin' # or mongrel
+# gem 'trinidad', :platform => 'jruby'
+
+# Project requirements
+gem 'rake'
+gem 'sinatra-flash', :require => 'sinatra/flash'
+
+# Component requirements
+gem 'haml'
 gem 'dm-sqlite-adapter'
+gem 'dm-validations'
+gem 'dm-timestamps'
+gem 'dm-migrations'
+gem 'dm-constraints'
+gem 'dm-aggregates'
+gem 'dm-core'
 
-group :development, :test do
-  gem 'sqlite3'
-  gem 'rspec'
-  gem 'rack'
-  gem 'rack-test'
-  gem 'autotest-growl'
-  gem 'autotest-fsevent'
-end
+# Test requirements
 
-group :production do
-  gem 'pg'
-  gem 'dm-postgres-adapter'
-end
+# Padrino Stable Gem
+gem 'padrino', '0.10.7'
+
+# Or Padrino Edge
+# gem 'padrino', :git => 'git://github.com/padrino/padrino-framework.git'
+
+# Or Individual Gems
+# %w(core gen helpers cache mailer admin).each do |g|
+#   gem 'padrino-' + g, '0.10.7'
+# end
