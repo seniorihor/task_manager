@@ -1,3 +1,5 @@
+require './task.rb'
+
 class User
   include DataMapper::Resource
 
@@ -13,6 +15,14 @@ class User
   has n,   :friendships, child_key: [:source_id]
   has n,   :friends,     self,      through: :friendships, via: :target
   has n,   :tasks
+end
+
+# Join table which include relations between two users (id to id)
+class Friendship
+  include DataMapper::Resource
+
+  belongs_to :source, 'User', key: true
+  belongs_to :target, 'User', key: true
 end
 
 DataMapper.finalize

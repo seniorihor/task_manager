@@ -1,13 +1,13 @@
 require 'sinatra/base'
 require 'rubygems'
+require 'data_mapper'
 require 'bundler/setup'
 require '../models/User.rb'
 require '../models/Task.rb'
-require '../models/Friendship.rb'
-require '../helpers/helpers.rb'
 require '../config/data_mapper.rb'
 
 class App < Sinatra::Base
+
 	# Filters
 	before do
   		content_type :json
