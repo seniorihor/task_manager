@@ -9,7 +9,8 @@ require './models/Task.rb'
 
 class App < Sinatra::Base
 
-
+  set :environment, ENV['RACK_ENV'] || :development 
+                                     #:test
 	# Filters
 	before do
   		content_type :json
