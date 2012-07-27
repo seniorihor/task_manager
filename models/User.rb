@@ -1,3 +1,5 @@
+require 'data_mapper'
+require './config/data_mapper.rb'
 require './models/Task.rb'
 
 class User

@@ -1,12 +1,14 @@
 require 'sinatra/base'
 require 'rubygems'
-require 'data_mapper'
 require 'bundler/setup'
+require 'data_mapper'
+require './config/data_mapper.rb'
 require './models/User.rb'
 require './models/Task.rb'
-require './config/data_mapper.rb'
+
 
 class App < Sinatra::Base
+
 
 	# Filters
 	before do
