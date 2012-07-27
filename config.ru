@@ -1,2 +1,2 @@
-require './api/app.rb'
-run App
+require './init.rb'
+run Sinatra::Application

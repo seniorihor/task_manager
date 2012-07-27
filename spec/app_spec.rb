@@ -1,4 +1,4 @@
-require_relative '../api/app.rb'
+require_relative '../init.rb'
 require 'rack/test'
 require 'json'
 
@@ -17,7 +17,7 @@ describe 'TaskManager' do
   before(:each) do
     User.create( login:     'login1',
                  password:  'password1',
-                 firstname: 'firstname1',      
+                 firstname: 'firstname1',
                  lastname:  'lastname1',
                  token:     'user1token')
 
@@ -26,13 +26,13 @@ describe 'TaskManager' do
                  firstname: 'firstname2',
                  lastname:  'lastname2',
                  token:     'user2token')
-  end  
+  end
 
   def app
     Sinatra::Application
   end
 
-  context 'register' do 
+  context 'register' do
     it 'of user1 should be successful' do
       request  = { taskmanager: { login:     'login',
                                   password:  'password',
@@ -54,7 +54,7 @@ describe 'TaskManager' do
       response = { register: { error: 'Empty fields' }}
       last_response.body.should == response.to_json
     end
-    
+
     it 'of user2 shouldn\'t be successful because of already existing login' do
       request  = { taskmanager: { login:     'login1',
                                   password:  'password2',
@@ -64,7 +64,7 @@ describe 'TaskManager' do
 
       response = { register: { error: 'Login exists' }}
       last_response.body.should == response.to_json
-    end 
+    end
 
     it 'of user2 shouldn\'t be successful because of validation' do
       request  = { taskmanager: { login:     'l',
@@ -77,11 +77,11 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-    after(:all) do 
+    after(:all) do
       User.last.destroy!
-    end  
+    end
 
-  end  
+  end
 
   context 'login' do
     it 'of user1 should be successful' do
@@ -96,7 +96,7 @@ describe 'TaskManager' do
 
       last_response.body.should == response.to_json
     end
-    
+
     it 'of user1 again should be failure' do
       request  = { taskmanager: { login:    User.first.login,
                                   password: User.first.password }}
@@ -115,7 +115,7 @@ describe 'TaskManager' do
       response = { login: { error: 'Invalid login or password' }}
 
       last_response.body.should == response.to_json
-    end 
+    end
   end
 
   context 'logout' do
@@ -137,9 +137,9 @@ describe 'TaskManager' do
 
       last_response.body.should == response.to_json
     end
-  end 
+  end
 
-  context 'delete' do 
+  context 'delete' do
     it 'of user1 should be successful' do
       request  = { taskmanager: { auth_token: User.first.token }}
       post '/protected/delete_user', request.to_json
@@ -157,7 +157,7 @@ describe 'TaskManager' do
       response = { restore_user: { error: 'Success' }}
       last_response.body.should == response.to_json
     end
-  end 
+  end
 
   context 'find_user(search)' do
     it 'of user2 should be successful' do
@@ -181,23 +181,23 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-    it 'of user should be failure because of short search_value' do 
+    it 'of user should be failure because of short search_value' do
       request  = { taskmanager: { auth_token:   User.first.token,
                                   search_value: 'u' }}
       post '/protected/find_user', request.to_json
 
       response = { find_user: { error: 'Need at least 2 characters' }}
       last_response.body.should == response.to_json
-    end 
+    end
 
-    it 'of user should be failure because such user doesn\'t exist' do 
+    it 'of user should be failure because such user doesn\'t exist' do
       request  = { taskmanager: { auth_token:   User.first.token,
                                   search_value: 'user' }}
       post '/protected/find_user', request.to_json
 
       response = { find_user: { error: 'No matching users' }}
       last_response.body.should == response.to_json
-    end 
+    end
   end
 
   context 'add_friend(invite)' do
@@ -240,7 +240,7 @@ describe 'TaskManager' do
       response = { add_friend: { error: 'You have invite from this user' }}
       last_response.body.should == response.to_json
     end
-  end 
+  end
 
   context 'add_friend(response)' do
     it 'on invite from user2 to user1 should be failure because of empty fields' do
@@ -305,9 +305,9 @@ describe 'TaskManager' do
                                  lastname:  User.first.lastname }}
       last_response.body.should == response.to_json
     end
-  end  
+  end
 
-  context 'new_task' do 
+  context 'new_task' do
     it ' to user2 should be failure because of empty fields' do
       request  = { taskmanager: { auth_token:     User.first.token,
                                   receiver_login: User.last.login,
@@ -369,12 +369,12 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-    after(:all) do 
+    after(:all) do
       User.first(login: 'login3').destroy!
-    end  
+    end
   end
 
-  context 'get_task' do  
+  context 'get_task' do
     it ' user2 should be successful' do
       request  = { taskmanager: { auth_token: User.last.token }}
       response = { get_task: { error:    'Success',
@@ -429,7 +429,7 @@ describe 'TaskManager' do
     end
   end
 
-  context 'delete_friend' do 
+  context 'delete_friend' do
     it ' should be failure because of empty fields' do
       request  = { taskmanager: { auth_token:     User.first.token,
                                   receiver_login: '' }}
@@ -455,7 +455,7 @@ describe 'TaskManager' do
 
       response = { delete_friend: { error: 'Success' }}
       last_response.body.should == response.to_json
-    end 
+    end
 
     it ' should be failure because users aren\'t friends' do
       request  = { taskmanager: { auth_token:     User.first.token,
@@ -464,6 +464,6 @@ describe 'TaskManager' do
 
       response = { delete_friend: { error: 'This is not your friend' }}
       last_response.body.should == response.to_json
-    end       
-  end  
+    end
+  end
 end
