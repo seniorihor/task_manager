@@ -5,3 +5,8 @@ bin/*
 vendor/gems/*
 !vendor/gems/cache/
 .sass-cache/*
+*.bundle
+*.db
+*.log
+*.swp
+*.sqlite3

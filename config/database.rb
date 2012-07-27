@@ -10,7 +10,8 @@
 #
 
 DataMapper.logger = logger
-DataMapper::Property::String.length(255)
+DataMapper::Property::String.length(20)
+DataMapper::Property::Text.length(140)
 
 case Padrino.env
   when :development then DataMapper.setup(:default, "sqlite3://" + Padrino.root('db', "task_manager_development.db"))
