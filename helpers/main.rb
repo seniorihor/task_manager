@@ -13,18 +13,18 @@ module CommonHelper
     end
 
     # Method name explain everything
-    def login_exists?(login)
-      User.first(login: login).nil? ? false : true
+    def login_exists?(options = {})
+      User.first(login: options['login']).nil? ? false : true
     end
 
     # friends.map! means that array of friends of certain user prepared to json parse
-    def login(login, password)
-      user = User.first(login: login)
+    def login(options = {})
+      user = User.first(login: options['login'])
 
       return { login: { error: 'Invalid login or password' }}.to_json if user.nil?
       return { login: { error: 'Already in system' }}.to_json         if user.token
 
-      if password == user.password
+      if options['password'] == user.password
         user.token = new_token
         if user.save
           friends = Array.new(user.friends)
@@ -43,8 +43,8 @@ module CommonHelper
     end
 
     # When logout, token of certain user become nil
-    def logout(auth_token)
-      user       = User.first(token: auth_token)
+    def logout(options = {})
+      user       = User.first(token: options['auth_token'])
       user.token = nil if user
 
       if user.save
@@ -55,17 +55,17 @@ module CommonHelper
     end
 
     # Registration
-    def add_new_user(login, password, firstname, lastname)
-      return { register: { error: 'Empty fields' }}.to_json if login.empty?     ||
-                                                               password.empty?  ||
-                                                               firstname.empty? ||
-                                                               lastname.empty?
+    def add_new_user(options = {})
+      return { register: { error: 'Empty fields' }}.to_json if options['login'].empty?     ||
+                                                               options['password'].empty?  ||
+                                                               options['firstname'].empty? ||
+                                                               options['lastname'].empty?
 
       user           = User.new
-      user.login     = login
-      user.password  = password
-      user.firstname = firstname
-      user.lastname  = lastname
+      user.login     = options['login']
+      user.password  = options['password']
+      user.firstname = options['firstname']
+      user.lastname  = options['lastname']
 
       if user.save
         { register: { error: 'Success' }}.to_json
@@ -75,8 +75,8 @@ module CommonHelper
     end
 
     # Property deleted of certain user become true (rights of "deleted" user is limited)
-    def delete_user(auth_token)
-      user = User.first(token: auth_token)
+    def delete_user(options = {})
+      user = User.first(token: options['auth_token'])
       user.deleted = true
 
       if user.save
@@ -87,8 +87,8 @@ module CommonHelper
     end
 
     # Property deleted of certain user become false (all rights are restored)
-    def restore_user(auth_token)
-      user = User.first(token: auth_token)
+    def restore_user(options = {})
+      user = User.first(token: options['auth_token'])
       user.deleted = false
 
       if user.save
@@ -99,7 +99,8 @@ module CommonHelper
     end
 
     # Search by certain fields in database (also can search by substring)
-    def find_user(auth_token, search_value)
+    def find_user(options = {})
+      search_value = options['search_value']
       return { find_user: { error: 'Empty fields' }}.to_json               if search_value.empty?
       return { find_user: { error: 'Need at least 2 characters' }}.to_json if search_value.size == 1
 
@@ -112,7 +113,7 @@ module CommonHelper
       users_by_firstname.each { |user| users << user } unless users_by_firstname.empty?
       users_by_lastname.each  { |user| users << user } unless users_by_lastname.empty?
 
-      users.delete(User.first(token: auth_token))
+      users.delete(User.first(token: options['auth_token']))
 
       return { find_user: { error: 'No matching users' }}.to_json if users.empty?
 
@@ -127,12 +128,12 @@ module CommonHelper
 
     # Sending message of agree or disagree if user accept or declain friendship request
     # There is a special priority: 5 of friendship request message
-    def add_friend(auth_token, receiver_login, friendship)
-      return { add_friend: { error: 'Empty fields' }}.to_json if receiver_login.empty? ||
-                                                                 friendship.empty?
+    def add_friend(options = {})
+      return { add_friend: { error: 'Empty fields' }}.to_json if options['receiver_login'].empty? ||
+                                                                 options['friendship'].empty?
 
-      sender   = User.first(token: auth_token)
-      receiver = User.first(login: receiver_login)
+      sender   = User.first(token: options['auth_token'])
+      receiver = User.first(login: options['receiver_login'])
 
       return { add_friend: { error: "User doesn't exist" }}.to_json                if receiver.nil?
       return { add_friend: { error: "You can't add yourself to friends" }}.to_json if sender == receiver
@@ -142,7 +143,7 @@ module CommonHelper
 
       return { add_friend: { error: "Invite doesn't exist" }}.to_json if invite_task.nil?
 
-      if friendship == 'true'
+      if options['friendship'] == 'true'
         sender.friends   << receiver
         receiver.friends << sender
 
@@ -167,11 +168,11 @@ module CommonHelper
     end
 
     # Delete relations from both sides of friendship
-    def delete_friend(auth_token, receiver_login)
-      return { delete_friend: { error: 'Empty fields' }}.to_json if receiver_login.empty?
+    def delete_friend(options = {})
+      return { delete_friend: { error: 'Empty fields' }}.to_json if options['receiver_login'].empty?
 
-      sender   = User.first(token: auth_token)
-      receiver = User.first(login: receiver_login)
+      sender   = User.first(token: options['auth_token'])
+      receiver = User.first(login: options['receiver_login'])
 
       return { delete_friend: { error: "User doesn't exist" }}.to_json      if receiver.nil?
       return { delete_friend: { error: 'This is not your friend' }}.to_json unless sender.friends.include?(receiver)
@@ -187,8 +188,8 @@ module CommonHelper
       end
     end
 
-    def friends_online(auth_token)
-      user    = User.first(token: auth_token)
+    def friends_online(options = {})
+      user    = User.first(token: options['auth_token'])
       friends = user.friends.select { |friend| friend.token }
       friends = friends.map! { |friend| { login:     friend.login,
                                           firstname: friend.firstname,
@@ -198,6 +199,12 @@ module CommonHelper
     end
 
     def add_new_task(auth_token, receiver_login, content, priority)
+
+     # auth_token     = options['auth_token']
+     # receiver_login = options['receiver_login']
+      #content        = options['content']
+      #priority       = options['priority']
+
       return { new_task: { error: 'Empty fields' }}.to_json if content.empty? ||
                                                                priority.nil?  ||
                                                                receiver_login.empty?
@@ -239,11 +246,11 @@ module CommonHelper
       end
     end
 
-    def delete_task(auth_token, task_id)
-      return { delete_task: { error: 'Empty fields' }}.to_json if task_id.nil?
+    def delete_task(options = {})
+      return { delete_task: { error: 'Empty fields' }}.to_json if options['task_id'].nil?
 
-      user = User.first(token: auth_token)
-      task = Task.all(receiver_login: user.login).get(task_id)
+      user = User.first(token: options['auth_token'])
+      task = Task.all(receiver_login: user.login).get(options['task_id'])
 
       return { delete_task: { error: "Task doesn't exist" }}.to_json if task.nil?
 
@@ -256,8 +263,8 @@ module CommonHelper
 
     # A method which return only new tasks of certain user
     # Also method delete temporary task like invites and response on them
-    def get_task(auth_token)
-      user       = User.first(token: auth_token)
+    def get_task(options = {})
+      user       = User.first(token: options['auth_token'])
       collection = Task.all(read: false, receiver_login: user.login)
 
       tasks    = Array.new(collection)

@@ -31,7 +31,7 @@ describe 'TaskManager' do
   def app
     TaskManager
   end
-
+  
   context 'register' do
     it 'of user1 should be successful' do
       request  = { taskmanager: { login:     'login',
