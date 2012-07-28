@@ -1,59 +1,143 @@
-class TaskManager < Padrino::Application
-  register Padrino::Rendering
-  register Padrino::Mailer
-  register Padrino::Helpers
+require 'sinatra/base'
+require 'sinatra/common_helper'
 
-  enable :sessions
+class TaskManager < Sinatra::Base
+  helpers Sinatra::CommonHelper
 
-  ##
-  # Caching support
-  #
-  # register Padrino::Cache
-  # enable :caching
-  #
-  # You can customize caching store engines:
-  #
-  #   set :cache, Padrino::Cache::Store::Memcache.new(::Memcached.new('127.0.0.1:11211', :exception_retry_limit => 1))
-  #   set :cache, Padrino::Cache::Store::Memcache.new(::Dalli::Client.new('127.0.0.1:11211', :exception_retry_limit => 1))
-  #   set :cache, Padrino::Cache::Store::Redis.new(::Redis.new(:host => '127.0.0.1', :port => 6379, :db => 0))
-  #   set :cache, Padrino::Cache::Store::Memory.new(50)
-  #   set :cache, Padrino::Cache::Store::File.new(Padrino.root('tmp', app_name.to_s, 'cache')) # default choice
-  #
+  # Filters
+  before do
+    content_type :json
+  end
 
-  ##
-  # Application configuration options
-  #
-  # set :raise_errors, true       # Raise exceptions (will stop application) (default for test)
-  # set :dump_errors, true        # Exception backtraces are written to STDERR (default for production/development)
-  # set :show_exceptions, true    # Shows a stack trace in browser (default for development)
-  # set :logging, true            # Logging in STDOUT for development and file for production (default only for development)
-  # set :public_folder, "foo/bar" # Location for static assets (default root/public)
-  # set :reload, false            # Reload application files (default in development)
-  # set :default_builder, "foo"   # Set a custom form builder (default 'StandardFormBuilder')
-  # set :locale_path, "bar"       # Set path for I18n translations (default your_app/locales)
-  # disable :sessions             # Disabled sessions by default (enable if needed)
-  # disable :flash                # Disables sinatra-flash (enabled by default if Sinatra::Flash is defined)
-  # layout  :my_layout            # Layout can be in views/layouts/foo.ext or views/foo.ext (default :application)
-  #
+  # Protected means that users without rights, can't receive response from certain methods
+  # @auth - indicator of authentication
+  before '/protected/*' do
+    json_data = request.body.read
 
-  ##
-  # You can configure for a specified environment like:
-  #
-  #   configure :development do
-  #     set :foo, :bar
-  #     disable :asset_stamp # no asset timestamping for dev
-  #   end
-  #
+    if json_data.empty?
+      @auth = false
+    else
+      @protected_hash = to_hash(json_data)
+      user = User.first(token: @protected_hash['taskmanager']['auth_token'])
 
-  ##
-  # You can manage errors like:
-  #
-  #   error 404 do
-  #     render 'errors/404'
-  #   end
-  #
-  #   error 505 do
-  #     render 'errors/505'
-  #   end
-  #
+      if user.nil?
+        @auth = false
+      elsif user.deleted
+        @auth         = false
+        @restore_auth = true
+      else
+        @auth = true
+      end
+    end
+  end
+
+  # Helpers
+  # Login user
+  post '/login' do
+    @hash = to_hash(request.body.read)
+
+    login(@hash['taskmanager']['login'],
+          @hash['taskmanager']['password'])
+  end
+
+  # Logout user
+  post '/protected/logout' do
+    return { logout: { error: '403 Forbidden' }}.to_json unless @auth
+
+    logout(@protected_hash['taskmanager']['auth_token'])
+  end
+
+  # Register user
+  post '/register' do
+    @hash = to_hash(request.body.read)
+
+    if login_exists?(@hash['taskmanager']['login'])
+      { register: { error: 'Login exists' }}.to_json
+    else
+      add_new_user(@hash['taskmanager']['login'],
+                   @hash['taskmanager']['password'],
+                   @hash['taskmanager']['firstname'],
+                   @hash['taskmanager']['lastname'])
+    end
+  end
+
+  # Delete user
+  post '/protected/delete_user' do
+    return { delete_user: { error: '403 Forbidden' }}.to_json unless @auth
+
+    delete_user(@protected_hash['taskmanager']['auth_token'])
+  end
+
+  # Restore user
+  post '/protected/restore_user' do
+    return { restore_user: { error: '403 Forbidden' }}.to_json unless @restore_auth
+
+    restore_user(@protected_hash['taskmanager']['auth_token'])
+  end
+
+  # Find user
+  post '/protected/find_user' do
+    return { find_user: { error: '403 Forbidden' }}.to_json unless @auth
+
+    find_user(@protected_hash['taskmanager']['auth_token'],
+              @protected_hash['taskmanager']['search_value'])
+  end
+
+  # Add friend
+  post '/protected/add_friend' do
+    return { add_friend: { error: '403 Forbidden' }}.to_json unless @auth
+
+    case @protected_hash['taskmanager']['priority']
+    when 4
+      add_new_task(@protected_hash['taskmanager']['auth_token'],
+                   @protected_hash['taskmanager']['receiver_login'],
+                   'Add me to friends!',
+                   @protected_hash['taskmanager']['priority'])
+    when 5
+      add_friend(@protected_hash['taskmanager']['auth_token'],
+                 @protected_hash['taskmanager']['receiver_login'],
+                 @protected_hash['taskmanager']['friendship'])
+    else
+      { add_friend: { error: 'Wrong priority' }}.to_json
+    end
+  end
+
+  # Delete friend
+  post '/protected/delete_friend' do
+    return { delete_friend: { error: '403 Forbidden' }}.to_json unless @auth
+
+    delete_friend(@protected_hash['taskmanager']['auth_token'],
+                  @protected_hash['taskmanager']['receiver_login'])
+  end
+
+  # Create new task
+  post '/protected/new_task' do
+    return { new_task: { error: '403 Forbidden' }}.to_json  unless @auth
+
+    case @protected_hash['taskmanager']['priority']
+    when 1..3
+    else
+      return { new_task: { error: 'Wrong priority' }}.to_json
+    end
+
+    add_new_task(@protected_hash['taskmanager']['auth_token'],
+                 @protected_hash['taskmanager']['receiver_login'],
+                 @protected_hash['taskmanager']['content'],
+                 @protected_hash['taskmanager']['priority'])
+  end
+
+  # Delete task
+  post '/protected/delete_task' do
+    return { delete_task: { error: '403 Forbidden' }}.to_json unless @auth
+
+    delete_task(@protected_hash['taskmanager']['auth_token'],
+                @protected_hash['taskmanager']['task_id'])
+  end
+
+  # List all tasks
+  post '/protected/get_task' do
+    return { get_task: { error: '403 Forbidden' }}.to_json unless @auth
+
+    get_task(@protected_hash['taskmanager']['auth_token'])
+  end
 end
