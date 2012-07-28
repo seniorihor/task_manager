@@ -1,20 +1,17 @@
 require 'data_mapper'
 
-set :environment, ENV['RACK_ENV'] || :development
-                                     #:test
-
 # Configuration connection to database
 configure :production do
   DataMapper.setup(:default, ENV['DATABASE_URL'])
 end
 
 configure :development do
-  DataMapper.setup(:default, "sqlite://#{Dir.pwd}/development.db")
+  DataMapper.setup(:default, "sqlite://#{Dir.pwd}/db/development.db")
   DataMapper::Logger.new($stdout, :debug)
 end
 
 configure :test do
-  #DataMapper.setup(:default, "sqlite://#{Dir.pwd}/test.db")
+  #DataMapper.setup(:default, "sqlite://#{Dir.pwd}/db/test.db")
   DataMapper.setup(:default, 'sqlite::memory:')
 end
 
@@ -27,5 +24,5 @@ require_relative 'task'
 require_relative 'friendship'
 
 
- DataMapper.finalize
- DataMapper.auto_upgrade!
+DataMapper.finalize
+DataMapper.auto_upgrade!

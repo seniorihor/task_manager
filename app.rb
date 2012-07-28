@@ -1,10 +1,10 @@
-require 'json'
 require 'sinatra'
 
 
 class TaskManager < Sinatra::Application
-  
-
+      
+  set :environment, ENV['RACK_ENV'] || :development
+                                      #:test
 end
 
 require_relative 'models/init'

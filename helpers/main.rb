@@ -1,3 +1,5 @@
+require 'json'
+
 module CommonHelper
     # Generating of token
     def new_token

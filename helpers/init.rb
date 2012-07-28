@@ -1,2 +1,2 @@
-require_relative 'helpers'
+require_relative 'main'
 TaskManager.helpers CommonHelper
