@@ -25,9 +25,10 @@ class TaskManager < Sinatra::Application
         @auth = true
       end
     end
+    puts "#{@auth}"
   end
 
-  # Helpers
+  # Routes
   # Login user
   post '/login' do
     @hash = to_hash(request.body.read)
