@@ -137,4 +137,3 @@ class TaskManager < Sinatra::Application
     get_task(@protected_hash['taskmanager']['auth_token'])
   end
 end
-end

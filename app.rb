@@ -1,14 +1,12 @@
 require 'data_mapper'
 require 'json'
 require 'sinatra'
-require_relative 'models/init'
-require_relative 'helpers/init'
-require_relative 'routes/init'
+
 
 
 class TaskManager < Sinatra::Application
 
-  set :environment, ENV['RACK_ENV'] || :development
+set :environment, ENV['RACK_ENV'] || :development
                                      #:test
 
 # Configuration connection to database
@@ -31,4 +29,6 @@ DataMapper::Property::Text.length(140)
       
 end
 
-
+require_relative 'models/init'
+require_relative 'helpers/init'
+require_relative 'routes/init'
