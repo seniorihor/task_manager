@@ -25,7 +25,6 @@ class TaskManager < Sinatra::Application
         @auth = true
       end
     end
-    puts "#{@auth}"
   end
 
   # Routes

@@ -1,7 +1,6 @@
-require_relative '../app/app.rb'
+require_relative '../app.rb'
 require 'rack/test'
 require 'json'
-require 'padrino'
 
 set :environment, :test
 
@@ -30,7 +29,7 @@ describe 'TaskManager' do
   end
 
   def app
-    Sinatra::Application
+    TaskManager
   end
 
   context 'register' do
@@ -44,6 +43,7 @@ describe 'TaskManager' do
       response = { register: { error: 'Success' }}
       last_response.body.should == response.to_json
     end
+  
 
     it 'of user2 shouldn\'t be successful' do
       request  = { taskmanager: { login:     '',
