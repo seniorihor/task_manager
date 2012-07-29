@@ -80,10 +80,7 @@ class TaskManager < Sinatra::Application
 
     case @protected_hash['taskmanager']['priority']
     when 4
-      add_new_task(@protected_hash['taskmanager']['auth_token'],
-                   @protected_hash['taskmanager']['receiver_login'],
-                   'Add me to friends!',
-                   @protected_hash['taskmanager']['priority'])
+      add_new_task(@protected_hash['taskmanager'])
     when 5
       add_friend(@protected_hash['taskmanager'])
     else
@@ -108,10 +105,7 @@ class TaskManager < Sinatra::Application
       return { new_task: { error: 'Wrong priority' }}.to_json
     end
 
-    add_new_task(@protected_hash['taskmanager']['auth_token'],
-                  @protected_hash['taskmanager']['receiver_login'],
-                  @protected_hash['taskmanager']['content'],
-                  @protected_hash['taskmanager']['priority'])
+    add_new_task(@protected_hash['taskmanager'])
   end
 
   # Delete task

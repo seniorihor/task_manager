@@ -148,7 +148,7 @@ module CommonHelper
         receiver.friends << sender
 
         if sender.friends.save && receiver.friends.save
-          system_message = Task.new(sender.token, receiver.login, "#{sender.firstname} #{sender.lastname} true", 5)
+          system_message = Task.new("#{sender.firstname} #{sender.lastname} true", 5,sender.id, receiver.login)
           system_message.create
           invite_task.destroy!
           { add_friend: { error:     'Success',
@@ -156,14 +156,14 @@ module CommonHelper
                           firstname: receiver.firstname,
                           lastname:  receiver.lastname }}.to_json
         else
-          system_message = Task.new(sender.token, receiver.login, "#{sender.firstname} #{sender.lastname} false", 5)
+          system_message = Task.new("#{sender.firstname} #{sender.lastname} false", 5,sender.id, receiver.login)
           system_message.create
           invite_task.destroy!
           { add_friend: { error: 'Success' }}.to_json
         end
 
       else
-        system_message = Task.new(sender.token, receiver.login, "#{sender.firstname} #{sender.lastname} false", 5)
+        system_message = Task.new("#{sender.firstname} #{sender.lastname} false", 5,sender.id, receiver.login)
         system_message.create
         invite_task.destroy!
         { add_friend: { error: 'Success' }}.to_json
@@ -184,7 +184,8 @@ module CommonHelper
       receiver.friends.delete(sender)
 
       if sender.friends.save && receiver.friends.save
-        add_new_task(sender.token, receiver.login, 'true', 6)
+        system_message = Task.new('true', 6, sender.id, receiver.login)
+        system_message.create
         { delete_friend: { error: 'Success' }}.to_json
       else
         { delete_friend: { error: 'Failure' }}.to_json
@@ -203,10 +204,14 @@ module CommonHelper
 
     def add_new_task(options = {})
 
+
+
       auth_token     = options['auth_token']
       receiver_login = options['receiver_login']
       content        = options['content']
       priority       = options['priority']
+
+      if priority == 4 then content = 'Add me to friends' end
 
       return { new_task: { error: 'Empty fields' }}.to_json if content.empty? ||
                                                                priority.nil?  ||
