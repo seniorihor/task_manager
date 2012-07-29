@@ -1,6 +1,8 @@
 require 'sinatra'
 
 class TaskManager < Sinatra::Application
+  set :environment, ENV['RACK_ENV'] || :development
+                                       #:test
 end
 
 require_relative 'config/init'

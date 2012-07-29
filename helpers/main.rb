@@ -148,20 +148,23 @@ module CommonHelper
         receiver.friends << sender
 
         if sender.friends.save && receiver.friends.save
-          add_new_task(sender.token, receiver.login, "#{sender.firstname} #{sender.lastname} true", 5)
+          system_message = Task.new(sender.token, receiver.login, "#{sender.firstname} #{sender.lastname} true", 5)
+          system_message.create
           invite_task.destroy!
           { add_friend: { error:     'Success',
                           login:     receiver.login,
                           firstname: receiver.firstname,
                           lastname:  receiver.lastname }}.to_json
         else
-          add_new_task(sender.token, receiver.login, "#{sender.firstname} #{sender.lastname} false", 5)
+          system_message = Task.new(sender.token, receiver.login, "#{sender.firstname} #{sender.lastname} false", 5)
+          system_message.create
           invite_task.destroy!
           { add_friend: { error: 'Success' }}.to_json
         end
 
       else
-        add_new_task(sender.token, receiver.login, "#{sender.firstname} #{sender.lastname} false", 5)
+        system_message = Task.new(sender.token, receiver.login, "#{sender.firstname} #{sender.lastname} false", 5)
+        system_message.create
         invite_task.destroy!
         { add_friend: { error: 'Success' }}.to_json
       end
@@ -198,12 +201,12 @@ module CommonHelper
                           friends: friends }}.to_json
     end
 
-    def add_new_task(auth_token, receiver_login, content, priority)
+    def add_new_task(options = {})
 
-     # auth_token     = options['auth_token']
-     # receiver_login = options['receiver_login']
-      #content        = options['content']
-      #priority       = options['priority']
+      auth_token     = options['auth_token']
+      receiver_login = options['receiver_login']
+      content        = options['content']
+      priority       = options['priority']
 
       return { new_task: { error: 'Empty fields' }}.to_json if content.empty? ||
                                                                priority.nil?  ||
@@ -231,15 +234,15 @@ module CommonHelper
       return { add_friend: { error: 'You have invite from this user' }}.to_json if invite_task_receiver &&
                                                                                    priority == 4
 
-      task                = Task.new
-      task.content        = content
-      task.priority       = priority
-      task.user_id        = sender.id
-      task.receiver_login = User.first(login: receiver_login).login
+      task = Task.new(content, priority, sender.id, User.first(login: receiver_login).login)
+      #task.content        = content
+      #task.priority       = priority
+      #task.user_id        = sender.id
+      #task.receiver_login = User.first(login: receiver_login).login
 
-      if task.save && priority == 4
+      if task.create && priority == 4
         { add_friend: { error: 'Success' }}.to_json
-      elsif task.save
+      elsif task.create
         { new_task: { error: 'Success' }}.to_json
       else
         { new_task: { error: 'Failure' }}.to_json

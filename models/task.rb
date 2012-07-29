@@ -12,4 +12,20 @@ class Task
   property :read,           Boolean,      required: true, default: false
 
   belongs_to :user
+
+  def initialize(content, priority, user_id, receiver_login)
+    @content        = content
+    @priority       = priority
+    @user_id        = user_id
+    @receiver_login = receiver_login
+  end
+
+  def create
+    self.content        = @content
+    self.priority       = @priority
+    self.user_id        = @user_id
+    self.receiver_login = @receiver_login
+    self.save
+  end
+
 end
