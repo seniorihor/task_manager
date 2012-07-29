@@ -13,4 +13,20 @@ class User
   has n,   :friendships, child_key: [:source_id]
   has n,   :friends,     self,      through: :friendships, via: :target
   has n,   :tasks
+
+  def initialize(login,password,firstname,lastname)
+    @login      = login
+    @password   = password
+    @firstname  = firstname
+    @lastname   = lastname
+  end
+
+  def add
+    self.login      = @login
+    self.password   = @password
+    self.firstname  = @firstname
+    self.lastname   = @lastname   
+    self.save
+  end  
+
 end

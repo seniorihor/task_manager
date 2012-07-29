@@ -21,7 +21,7 @@ class Task
     @receiver_login = receiver_login
   end
 
-  def create
+  def add
     self.content        = @content
     self.priority       = @priority
     self.user_id        = @user_id

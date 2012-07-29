@@ -15,17 +15,21 @@ end
 describe 'TaskManager' do
 
   before(:each) do
-    User.create( login:     'login1',
-                 password:  'password1',
-                 firstname: 'firstname1',
-                 lastname:  'lastname1',
-                 token:     'user1token')
 
-    User.create( login:     'login2',
-                 password:  'password2',
-                 firstname: 'firstname2',
-                 lastname:  'lastname2',
-                 token:     'user2token')
+    user1  = User.new(  'login1',
+                        'password1',
+                        'firstname1',
+                        'lastname1')
+    user1.add
+    user1.token = 'user1token'
+    user1.save
+    user2 =  User.new(      'login2',
+                            'password2',
+                            'firstname2',
+                            'lastname2')
+    user2.add
+    user2.token = 'user2token'
+    user2.save
   end
 
   def app
@@ -343,11 +347,13 @@ describe 'TaskManager' do
     end
 
     it ' to user3 from user1 should be failure because they aren\'t friends' do
-      User.create( login:     'login3',
-                   password:  'password3',
-                   firstname: 'firstname3',
-                   lastname:  'lastname3',
-                   token:     'user3token')
+      user3 = User.new( 'login3',
+                        'password3',
+                        'firstname3',
+                        'lastname3')
+      user3.add
+      user3.token = 'user3token'
+      user3.save
 
       request  = { taskmanager: { auth_token:     User.first.token,
                                   receiver_login: User.first(login: 'login3').login,

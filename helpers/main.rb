@@ -61,13 +61,12 @@ module CommonHelper
                                                                options['firstname'].empty? ||
                                                                options['lastname'].empty?
 
-      user           = User.new
-      user.login     = options['login']
-      user.password  = options['password']
-      user.firstname = options['firstname']
-      user.lastname  = options['lastname']
-
-      if user.save
+      user  = User.new(options['login'],
+                       options['password'],
+                       options['firstname'],
+                       options['lastname'])
+      
+      if user.add
         { register: { error: 'Success' }}.to_json
       else
         { register: { error: 'Failure' }}.to_json
@@ -149,7 +148,7 @@ module CommonHelper
 
         if sender.friends.save && receiver.friends.save
           system_message = Task.new("#{sender.firstname} #{sender.lastname} true", 5,sender.id, receiver.login)
-          system_message.create
+          system_message.add
           invite_task.destroy!
           { add_friend: { error:     'Success',
                           login:     receiver.login,
@@ -157,14 +156,14 @@ module CommonHelper
                           lastname:  receiver.lastname }}.to_json
         else
           system_message = Task.new("#{sender.firstname} #{sender.lastname} false", 5,sender.id, receiver.login)
-          system_message.create
+          system_message.add
           invite_task.destroy!
           { add_friend: { error: 'Success' }}.to_json
         end
 
       else
         system_message = Task.new("#{sender.firstname} #{sender.lastname} false", 5,sender.id, receiver.login)
-        system_message.create
+        system_message.add
         invite_task.destroy!
         { add_friend: { error: 'Success' }}.to_json
       end
@@ -185,7 +184,7 @@ module CommonHelper
 
       if sender.friends.save && receiver.friends.save
         system_message = Task.new('true', 6, sender.id, receiver.login)
-        system_message.create
+        system_message.add
         { delete_friend: { error: 'Success' }}.to_json
       else
         { delete_friend: { error: 'Failure' }}.to_json
@@ -203,8 +202,6 @@ module CommonHelper
     end
 
     def add_new_task(options = {})
-
-
 
       auth_token     = options['auth_token']
       receiver_login = options['receiver_login']
@@ -240,14 +237,10 @@ module CommonHelper
                                                                                    priority == 4
 
       task = Task.new(content, priority, sender.id, User.first(login: receiver_login).login)
-      #task.content        = content
-      #task.priority       = priority
-      #task.user_id        = sender.id
-      #task.receiver_login = User.first(login: receiver_login).login
 
-      if task.create && priority == 4
+      if task.add && priority == 4
         { add_friend: { error: 'Success' }}.to_json
-      elsif task.create
+      elsif task.add
         { new_task: { error: 'Success' }}.to_json
       else
         { new_task: { error: 'Failure' }}.to_json
