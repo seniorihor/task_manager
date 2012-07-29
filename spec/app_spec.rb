@@ -1,4 +1,4 @@
-require_relative '../app.rb'
+require_relative '../app'
 require 'rack/test'
 require 'json'
 
@@ -31,7 +31,7 @@ describe 'TaskManager' do
   def app
     TaskManager
   end
-  
+
   context 'register' do
     it 'of user1 should be successful' do
       request  = { taskmanager: { login:     'login',
@@ -43,7 +43,7 @@ describe 'TaskManager' do
       response = { register: { error: 'Success' }}
       last_response.body.should == response.to_json
     end
-  
+
 
     it 'of user2 shouldn\'t be successful' do
       request  = { taskmanager: { login:     '',

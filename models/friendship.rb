@@ -1,5 +1,4 @@
-
-class Friendship 
+class Friendship
   include DataMapper::Resource
 
   belongs_to :source, 'User', key: true

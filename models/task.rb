@@ -1,5 +1,4 @@
-
-class Task 
+class Task
   include DataMapper::Resource
 
   property :id,             Serial
