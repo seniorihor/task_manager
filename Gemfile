@@ -9,9 +9,9 @@ gem 'dm-sqlite-adapter'
 gem 'dm-validations'
 gem 'dm-timestamps'
 gem 'dm-migrations'
-gem 'dm-types'
+gem 'dm-types', '1.2.1'
 gem 'dm-core'
-gem 'json'
+gem 'json', '1.6.1'
 
 group :development, :test do
   gem 'sqlite3'

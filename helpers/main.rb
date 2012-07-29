@@ -65,7 +65,7 @@ module CommonHelper
                        options['password'],
                        options['firstname'],
                        options['lastname'])
-      
+
       if user.add
         { register: { error: 'Success' }}.to_json
       else
