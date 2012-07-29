@@ -1,5 +1,7 @@
 
 class User 
+
+  
   include DataMapper::Resource
 
   property :id,         Serial
@@ -14,4 +16,5 @@ class User
   has n,   :friendships, child_key: [:source_id]
   has n,   :friends,     self,      through: :friendships, via: :target
   has n,   :tasks
+
 end
