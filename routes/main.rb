@@ -32,14 +32,14 @@ class TaskManager < Sinatra::Application
   post '/login' do
     @hash = to_hash(request.body.read)
 
-    login(@hash['taskmanager'])
+    User.login(@hash['taskmanager'])
   end
 
   # Logout user
   post '/protected/logout' do
     return { logout: { error: '403 Forbidden' }}.to_json unless @auth
 
-    logout(@protected_hash['taskmanager'])
+    User.logout(@protected_hash['taskmanager'])
   end
 
   # Register user
@@ -49,7 +49,7 @@ class TaskManager < Sinatra::Application
     if login_exists?(@hash['taskmanager'])
       { register: { error: 'Login exists' }}.to_json
     else
-      add_new_user(@hash['taskmanager'])
+      User.register(@hash['taskmanager'])
     end
   end
 
@@ -57,21 +57,21 @@ class TaskManager < Sinatra::Application
   post '/protected/delete_user' do
     return { delete_user: { error: '403 Forbidden' }}.to_json unless @auth
 
-    delete_user(@protected_hash['taskmanager'])
+    User.remove(@protected_hash['taskmanager']['auth_token'])
   end
 
   # Restore user
   post '/protected/restore_user' do
     return { restore_user: { error: '403 Forbidden' }}.to_json unless @restore_auth
 
-    restore_user(@protected_hash['taskmanager'])
+    User.restore(@protected_hash['taskmanager']['auth_token'])
   end
 
   # Find user
   post '/protected/find_user' do
     return { find_user: { error: '403 Forbidden' }}.to_json unless @auth
 
-    find_user(@protected_hash['taskmanager'])
+    User.find(@protected_hash['taskmanager'])
   end
 
   # Add friend
@@ -80,9 +80,9 @@ class TaskManager < Sinatra::Application
 
     case @protected_hash['taskmanager']['priority']
     when 4
-      add_new_task(@protected_hash['taskmanager'])
+      Task.add(@protected_hash['taskmanager'])
     when 5
-      add_friend(@protected_hash['taskmanager'])
+      User.add_friend(@protected_hash['taskmanager'])
     else
       { add_friend: { error: 'Wrong priority' }}.to_json
     end
@@ -92,7 +92,7 @@ class TaskManager < Sinatra::Application
   post '/protected/delete_friend' do
     return { delete_friend: { error: '403 Forbidden' }}.to_json unless @auth
 
-    delete_friend(@protected_hash['taskmanager'])
+    User.delete_friend(@protected_hash['taskmanager'])
   end
 
   # Create new task
@@ -105,20 +105,20 @@ class TaskManager < Sinatra::Application
       return { new_task: { error: 'Wrong priority' }}.to_json
     end
 
-    add_new_task(@protected_hash['taskmanager'])
+    Task.add(@protected_hash['taskmanager'])
   end
 
   # Delete task
   post '/protected/delete_task' do
     return { delete_task: { error: '403 Forbidden' }}.to_json unless @auth
 
-    delete_task(@protected_hash['taskmanager'])
+    Task.delete(@protected_hash['taskmanager'])
   end
 
   # List all tasks
   post '/protected/get_task' do
     return { get_task: { error: '403 Forbidden' }}.to_json unless @auth
 
-    get_task(@protected_hash['taskmanager'])
+    Task.get(@protected_hash['taskmanager'])
   end
 end
