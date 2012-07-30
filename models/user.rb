@@ -14,18 +14,12 @@ class User
   has n,   :friends,     self,      through: :friendships, via: :target
   has n,   :tasks
 
-  def initialize(login,password,firstname,lastname)
-    @login      = login
-    @password   = password
-    @firstname  = firstname
-    @lastname   = lastname
-  end
-
-  def add
-    self.login      = @login
-    self.password   = @password
-    self.firstname  = @firstname
-    self.lastname   = @lastname
+  # Save user in database
+  def add(login, password, firstname, lastname)
+    self.login     = login
+    self.password  = password
+    self.firstname = firstname
+    self.lastname  = lastname
     self.save
   end
 
@@ -79,12 +73,11 @@ class User
                                                              options['firstname'].empty? ||
                                                              options['lastname'].empty?
 
-    user  = User.new(options['login'],
-                     options['password'],
-                     options['firstname'],
-                     options['lastname'])
-
-    if user.add
+    user = User.new
+    if user.add(options['login'],
+                options['password'],
+                options['firstname'],
+                options['lastname'])
       { register: { error: 'Success' }}.to_json
     else
       { register: { error: 'Failure' }}.to_json
@@ -165,23 +158,23 @@ class User
       receiver.friends << sender
 
       if sender.friends.save && receiver.friends.save
-        system_message = Task.new("#{sender.firstname} #{sender.lastname} true", 5,sender.id, receiver.login)
-        system_message.save_in_db
+        system_message = Task.new
+        system_message.save_in_db("#{sender.firstname} #{sender.lastname} true", 5,sender.id, receiver.login)
         invite_task.destroy!
         { add_friend: { error:     'Success',
                         login:     receiver.login,
                         firstname: receiver.firstname,
                         lastname:  receiver.lastname }}.to_json
       else
-        system_message = Task.new("#{sender.firstname} #{sender.lastname} false", 5,sender.id, receiver.login)
-        system_message.save_in_db
+        system_message = Task.new
+        system_message.save_in_db("#{sender.firstname} #{sender.lastname} false", 5,sender.id, receiver.login)
         invite_task.destroy!
         { add_friend: { error: 'Success' }}.to_json
       end
 
     else
-      system_message = Task.new("#{sender.firstname} #{sender.lastname} false", 5,sender.id, receiver.login)
-      system_message.save_in_db
+      system_message = Task.new
+      system_message.save_in_db("#{sender.firstname} #{sender.lastname} false", 5,sender.id, receiver.login)
       invite_task.destroy!
       { add_friend: { error: 'Success' }}.to_json
     end
@@ -201,8 +194,8 @@ class User
     receiver.friends.delete(sender)
 
     if sender.friends.save && receiver.friends.save
-      system_message = Task.new('true', 6, sender.id, receiver.login)
-      system_message.save_in_db
+      system_message = Task.new
+      system_message.save_in_db('true', 6, sender.id, receiver.login)
       { delete_friend: { error: 'Success' }}.to_json
     else
       { delete_friend: { error: 'Failure' }}.to_json

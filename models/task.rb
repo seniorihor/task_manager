@@ -14,23 +14,15 @@ class Task
 
   belongs_to :user
 
-  def initialize(content, priority, user_id, receiver_login)
-    @content        = content
-    @priority       = priority
-    @user_id        = user_id
-    @receiver_login = receiver_login
-  end
-
-  def save_in_db
-    self.content        = @content
-    self.priority       = @priority
-    self.user_id        = @user_id
-    self.receiver_login = @receiver_login
+  def save_in_db(content, priority, user_id, receiver_login)
+    self.content        = content
+    self.priority       = priority
+    self.user_id        = user_id
+    self.receiver_login = receiver_login
     self.save
   end
 
   def self.add(options = {})
-
     auth_token     = options['auth_token']
     receiver_login = options['receiver_login']
     content        = options['content']
@@ -64,11 +56,10 @@ class Task
     return { add_friend: { error: 'You have invite from this user' }}.to_json if invite_task_receiver &&
                                                                                  priority == 4
 
-    task = Task.new(content, priority, sender.id, User.first(login: receiver_login).login)
-
-    if task.save_in_db && priority == 4
+    task = Task.new
+    if task.save_in_db(content, priority, sender.id, User.first(login: receiver_login).login) && priority == 4
       { add_friend: { error: 'Success' }}.to_json
-    elsif task.save_in_db
+    elsif task.save_in_db(content, priority, sender.id, User.first(login: receiver_login).login)
       { new_task: { error: 'Success' }}.to_json
     else
       { new_task: { error: 'Failure' }}.to_json

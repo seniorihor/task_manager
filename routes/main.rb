@@ -31,7 +31,6 @@ class TaskManager < Sinatra::Application
   # Login user
   post '/login' do
     @hash = to_hash(request.body.read)
-
     User.login(@hash['taskmanager'])
   end
 
