@@ -10,4 +10,7 @@ module CommonHelper
   def login_exists?(options = {})
     User.first(login: options['login']).nil? ? false : true
   end
+
+  def empty_fields?(options = {})
+  end
 end

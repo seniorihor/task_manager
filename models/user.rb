@@ -68,11 +68,6 @@ class User
 
   # Registration
   def self.register(options = {})
-    return { register: { error: 'Empty fields' }}.to_json if options['login'].empty?     ||
-                                                             options['password'].empty?  ||
-                                                             options['firstname'].empty? ||
-                                                             options['lastname'].empty?
-
     user = User.new
     if user.add(options['login'],
                 options['password'],
@@ -111,7 +106,6 @@ class User
   # Search by certain fields in database (also can search by substring)
   def self.find(options = {})
     search_value = options['search_value']
-    return { find_user: { error: 'Empty fields' }}.to_json               if search_value.empty?
     return { find_user: { error: 'Need at least 2 characters' }}.to_json if search_value.size == 1
 
     users              = Array.new
@@ -139,9 +133,6 @@ class User
   # Sending message of agree or disagree if user accept or declain friendship request
   # There is a special priority: 5 of friendship request message
   def self.add_friend(options = {})
-    return { add_friend: { error: 'Empty fields' }}.to_json if options['receiver_login'].empty? ||
-                                                               options['friendship'].empty?
-
     sender   = User.first(token: options['auth_token'])
     receiver = User.first(login: options['receiver_login'])
 
@@ -182,8 +173,6 @@ class User
 
   # Delete relations from both sides of friendship
   def self.delete_friend(options = {})
-    return { delete_friend: { error: 'Empty fields' }}.to_json if options['receiver_login'].empty?
-
     sender   = User.first(token: options['auth_token'])
     receiver = User.first(login: options['receiver_login'])
 

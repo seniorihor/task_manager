@@ -28,11 +28,7 @@ class Task
     content        = options['content']
     priority       = options['priority']
 
-    if priority == 4 then content = 'Add me to friends' end
-
-    return { new_task: { error: 'Empty fields' }}.to_json if content.empty? ||
-                                                             priority.nil?  ||
-                                                             receiver_login.empty?
+    content = 'Add me to friends' if priority == 4
 
     sender   = User.first(token: auth_token)
     receiver = User.first(login: receiver_login)
@@ -67,8 +63,6 @@ class Task
   end
 
   def self.delete(options = {})
-    return { delete_task: { error: 'Empty fields' }}.to_json if options['task_id'].nil?
-
     user = User.first(token: options['auth_token'])
     task = Task.all(receiver_login: user.login).get(options['task_id'])
 

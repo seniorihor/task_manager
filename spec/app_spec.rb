@@ -45,7 +45,7 @@ describe 'TaskManager' do
     end
 
 
-    it 'of user2 shouldn\'t be successful' do
+    it 'of user2 shouldn\'t be successful because of empty fields' do
       request  = { taskmanager: { login:     '',
                                   password:  'password2',
                                   firstname: 'firstname2',
@@ -68,7 +68,7 @@ describe 'TaskManager' do
     end
 
     it 'of user2 shouldn\'t be successful because of validation' do
-      request  = { taskmanager: { login:     'l',
+      request  = { taskmanager: { login:     '2',
                                   password:  'password2',
                                   firstname: 'firstname2',
                                   lastname:  'lastname2' }}
