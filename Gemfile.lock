@@ -71,9 +71,9 @@ DEPENDENCIES
   dm-postgres-adapter
   dm-sqlite-adapter
   dm-timestamps
-  dm-types (= 1.2.1)
+  dm-types
   dm-validations
-  json (= 1.6.1)
+  json
   pg
   rack
   rack-test
