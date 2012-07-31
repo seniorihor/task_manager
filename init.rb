@@ -11,7 +11,7 @@ require 'dm-timestamps'
 require 'dm-types'
 require 'json'
 
-set :environment, ENV['RACK_ENV'] || :development 
+set :environment, ENV['RACK_ENV'] || :development
                                      #:test
 
 # Configuration connection to database
@@ -95,7 +95,7 @@ before '/protected/*' do
     @protected_hash = to_hash(json_data)
     user = User.first(token: @protected_hash['taskmanager']['auth_token'])
 
-    if user.nil?
+    if user.nil? || user.token.nil?
       @auth = false
     elsif user.deleted
       @auth         = false

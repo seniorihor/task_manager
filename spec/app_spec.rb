@@ -141,6 +141,7 @@ describe 'TaskManager' do
 
   context 'delete' do
     it 'of user1 should be successful' do
+      User.first.update(token: 'user1token')
       request  = { taskmanager: { auth_token: User.first.token }}
       post '/protected/delete_user', request.to_json
 
