@@ -1,5 +1,4 @@
 class Task
-
   include DataMapper::Resource
 
   property :id,             Serial
@@ -22,28 +21,9 @@ class Task
     self.save
   end
 
-  def self.add(options = {})
-    auth_token     = options['auth_token']
-    receiver_login = options['receiver_login']
-    content        = options['content']
+  def self.add(sender, receiver, options = {})
     priority       = options['priority']
-
-    content = 'Add me to friends' if priority == 4
-
-    sender   = User.first(token: auth_token)
-    receiver = User.first(login: receiver_login)
-
-    return { new_task: { error: "User doesn't exist" }}.to_json    if receiver.nil?
-    return { new_task: { error: "You can't be receiver" }}.to_json if sender == receiver
-    return { new_task: { error: 'User is deleted' }}.to_json       if receiver.deleted
-
-    case priority
-    when 1..3
-      return { new_task: { error: 'This is not your friend' }}.to_json unless sender.friends.include?(receiver)
-    end
-
-    return { add_friend: { error: 'Already friend' }}.to_json if sender.friends.include?(receiver) &&
-                                                                 priority == 4
+    content        = priority == 4 ? 'Add me to friends' : options['content']
 
     invite_task_sender   = sender.tasks.all(receiver_login: receiver.login).last(priority: 4)
     invite_task_receiver = receiver.tasks.all(receiver_login: sender.login).last(priority: 4)
@@ -53,21 +33,16 @@ class Task
                                                                                  priority == 4
 
     task = Task.new
-    if task.save_in_db(content, priority, sender.id, User.first(login: receiver_login).login) && priority == 4
+    if task.save_in_db(content, priority, sender.id, receiver.login) && priority == 4
       { add_friend: { error: 'Success' }}.to_json
-    elsif task.save_in_db(content, priority, sender.id, User.first(login: receiver_login).login)
+    elsif task.save_in_db(content, priority, sender.id, receiver.login)
       { new_task: { error: 'Success' }}.to_json
     else
       { new_task: { error: 'Failure' }}.to_json
     end
   end
 
-  def self.delete(options = {})
-    user = User.first(token: options['auth_token'])
-    task = Task.all(receiver_login: user.login).get(options['task_id'])
-
-    return { delete_task: { error: "Task doesn't exist" }}.to_json if task.nil?
-
+  def self.delete(task)
     if task.destroy!
       { delete_task: { error: 'Success' }}.to_json
     else
@@ -75,12 +50,10 @@ class Task
     end
   end
 
-  def self.get(options = {})
-    user       = User.first(token: options['auth_token'])
+  def self.get(user)
     collection = Task.all(read: false, receiver_login: user.login)
-
-    tasks    = Array.new(collection)
-    quantity = tasks.size
+    tasks      = Array.new(collection)
+    quantity   = tasks.size
 
     return { get_task: { error:    'Success',
                          quantity: quantity }}.to_json if quantity == 0

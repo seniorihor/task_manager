@@ -7,8 +7,8 @@ module CommonHelper
   end
 
   # Method name explain everything
-  def login_exists?(options = {})
-    User.first(login: options['login']).nil? ? false : true
+  def login_exists?(login)
+    User.first(login: login).nil? ? false : true
   end
 
   def empty_fields?(options = {})
@@ -16,5 +16,13 @@ module CommonHelper
       return true if field.to_s.empty?
     end
     false
+  end
+
+  def user_by_token
+    User.first(token: @protected_hash['taskmanager']['auth_token'])
+  end
+
+  def user_by_receiver_login
+    User.first(login: @protected_hash['taskmanager']['receiver_login'])
   end
 end

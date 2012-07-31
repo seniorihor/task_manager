@@ -33,6 +33,10 @@ class TaskManager < Sinatra::Application
     @hash = to_hash(request.body.read)
     halt 400, { login: { error: 'Empty fields' }}.to_json if empty_fields?(@hash['taskmanager'])
 
+    user = User.first(login: @hash['taskmanager']['login'])
+    return { login: { error: 'Invalid login or password' }}.to_json if user.nil?
+    return { login: { error: 'Already in system' }}.to_json         if user.token
+
     User.login(@hash['taskmanager'])
   end
 
@@ -40,7 +44,7 @@ class TaskManager < Sinatra::Application
   post '/protected/logout' do
     halt 403, { logout: { error: '403 Forbidden' }}.to_json unless @auth
 
-    User.logout(@protected_hash['taskmanager'])
+    User.logout(user_by_token)
   end
 
   # Register user
@@ -48,7 +52,7 @@ class TaskManager < Sinatra::Application
     @hash = to_hash(request.body.read)
     halt 400, { register: { error: 'Empty fields' }}.to_json if empty_fields?(@hash['taskmanager'])
 
-    if login_exists?(@hash['taskmanager'])
+    if login_exists?(@hash['taskmanager']['login'])
       halt 500, { register: { error: 'Login exists' }}.to_json
     else
       User.register(@hash['taskmanager'])
@@ -59,34 +63,44 @@ class TaskManager < Sinatra::Application
   post '/protected/delete_user' do
     halt 403, { delete_user: { error: '403 Forbidden' }}.to_json unless @auth
 
-    User.remove(@protected_hash['taskmanager']['auth_token'])
+    User.remove(user_by_token)
   end
 
   # Restore user
   post '/protected/restore_user' do
     halt 403, { restore_user: { error: '403 Forbidden' }}.to_json unless @restore_auth
 
-    User.restore(@protected_hash['taskmanager']['auth_token'])
+    User.restore(user_by_token)
   end
 
   # Find user
   post '/protected/find_user' do
     halt 403, { find_user: { error: '403 Forbidden' }}.to_json unless @auth
-    halt 400, { find_user: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
+    halt 400, { find_user: { error: 'Empty fields' }}.to_json  if empty_fields?(@protected_hash['taskmanager'])
 
-    User.find(@protected_hash['taskmanager'])
+    search_value = @protected_hash['taskmanager']['search_value']
+    return { find_user: { error: 'Need at least 2 characters' }}.to_json if search_value.size == 1
+
+    User.find(user_by_token, search_value)
   end
 
   # Add friend
   post '/protected/add_friend' do
     halt 403, { add_friend: { error: '403 Forbidden' }}.to_json unless @auth
-    halt 400, { add_friend: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
+    halt 400, { add_friend: { error: 'Empty fields' }}.to_json  if empty_fields?(@protected_hash['taskmanager'])
+
+    sender   = user_by_token
+    receiver = user_by_receiver_login
+
+    return { add_friend: { error: "User doesn't exist" }}.to_json                if receiver.nil?
+    return { add_friend: { error: "You can't add yourself to friends" }}.to_json if sender == receiver
+    return { add_friend: { error: 'User is deleted' }}.to_json                   if receiver.deleted
 
     case @protected_hash['taskmanager']['priority']
     when 4
-      Task.add(@protected_hash['taskmanager'])
+      Task.add(sender, receiver, @protected_hash['taskmanager'])
     when 5
-      User.add_friend(@protected_hash['taskmanager'])
+      User.add_friend(sender, receiver, @protected_hash['taskmanager'])
     else
       halt 406, { add_friend: { error: 'Wrong priority' }}.to_json
     end
@@ -95,38 +109,59 @@ class TaskManager < Sinatra::Application
   # Delete friend
   post '/protected/delete_friend' do
     halt 403, { delete_friend: { error: '403 Forbidden' }}.to_json unless @auth
-    halt 400, { delete_friend: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
+    halt 400, { delete_friend: { error: 'Empty fields' }}.to_json  if empty_fields?(@protected_hash['taskmanager'])
 
-    User.delete_friend(@protected_hash['taskmanager'])
+    sender   = user_by_token
+    receiver = user_by_receiver_login
+
+    return { delete_friend: { error: "User doesn't exist" }}.to_json      if receiver.nil?
+    return { delete_friend: { error: 'This is not your friend' }}.to_json unless sender.friends.include?(receiver)
+
+    User.delete_friend(sender, receiver)
   end
 
   # Create new task
   post '/protected/new_task' do
-    halt 403, { new_task: { error: '403 Forbidden' }}.to_json  unless @auth
-    halt 400, { new_task: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
+    halt 403, { new_task: { error: '403 Forbidden' }}.to_json unless @auth
+    halt 400, { new_task: { error: 'Empty fields' }}.to_json  if empty_fields?(@protected_hash['taskmanager'])
 
-    case @protected_hash['taskmanager']['priority']
+    sender   = user_by_token
+    receiver = user_by_receiver_login
+    priority = @protected_hash['taskmanager']['priority']
+
+    return { new_task: { error: "User doesn't exist" }}.to_json    if receiver.nil?
+    return { new_task: { error: "You can't be receiver" }}.to_json if sender == receiver
+    return { new_task: { error: 'User is deleted' }}.to_json       if receiver.deleted
+    return { add_friend: { error: 'Already friend' }}.to_json      if sender.friends.include?(receiver) &&
+                                                                      priority == 4
+
+    case priority
     when 1..3
+      return { new_task: { error: 'This is not your friend' }}.to_json unless sender.friends.include?(receiver)
     else
       halt 406, { new_task: { error: 'Wrong priority' }}.to_json
     end
 
-    Task.add(@protected_hash['taskmanager'])
+    Task.add(sender, receiver, @protected_hash['taskmanager'])
   end
 
   # Delete task
   post '/protected/delete_task' do
     halt 403, { delete_task: { error: '403 Forbidden' }}.to_json unless @auth
-    halt 400, { delete_task: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
+    halt 400, { delete_task: { error: 'Empty fields' }}.to_json  if empty_fields?(@protected_hash['taskmanager'])
 
-    Task.delete(@protected_hash['taskmanager'])
+    task = Task.all(receiver_login: user_by_token.login).get(@protected_hash['taskmanager']['task_id'])
+
+    return { delete_task: { error: "Task doesn't exist" }}.to_json if task.nil?
+
+    Task.delete(task)
   end
 
   # List all tasks
   post '/protected/get_task' do
     halt 403, { get_task: { error: '403 Forbidden' }}.to_json unless @auth
-    halt 400, { get_task: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
+    halt 400, { get_task: { error: 'Empty fields' }}.to_json  if empty_fields?(@protected_hash['taskmanager'])
 
-    Task.get(@protected_hash['taskmanager'])
+    Task.get(user_by_token)
   end
 end
