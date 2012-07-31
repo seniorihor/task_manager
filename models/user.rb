@@ -117,6 +117,7 @@ class User
     users_by_firstname.each { |user| users << user } unless users_by_firstname.empty?
     users_by_lastname.each  { |user| users << user } unless users_by_lastname.empty?
 
+    # Delete user which searching for other users
     users.delete(User.first(token: options['auth_token']))
 
     return { find_user: { error: 'No matching users' }}.to_json if users.empty?

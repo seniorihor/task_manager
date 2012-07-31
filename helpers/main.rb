@@ -12,5 +12,11 @@ module CommonHelper
   end
 
   def empty_fields?(options = {})
+    options.each_value do |field|
+      return true if field.to_s.empty?
+    end
+    false
   end
+
+
 end
