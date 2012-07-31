@@ -17,6 +17,4 @@ module CommonHelper
     end
     false
   end
-
-
 end
