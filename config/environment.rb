@@ -1,7 +1,7 @@
 require 'bundler'
 Bundler.require
 
-%w(data_mapper_conf
+%w(datamapper
    ../models/user
    ../models/task
    ../models/friendship
