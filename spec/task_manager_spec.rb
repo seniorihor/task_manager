@@ -20,7 +20,8 @@ describe 'TaskManager' do
     TaskManager
   end
 
-  context 'register' do
+  context 'Register' do
+
     it 'of user1 should be successful' do
       request  = { taskmanager: { login:     'login',
                                   password:  'password',
@@ -32,8 +33,7 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-
-    it 'of user2 shouldn\'t be successful because of empty fields' do
+    it "of user2 shouldn't be successful because of empty fields" do
       request  = { taskmanager: { login:     '',
                                   password:  'password2',
                                   firstname: 'firstname2',
@@ -44,7 +44,7 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-    it 'of user2 shouldn\'t be successful because of already existing login' do
+    it "of user2 shouldn't be successful because of already existing login" do
       request  = { taskmanager: { login:     'login1',
                                   password:  'password2',
                                   firstname: 'firstname2',
@@ -55,7 +55,7 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-    it 'of user2 shouldn\'t be successful because of validation' do
+    it "of user2 shouldn't be successful because of validation" do
       request  = { taskmanager: { login:     '2',
                                   password:  'password2',
                                   firstname: 'firstname2',
@@ -69,10 +69,10 @@ describe 'TaskManager' do
     after(:all) do
       User.last.destroy!
     end
-
   end
 
-  context 'login' do
+  context 'Login' do
+
     it 'of user1 should be successful' do
       User.first.update(token: nil)
       request  = { taskmanager: { login:    User.first.login,
@@ -82,7 +82,6 @@ describe 'TaskManager' do
       response = { login: { error:      'Success',
                             auth_token: User.first.token,
                             friends:    User.first.friends.to_a }}
-
       last_response.body.should == response.to_json
     end
 
@@ -92,17 +91,15 @@ describe 'TaskManager' do
       post '/login', request.to_json
 
       response = { login: { error: 'Already in system' }}
-
       last_response.body.should == response.to_json
     end
 
-    it 'of user2 shouldn\'t be successful' do
+    it "of user2 shouldn't be successful" do
       request  = { taskmanager: { login:    'Invalid login',
                                   password: User.last.password }}
       post '/login', request.to_json
 
       response = { login: { error: 'Invalid login or password' }}
-
       last_response.body.should == response.to_json
     end
   end
@@ -114,7 +111,6 @@ describe 'TaskManager' do
       post '/protected/logout', request.to_json
 
       response = { logout: { error: '403 Forbidden' }}
-
       last_response.body.should == response.to_json
     end
 
@@ -123,12 +119,12 @@ describe 'TaskManager' do
       post '/protected/logout', request.to_json
 
       response = { logout: { error: 'Success' }}
-
       last_response.body.should == response.to_json
     end
   end
 
-  context 'delete' do
+  context 'Delete' do
+
     it 'of user1 should be successful' do
       User.first.update(token: 'user1token')
       request  = { taskmanager: { auth_token: User.first.token }}
@@ -139,7 +135,8 @@ describe 'TaskManager' do
     end
   end
 
-  context 'restore' do
+  context 'Restore' do
+
     it 'of user1 should be successful' do
       request  = { taskmanager: { auth_token: User.first.token }}
       post '/protected/restore_user', request.to_json
@@ -149,7 +146,8 @@ describe 'TaskManager' do
     end
   end
 
-  context 'find_user(search)' do
+  context 'Find_user(search)' do
+
     it 'of user2 should be successful' do
       request  = { taskmanager: { auth_token:   User.first.token,
                                   search_value: User.last.login }}
@@ -173,14 +171,14 @@ describe 'TaskManager' do
 
     it 'of user should be failure because of short search_value' do
       request  = { taskmanager: { auth_token:   User.first.token,
-                                  search_value: 'u' }}
+                                  search_value: '1' }}
       post '/protected/find_user', request.to_json
 
       response = { find_user: { error: 'Need at least 2 characters' }}
       last_response.body.should == response.to_json
     end
 
-    it 'of user should be failure because such user doesn\'t exist' do
+    it "of user should be failure because such user doesn't exist" do
       request  = { taskmanager: { auth_token:   User.first.token,
                                   search_value: 'user' }}
       post '/protected/find_user', request.to_json
@@ -190,8 +188,9 @@ describe 'TaskManager' do
     end
   end
 
-  context 'add_friend(invite)' do
-    it ' to friends user2 should be failure because of priority' do
+  context 'Add friend (invite)' do
+
+    it 'to friends user2 should be failure because of priority' do
       request  = { taskmanager: { auth_token:     User.first.token,
                                   receiver_login: User.last.login,
                                   priority:       3 }}
@@ -201,7 +200,7 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-    it ' to friends user2 should be successful' do
+    it 'to friends user2 should be successful' do
       request  = { taskmanager: { auth_token:     User.first.token,
                                   receiver_login: User.last.login,
                                   priority:       4 }}
@@ -211,7 +210,7 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-    it ' to friends user2 should be failure because of invite already exists' do
+    it 'to friends user2 should be failure because of invite already exists' do
       request  = { taskmanager: { auth_token:     User.first.token,
                                   receiver_login: User.last.login,
                                   priority:       4 }}
@@ -221,7 +220,7 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-    it ' to friends user1 should be failure because of existing invite ' do
+    it 'to friends user1 should be failure because of existing invite' do
       request  = { taskmanager: { auth_token:     User.last.token,
                                   receiver_login: User.first.login,
                                   priority:       4 }}
@@ -232,7 +231,8 @@ describe 'TaskManager' do
     end
   end
 
-  context 'add_friend(response)' do
+  context 'Add friend (response)' do
+
     it 'on invite from user2 to user1 should be failure because of empty fields' do
       request  = { taskmanager: { auth_token:     User.last.token,
                                   receiver_login: '',
@@ -244,14 +244,14 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-    it 'on invite from user2 to user should be failure because user doesn\'t exists' do
+    it "on invite from user2 to user should be failure because user doesn't exists" do
       request  = { taskmanager: { auth_token:     User.last.token,
                                   receiver_login: 'nothing',
                                   friendship:     'true',
                                   priority:       5 }}
       post '/protected/add_friend', request.to_json
 
-      response = { add_friend: { error: 'User doesn\'t exist' }}
+      response = { add_friend: { error: "User doesn't exist" }}
       last_response.body.should == response.to_json
     end
 
@@ -262,11 +262,11 @@ describe 'TaskManager' do
                                   priority:       5 }}
       post '/protected/add_friend', request.to_json
 
-      response = { add_friend: { error: 'You can\'t add yourself to friends' }}
+      response = { add_friend: { error: "You can't add yourself to friends" }}
       last_response.body.should == response.to_json
     end
 
-    it 'on invite from user2 to user1 should be successful(false)' do
+    it 'on invite from user2 to user1 should be successful (false)' do
       request  = { taskmanager: { auth_token:     User.last.token,
                                   receiver_login: User.first.login,
                                   friendship:     'false',
@@ -277,7 +277,7 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-    it 'on invite from user2 to user1 should be successful(true)' do
+    it 'on invite from user2 to user1 should be successful (true)' do
       request_invite  = { taskmanager: { auth_token:     User.first.token,
                                          receiver_login: User.last.login,
                                          priority:       4 }}
@@ -297,8 +297,9 @@ describe 'TaskManager' do
     end
   end
 
-  context 'new_task' do
-    it ' to user2 should be failure because of empty fields' do
+  context 'New_task' do
+
+    it 'to user2 should be failure because of empty fields' do
       request  = { taskmanager: { auth_token:     User.first.token,
                                   receiver_login: User.last.login,
                                   content:        '',
@@ -309,29 +310,29 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-    it ' to user should be failure because such user doesn\'t exists' do
+    it "to user should be failure because such user doesn't exists" do
       request  = { taskmanager: { auth_token:     User.first.token,
-                                  receiver_login: 'nothing',
+                                  receiver_login: 'nobody',
                                   content:        'content',
                                   priority:       1 }}
       post '/protected/new_task', request.to_json
 
-      response = { new_task: { error: 'User doesn\'t exist' }}
+      response = { new_task: { error: "User doesn't exist" }}
       last_response.body.should == response.to_json
     end
 
-    it ' to user1 from user1 should be failure ' do
+    it 'to user1 from user1 should be failure' do
       request  = { taskmanager: { auth_token:     User.first.token,
                                   receiver_login: User.first.login,
                                   content:        'content',
                                   priority:       1 }}
       post '/protected/new_task', request.to_json
 
-      response = { new_task: { error: 'You can\'t be receiver' }}
+      response = { new_task: { error: "You can't be receiver" }}
       last_response.body.should == response.to_json
     end
 
-    it ' to user3 from user1 should be failure because they aren\'t friends' do
+    it "to user3 from user1 should be failure because they aren't friends" do
       User.create(login:     'login3',
                   password:  'password3',
                   firstname: 'firstname3',
@@ -348,7 +349,7 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-    it ' to user1 from user2 should be successful ' do
+    it 'to user1 from user2 should be successful' do
       request  = { taskmanager: { auth_token:     User.first.token,
                                   receiver_login: User.first(login: 'login2').login,
                                   content:        'content',
@@ -360,12 +361,13 @@ describe 'TaskManager' do
     end
 
     after(:all) do
-      User.first(login: 'login3').destroy!
+      User.last.destroy!
     end
   end
 
-  context 'get_task' do
-    it ' user2 should be successful' do
+  context 'Get task' do
+
+    it 'user2 should be successful' do
       request  = { taskmanager: { auth_token: User.last.token }}
       response = { get_task: { error:    'Success',
                                quantity: Task.all(receiver_login: User.last.login, read: false).size,
@@ -379,7 +381,7 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-    it ' user2 should be successful(empty)' do
+    it 'user2 should be successful (empty)' do
       request  = { taskmanager: { auth_token: User.last.token }}
       response = { get_task: { error:    'Success',
                                quantity: Task.all(receiver_login: User.last.login, read: false).size }}
@@ -389,8 +391,9 @@ describe 'TaskManager' do
     end
   end
 
-  context 'delete_task' do
-    it ' should be failure because of empty fields' do
+  context 'Delete task' do
+
+    it 'should be failure because of empty fields' do
       request  = { taskmanager: { auth_token: User.last.token,
                                   task_id:    nil }}
       post '/protected/delete_task', request.to_json
@@ -399,16 +402,16 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-     it ' should be failure because task doesn\'t exists' do
+    it "should be failure because task doesn't exists" do
       request  = { taskmanager: { auth_token: User.last.token,
                                   task_id:    0 }}
       post '/protected/delete_task', request.to_json
 
-      response = { delete_task: { error: 'Task doesn\'t exist' }}
+      response = { delete_task: { error: "Task doesn't exist" }}
       last_response.body.should == response.to_json
     end
 
-    it ' should be successful' do
+    it 'should be successful' do
       task_id  = Task.all(receiver_login: User.last.login).last(read: true).id
       request  = { taskmanager: { auth_token: User.last.token,
                                   task_id:    task_id }}
@@ -419,8 +422,9 @@ describe 'TaskManager' do
     end
   end
 
-  context 'delete_friend' do
-    it ' should be failure because of empty fields' do
+  context 'Delete friend' do
+
+    it 'should be failure because of empty fields' do
       request  = { taskmanager: { auth_token:     User.first.token,
                                   receiver_login: '' }}
       post '/protected/delete_friend', request.to_json
@@ -429,16 +433,16 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-     it ' should be failure because user doesn\'t exists' do
+     it "should be failure because user doesn't exists" do
       request  = { taskmanager: { auth_token:     User.first.token,
                                   receiver_login: 'nothing' }}
       post '/protected/delete_friend', request.to_json
 
-      response = { delete_friend: { error: 'User doesn\'t exist' }}
+      response = { delete_friend: { error: "User doesn't exist" }}
       last_response.body.should == response.to_json
     end
 
-    it ' should be successful' do
+    it 'should be successful' do
       request  = { taskmanager: { auth_token:     User.first.token,
                                   receiver_login: User.last.login }}
       post '/protected/delete_friend', request.to_json
@@ -447,7 +451,7 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-    it ' should be failure because users aren\'t friends' do
+    it "should be failure because users aren't friends" do
       request  = { taskmanager: { auth_token:     User.first.token,
                                   receiver_login: User.last.login }}
       post '/protected/delete_friend', request.to_json
