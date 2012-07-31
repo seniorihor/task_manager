@@ -31,14 +31,14 @@ class TaskManager < Sinatra::Application
   # Login user
   post '/login' do
     @hash = to_hash(request.body.read)
-    return { login: { error: 'Empty fields' }}.to_json if empty_fields?(@hash['taskmanager'])
+    halt 400, { login: { error: 'Empty fields' }}.to_json if empty_fields?(@hash['taskmanager'])
 
     User.login(@hash['taskmanager'])
   end
 
   # Logout user
   post '/protected/logout' do
-    return { logout: { error: '403 Forbidden' }}.to_json unless @auth
+    halt 403, { logout: { error: '403 Forbidden' }}.to_json unless @auth
 
     User.logout(@protected_hash['taskmanager'])
   end
@@ -46,10 +46,10 @@ class TaskManager < Sinatra::Application
   # Register user
   post '/register' do
     @hash = to_hash(request.body.read)
-    return { register: { error: 'Empty fields' }}.to_json if empty_fields?(@hash['taskmanager'])
+    halt 400, { register: { error: 'Empty fields' }}.to_json if empty_fields?(@hash['taskmanager'])
 
     if login_exists?(@hash['taskmanager'])
-      { register: { error: 'Login exists' }}.to_json
+      halt 500, { register: { error: 'Login exists' }}.to_json
     else
       User.register(@hash['taskmanager'])
     end
@@ -57,30 +57,30 @@ class TaskManager < Sinatra::Application
 
   # Delete user
   post '/protected/delete_user' do
-    return { delete_user: { error: '403 Forbidden' }}.to_json unless @auth
+    halt 403, { delete_user: { error: '403 Forbidden' }}.to_json unless @auth
 
     User.remove(@protected_hash['taskmanager']['auth_token'])
   end
 
   # Restore user
   post '/protected/restore_user' do
-    return { restore_user: { error: '403 Forbidden' }}.to_json unless @restore_auth
+    halt 403, { restore_user: { error: '403 Forbidden' }}.to_json unless @restore_auth
 
     User.restore(@protected_hash['taskmanager']['auth_token'])
   end
 
   # Find user
   post '/protected/find_user' do
-    return { find_user: { error: '403 Forbidden' }}.to_json unless @auth
-    return { find_user: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
+    halt 403, { find_user: { error: '403 Forbidden' }}.to_json unless @auth
+    halt 400, { find_user: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
 
     User.find(@protected_hash['taskmanager'])
   end
 
   # Add friend
   post '/protected/add_friend' do
-    return { add_friend: { error: '403 Forbidden' }}.to_json unless @auth
-    return { add_friend: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
+    halt 403, { add_friend: { error: '403 Forbidden' }}.to_json unless @auth
+    halt 400, { add_friend: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
 
     case @protected_hash['taskmanager']['priority']
     when 4
@@ -88,27 +88,27 @@ class TaskManager < Sinatra::Application
     when 5
       User.add_friend(@protected_hash['taskmanager'])
     else
-      { add_friend: { error: 'Wrong priority' }}.to_json
+      halt 406, { add_friend: { error: 'Wrong priority' }}.to_json
     end
   end
 
   # Delete friend
   post '/protected/delete_friend' do
-    return { delete_friend: { error: '403 Forbidden' }}.to_json unless @auth
-    return { delete_friend: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
+    halt 403, { delete_friend: { error: '403 Forbidden' }}.to_json unless @auth
+    halt 400, { delete_friend: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
 
     User.delete_friend(@protected_hash['taskmanager'])
   end
 
   # Create new task
   post '/protected/new_task' do
-    return { new_task: { error: '403 Forbidden' }}.to_json  unless @auth
-    return { new_task: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
+    halt 403, { new_task: { error: '403 Forbidden' }}.to_json  unless @auth
+    halt 400, { new_task: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
 
     case @protected_hash['taskmanager']['priority']
     when 1..3
     else
-      return { new_task: { error: 'Wrong priority' }}.to_json
+      halt 406, { new_task: { error: 'Wrong priority' }}.to_json
     end
 
     Task.add(@protected_hash['taskmanager'])
@@ -116,16 +116,16 @@ class TaskManager < Sinatra::Application
 
   # Delete task
   post '/protected/delete_task' do
-    return { delete_task: { error: '403 Forbidden' }}.to_json unless @auth
-    return { delete_task: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
+    halt 403, { delete_task: { error: '403 Forbidden' }}.to_json unless @auth
+    halt 400, { delete_task: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
 
     Task.delete(@protected_hash['taskmanager'])
   end
 
   # List all tasks
   post '/protected/get_task' do
-    return { get_task: { error: '403 Forbidden' }}.to_json unless @auth
-    return { get_task: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
+    halt 403, { get_task: { error: '403 Forbidden' }}.to_json unless @auth
+    halt 400, { get_task: { error: 'Empty fields' }}.to_json if empty_fields?(@protected_hash['taskmanager'])
 
     Task.get(@protected_hash['taskmanager'])
   end
