@@ -38,9 +38,9 @@ class User
         friends.map! { |friend| { login:     friend.login,
                                   firstname: friend.firstname,
                                   lastname:  friend.lastname }}
-        200
+        true
       else
-        424
+        false
       end
     end
 

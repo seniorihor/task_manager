@@ -40,12 +40,11 @@ class TaskManager < Sinatra::Application
     halt 403, { login: { error: 'Invalid login or password' }}.to_json if user.nil? || password != user.password
     halt 403, { login: { error: 'Already in system' }}.to_json         if user.token
 
-    case User.login(user, password)
-    when 200
+    if User.login(user, password)
       halt 200, { login: { error:      'Success',
                            auth_token: user.token,
                            friends:    Array.new(user.friends) }}.to_json
-    when 424
+    else
       halt 424, { login: { error: 'Failure' }}.to_json
     end
   end
