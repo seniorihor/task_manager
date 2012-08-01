@@ -26,4 +26,15 @@ module CommonHelper
   def user_by_receiver_login
     User.first(login: @protected_hash['taskmanager']['receiver_login'])
   end
+
+  def delete_temporary_tasks(login)
+    add_friend_tasks    = Array.new(Task.all(receiver_login: login,
+                                             read:           true,
+                                             priority:       5))
+    delete_friend_tasks = Array.new(Task.all(receiver_login: login,
+                                             read:           true,
+                                             priority:       6))
+    add_friend_tasks.each    { |task| task.destroy! } unless add_friend_tasks.empty?
+    delete_friend_tasks.each { |task| task.destroy! } unless delete_friend_tasks.empty?
+  end
 end

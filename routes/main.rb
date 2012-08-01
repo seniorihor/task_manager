@@ -258,15 +258,7 @@ class TaskManager < Sinatra::Base
                             user_login: User.get(task.user_id).login,
                             created_at: task.created_at.strftime('%d.%m.%Y %H:%M') }} # 12.12.2012 12:12
 
-      # Delete all temporary tasks
-      add_friend_tasks    = Array.new(Task.all(receiver_login: user_by_token.login,
-                                               read:           true,
-                                               priority:       5))
-      delete_friend_tasks = Array.new(Task.all(receiver_login: user_by_token.login,
-                                               read:           true,
-                                               priority:       6))
-      add_friend_tasks.each    { |task| task.destroy! } unless add_friend_tasks.empty?
-      delete_friend_tasks.each { |task| task.destroy! } unless delete_friend_tasks.empty?
+      delete_temporary_tasks(user_by_token.login)
 
       halt 200, { get_task: { error:    'Success',
                               quantity: tasks.size,
