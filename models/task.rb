@@ -13,21 +13,15 @@ class Task
 
   belongs_to :user
 
-    def save_in_db(content, priority, user_id, receiver_login)
-      self.content        = content
-      self.priority       = priority
-      self.user_id        = user_id
-      self.receiver_login = receiver_login
-      self.save
-    end
-
   class << self
     def add(sender, receiver, options = {})
       priority = options['priority']
       content  = priority == 4 ? 'Add me to friends' : options['content']
 
-      task = Task.new
-      task.save_in_db(content, priority, sender.id, receiver.login)
+      Task.new({ content:        content,
+                 priority:       priority,
+                 user_id:        sender.id,
+                 receiver_login: receiver.login }).save
     end
 
     def delete(task)
@@ -46,11 +40,7 @@ class Task
     end
 
     def system_message(options = {})
-      task = Task.new
-      task.save_in_db(options['content'],
-                      options['priority'],
-                      options['user_id'],
-                      options['receiver_login'])
+      Task.new(options).save
     end
   end
 end

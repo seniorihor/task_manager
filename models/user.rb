@@ -14,15 +14,6 @@ class User
   has n,   :friends,     self,      through: :friendships, via: :target
   has n,   :tasks
 
-  # Save user in database
-  def add(login, password, firstname, lastname)
-    self.login     = login
-    self.password  = password
-    self.firstname = firstname
-    self.lastname  = lastname
-    self.save
-  end
-
   class << self
     # Generating of token
     def new_token
@@ -42,11 +33,7 @@ class User
 
     # Registration
     def register(options = {})
-      user = User.new
-      user.add(options['login'],
-               options['password'],
-               options['firstname'],
-               options['lastname'])
+      User.new(options).save
     end
 
     # Property deleted of certain user become true (rights of "deleted" user is limited)
