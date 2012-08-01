@@ -80,7 +80,11 @@ class TaskManager < Sinatra::Application
   post '/protected/delete_user' do
     halt 403, { delete_user: { error: '403 Forbidden' }}.to_json unless @auth
 
-    User.remove(user_by_token)
+    if User.remove(user_by_token)
+      { delete_user: { error: 'Success' }}.to_json
+    else
+      { delete_user: { error: 'Failure' }}.to_json
+    end
   end
 
   # Restore user

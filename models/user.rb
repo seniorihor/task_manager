@@ -60,13 +60,7 @@ class User
 
     # Property deleted of certain user become true (rights of "deleted" user is limited)
     def remove(user)
-      user.deleted = true
-
-      if user.save
-        { delete_user: { error: 'Success' }}.to_json
-      else
-        { delete_user: { error: 'Failure' }}.to_json
-      end
+      user.update(deleted: true)
     end
 
     # Property deleted of certain user become false (all rights are restored)
