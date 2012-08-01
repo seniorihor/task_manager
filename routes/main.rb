@@ -91,7 +91,11 @@ class TaskManager < Sinatra::Application
   post '/protected/restore_user' do
     halt 403, { restore_user: { error: '403 Forbidden' }}.to_json unless @restore_auth
 
-    User.restore(user_by_token)
+    if User.restore(user_by_token)
+      { restore_user: { error: 'Success' }}.to_json
+    else
+      { restore_user: { error: 'Failure' }}.to_json
+    end
   end
 
   # Find user

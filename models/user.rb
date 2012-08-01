@@ -65,13 +65,7 @@ class User
 
     # Property deleted of certain user become false (all rights are restored)
     def restore(user)
-      user.deleted = false
-
-      if user.save
-        { restore_user: { error: 'Success' }}.to_json
-      else
-        { restore_user: { error: 'Failure' }}.to_json
-      end
+      user.update(deleted: false)
     end
 
     # Search by certain fields in database (also can search by substring)
