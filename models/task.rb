@@ -44,5 +44,13 @@ class Task
       end
       tasks
     end
+
+    def system_message(options = {})
+      task = Task.new
+      task.save_in_db(options['content'],
+                      options['priority'],
+                      options['user_id'],
+                      options['receiver_login'])
+    end
   end
 end
