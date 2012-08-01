@@ -35,25 +35,13 @@ class Task
     end
 
     def get(user)
-      tasks      = Array.new(Task.all(read: false, receiver_login: user.login))
-
+      tasks = Array.new(Task.all(read:           false,
+                                 receiver_login: user.login))
       return false if tasks.size == 0
 
       tasks.each do |task|
         task.update(read: true)
       end
-
-      tasks.map! { |task| { id:         task.id,
-                            content:    task.content,
-                            priority:   task.priority,
-                            user_login: User.get(task.user_id).login,
-                            created_at: task.created_at.strftime('%d.%m.%Y %H:%M') }} # 12.12.2012 12:12
-
-      # Delete all temporary tasks
-      add_friend_tasks    = Array.new(Task.all(receiver_login: user.login, read: true, priority: 5))
-      delete_friend_tasks = Array.new(Task.all(receiver_login: user.login, read: true, priority: 6))
-      add_friend_tasks.each    { |task| task.destroy! } unless add_friend_tasks.empty?
-      delete_friend_tasks.each { |task| task.destroy! } unless delete_friend_tasks.empty?
       tasks
     end
   end

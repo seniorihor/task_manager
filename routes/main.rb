@@ -1,4 +1,4 @@
-class TaskManager < Sinatra::Application
+class TaskManager < Sinatra::Base
 
   # Filters
   before do
@@ -245,12 +245,28 @@ class TaskManager < Sinatra::Application
     halt 400, { get_task: { error: 'Empty fields' }}.to_json  if empty_fields?(@protected_hash['taskmanager'])
 
     if tasks = Task.get(user_by_token)
-      { get_task: { error:    'Success',
-                    quantity: tasks.size,
-                    tasks:    tasks }}.to_json
+      tasks.map! { |task| { id:         task.id,
+                            content:    task.content,
+                            priority:   task.priority,
+                            user_login: User.get(task.user_id).login,
+                            created_at: task.created_at.strftime('%d.%m.%Y %H:%M') }} # 12.12.2012 12:12
+
+      # Delete all temporary tasks
+      add_friend_tasks    = Array.new(Task.all(receiver_login: user_by_token.login,
+                                               read:           true,
+                                               priority:       5))
+      delete_friend_tasks = Array.new(Task.all(receiver_login: user_by_token.login,
+                                               read:           true,
+                                               priority:       6))
+      add_friend_tasks.each    { |task| task.destroy! } unless add_friend_tasks.empty?
+      delete_friend_tasks.each { |task| task.destroy! } unless delete_friend_tasks.empty?
+
+      halt 200, { get_task: { error:    'Success',
+                              quantity: tasks.size,
+                              tasks:    tasks }}.to_json
     else
-      return { get_task: { error:    'Success',
-                           quantity: 0 }}.to_json
+      halt 200, { get_task: { error:    'Success',
+                              quantity: 0 }}.to_json
     end
   end
 end
