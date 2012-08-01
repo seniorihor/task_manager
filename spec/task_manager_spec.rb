@@ -359,6 +359,17 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
+    it 'to user1 from user2 should be failure because of validation' do
+      request  = { taskmanager: { auth_token:     User.first.token,
+                                  receiver_login: User.first(login: 'login2').login,
+                                  content:        'content_too_large' * 10,
+                                  priority:       1 }}
+      post '/protected/new_task', request.to_json
+
+      response = { new_task: { error: 'Failure' }}
+      last_response.body.should == response.to_json
+    end
+
     it 'to user1 from user2 should be successful' do
       request  = { taskmanager: { auth_token:     User.first.token,
                                   receiver_login: User.first(login: 'login2').login,
