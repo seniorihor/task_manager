@@ -146,7 +146,7 @@ describe 'TaskManager' do
     end
   end
 
-  context 'Find_user(search)' do
+  context 'Find user (search)' do
 
     it 'of user2 should be successful' do
       request  = { taskmanager: { auth_token:   User.first.token,
@@ -297,7 +297,7 @@ describe 'TaskManager' do
     end
   end
 
-  context 'New_task' do
+  context 'New task' do
 
     it 'to user2 should be failure because of empty fields' do
       request  = { taskmanager: { auth_token:     User.first.token,
