@@ -68,7 +68,11 @@ class TaskManager < Sinatra::Application
     if login_exists?(@hash['taskmanager']['login'])
       halt 403, { register: { error: 'Login exists' }}.to_json
     else
-      User.register(@hash['taskmanager'])
+      if User.register(@hash['taskmanager'])
+        { register: { error: 'Success' }}.to_json
+      else
+        { register: { error: 'Failure' }}.to_json
+      end
     end
   end
 

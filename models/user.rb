@@ -52,14 +52,10 @@ class User
     # Registration
     def register(options = {})
       user = User.new
-      if user.add(options['login'],
-                  options['password'],
-                  options['firstname'],
-                  options['lastname'])
-        { register: { error: 'Success' }}.to_json
-      else
-        { register: { error: 'Failure' }}.to_json
-      end
+      user.add(options['login'],
+               options['password'],
+               options['firstname'],
+               options['lastname'])
     end
 
     # Property deleted of certain user become true (rights of "deleted" user is limited)
