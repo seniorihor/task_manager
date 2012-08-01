@@ -11,6 +11,6 @@
     *   Можливість додавання і видалення друзів
     *   Обмін завданнями між друзями
 
-    Детальніші відомості щодо функціоналу сервера можна отримати в [Curl API](/seniorihor/task_manager/blob/master/curl.api)
+    Детальніші відомості щодо функціоналу сервера можна отримати в [Curl API](/seniorihor/task_manager/blob/modular_style/curl.api)
 
 > Contributors: [seniorihor](https://github.com/seniorihor) & [taras42](https://github.com/taras42)
