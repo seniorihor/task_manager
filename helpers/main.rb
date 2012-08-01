@@ -11,6 +11,7 @@ module CommonHelper
     User.first(login: login).nil? ? false : true
   end
 
+  # Check for empty fields
   def empty_fields?(options = {})
     options.each_value do |field|
       return true if field.to_s.empty?
