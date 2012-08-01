@@ -38,7 +38,7 @@ class User
         friends.map! { |friend| { login:     friend.login,
                                   firstname: friend.firstname,
                                   lastname:  friend.lastname }}
-        true
+        friends
       else
         false
       end
@@ -82,15 +82,12 @@ class User
       # Delete user which searching for other users
       users.delete(user)
 
-      return { find_user: { error: 'No matching users' }}.to_json if users.empty?
+      return false if users.empty?
 
       users.map! { |user| { login:     user.login,
                             firstname: user.firstname,
                             lastname:  user.lastname }}
       users = users.uniq
-
-      { find_user: { error: 'Success',
-                     users: users }}.to_json
     end
 
     # Sending message of agree or disagree if user accept or declain friendship request
@@ -106,7 +103,7 @@ class User
 
         if sender.friends.save && receiver.friends.save
           system_message = Task.new
-          system_message.save_in_db("#{sender.firstname} #{sender.lastname} true", 5,sender.id, receiver.login)
+          system_message.save_in_db("#{sender.firstname} #{sender.lastname} true", 5, sender.id, receiver.login)
           invite_task.destroy!
           { add_friend: { error:     'Success',
                           login:     receiver.login,

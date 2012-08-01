@@ -40,12 +40,12 @@ class TaskManager < Sinatra::Application
     halt 403, { login: { error: 'Invalid login or password' }}.to_json if user.nil? || password != user.password
     halt 403, { login: { error: 'Already in system' }}.to_json         if user.token
 
-    if User.login(user, password)
+    unless friends = User.login(user, password)
+      halt 424, { login: { error: 'Failure' }}.to_json
+    else
       halt 200, { login: { error:      'Success',
                            auth_token: user.token,
-                           friends:    Array.new(user.friends) }}.to_json
-    else
-      halt 424, { login: { error: 'Failure' }}.to_json
+                           friends:    friends }}.to_json
     end
   end
 
@@ -106,7 +106,12 @@ class TaskManager < Sinatra::Application
     search_value = @protected_hash['taskmanager']['search_value']
     halt 411, { find_user: { error: 'Need at least 2 characters' }}.to_json if search_value.size == 1
 
-    User.find(user_by_token, search_value)
+    unless users = User.find(user_by_token, search_value)
+      halt 500, { find_user: { error: 'No matching users' }}.to_json
+    else
+      { find_user: { error: 'Success',
+                     users: users }}.to_json
+    end
   end
 
   # Add friend
