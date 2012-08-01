@@ -46,13 +46,7 @@ class User
 
     # When logout, token of certain user become nil
     def logout(user)
-      user.token = nil if user
-
-      if user.save
-        { logout: { error: 'Success' }}.to_json
-      else
-        { logout: { error: 'Failure' }}.to_json
-      end
+      user.update(token: nil) if user
     end
 
     # Registration

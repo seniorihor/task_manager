@@ -53,7 +53,11 @@ class TaskManager < Sinatra::Application
   post '/protected/logout' do
     halt 403, { logout: { error: '403 Forbidden' }}.to_json unless @auth
 
-    User.logout(user_by_token)
+    if User.logout(user_by_token)
+      { logout: { error: 'Success' }}.to_json
+    else
+        { logout: { error: 'Failure' }}.to_json
+    end
   end
 
   # Register user
