@@ -180,7 +180,7 @@ describe 'TaskManager' do
 
     it "of user should be failure because such user doesn't exist" do
       request  = { taskmanager: { auth_token:   User.first.token,
-                                  search_value: 'user' }}
+                                  search_value: 'nobody' }}
       post '/protected/find_user', request.to_json
 
       response = { find_user: { error: 'No matching users' }}
