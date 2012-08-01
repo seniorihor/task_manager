@@ -295,6 +295,16 @@ describe 'TaskManager' do
                                  lastname:  User.first.lastname }}
       last_response.body.should == response.to_json
     end
+
+    it 'on invite from user1 to user2 shoud be failure because they are already friends' do
+      request  = { taskmanager: { auth_token:     User.first.token,
+                                  receiver_login: User.last.login,
+                                  priority:       4 }}
+      post '/protected/add_friend', request.to_json
+
+      response = { add_friend: { error: 'Already friend' }}
+      last_response.body.should == response.to_json
+    end
   end
 
   context 'New task' do
