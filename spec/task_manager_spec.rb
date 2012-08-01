@@ -8,12 +8,12 @@ describe 'TaskManager' do
                 password:  'password1',
                 firstname: 'firstname1',
                 lastname:  'lastname1',
-                token:     'user1token')
+                token:     User.new_token)
     User.create(login:     'login2',
                 password:  'password2',
                 firstname: 'firstname2',
                 lastname:  'lastname2',
-                token:     'user2token')
+                token:     User.new_token)
   end
 
   def app
@@ -347,7 +347,7 @@ describe 'TaskManager' do
                   password:  'password3',
                   firstname: 'firstname3',
                   lastname:  'lastname3',
-                  token:     'user3token')
+                  token:     User.new_token)
 
       request  = { taskmanager: { auth_token:     User.first.token,
                                   receiver_login: User.first(login: 'login3').login,
