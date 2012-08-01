@@ -1,6 +1,6 @@
-require 'sinatra'
+require 'sinatra/base'
 
-class TaskManager < Sinatra::Application
+class TaskManager < Sinatra::Base
   set :environment, ENV['RACK_ENV'] || :development
                                        #:test
 
