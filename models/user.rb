@@ -31,24 +31,16 @@ class User
     end
 
     # friends.map! means that array of friends of certain user prepared to json parse
-    def login(options = {})
-      user = User.first(login: options['login'])
-
-      if options['password'] == user.password
-        user.token = self.new_token
-        if user.save
-          friends = Array.new(user.friends)
-          friends.map! { |friend| { login:     friend.login,
-                                    firstname: friend.firstname,
-                                    lastname:  friend.lastname }}
-          { login: { error:      'Success',
-                     auth_token: user.token,
-                     friends:    friends }}.to_json
-        else
-          { login: { error: 'Failure' }}.to_json
-        end
+    def login(user, password)
+      user.token = self.new_token
+      if user.save
+        friends = Array.new(user.friends)
+        friends.map! { |friend| { login:     friend.login,
+                                  firstname: friend.firstname,
+                                  lastname:  friend.lastname }}
+        200
       else
-        { login: { error: 'Invalid login or password' }}.to_json
+        424
       end
     end
 

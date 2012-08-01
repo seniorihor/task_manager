@@ -31,13 +31,23 @@ class TaskManager < Sinatra::Application
   # Login user
   post '/login' do
     @hash = to_hash(request.body.read)
+
     halt 400, { login: { error: 'Empty fields' }}.to_json if empty_fields?(@hash['taskmanager'])
 
-    user = User.first(login: @hash['taskmanager']['login'])
-    halt 403, { login: { error: 'Invalid login or password' }}.to_json if user.nil?
+    user     = User.first(login: @hash['taskmanager']['login'])
+    password = @hash['taskmanager']['password']
+
+    halt 403, { login: { error: 'Invalid login or password' }}.to_json if user.nil? || password != user.password
     halt 403, { login: { error: 'Already in system' }}.to_json         if user.token
 
-    User.login(@hash['taskmanager'])
+    case User.login(user, password)
+    when 200
+      halt 200, { login: { error:      'Success',
+                           auth_token: user.token,
+                           friends:    Array.new(user.friends) }}.to_json
+    when 424
+      halt 424, { login: { error: 'Failure' }}.to_json
+    end
   end
 
   # Logout user
