@@ -34,7 +34,7 @@ describe 'TaskManager' do
     end
 
     it "of user2 shouldn't be successful because of empty fields" do
-      request  = { taskmanager: { login:     '',
+      request  = { taskmanager: { login:     nil,
                                   password:  'password2',
                                   firstname: 'firstname2',
                                   lastname:  'lastname2' }}
@@ -126,7 +126,7 @@ describe 'TaskManager' do
   context 'Delete' do
 
     it 'of user1 should be successful' do
-      User.first.update(token: 'user1token')
+      User.first.update(token: User.new_token)
       request  = { taskmanager: { auth_token: User.first.token }}
       post '/protected/delete_user', request.to_json
 
