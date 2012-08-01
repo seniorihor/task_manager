@@ -104,7 +104,7 @@ describe 'TaskManager' do
     end
   end
 
-  context 'logout' do
+  context 'Logout' do
 
     it 'of user1 should be failure because token is invalid' do
       request  = { taskmanager: { auth_token: 'invalid_token' }}
