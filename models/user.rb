@@ -132,9 +132,6 @@ class User
       if sender.friends.save && receiver.friends.save
         system_message = Task.new
         system_message.save_in_db('true', 6, sender.id, receiver.login)
-        { delete_friend: { error: 'Success' }}.to_json
-      else
-        { delete_friend: { error: 'Failure' }}.to_json
       end
     end
 

@@ -147,7 +147,11 @@ class TaskManager < Sinatra::Application
     halt 403, { delete_friend: { error: "User doesn't exist" }}.to_json      if receiver.nil?
     halt 403, { delete_friend: { error: 'This is not your friend' }}.to_json unless sender.friends.include?(receiver)
 
-    User.delete_friend(sender, receiver)
+    if User.delete_friend(sender, receiver)
+      { delete_friend: { error: 'Success' }}.to_json
+    else
+      { delete_friend: { error: 'Failure' }}.to_json
+    end
   end
 
   # Create new task
