@@ -26,42 +26,21 @@ class Task
       priority = options['priority']
       content  = priority == 4 ? 'Add me to friends' : options['content']
 
-      invite_task_sender   = sender.tasks.all(receiver_login: receiver.login).last(priority: 4)
-      invite_task_receiver = receiver.tasks.all(receiver_login: sender.login).last(priority: 4)
-
-      return { add_friend: { error: 'Invite exists' }}.to_json                  if invite_task_sender
-      return { add_friend: { error: 'You have invite from this user' }}.to_json if invite_task_receiver &&
-                                                                                   priority == 4
-
       task = Task.new
-      if task.save_in_db(content, priority, sender.id, receiver.login) && priority == 4
-        { add_friend: { error: 'Success' }}.to_json
-      elsif task.save_in_db(content, priority, sender.id, receiver.login)
-        { new_task: { error: 'Success' }}.to_json
-      else
-        { new_task: { error: 'Failure' }}.to_json
-      end
+      task.save_in_db(content, priority, sender.id, receiver.login)
     end
 
     def delete(task)
-      if task.destroy!
-        { delete_task: { error: 'Success' }}.to_json
-      else
-        { delete_task: { error: 'Failure' }}.to_json
-      end
+      task.destroy!
     end
 
     def get(user)
-      collection = Task.all(read: false, receiver_login: user.login)
-      tasks      = Array.new(collection)
-      quantity   = tasks.size
+      tasks      = Array.new(Task.all(read: false, receiver_login: user.login))
 
-      return { get_task: { error:    'Success',
-                           quantity: quantity }}.to_json if quantity == 0
+      return false if tasks.size == 0
 
       tasks.each do |task|
-           task.read = true
-           task.save
+        task.update(read: true)
       end
 
       tasks.map! { |task| { id:         task.id,
@@ -75,10 +54,7 @@ class Task
       delete_friend_tasks = Array.new(Task.all(receiver_login: user.login, read: true, priority: 6))
       add_friend_tasks.each    { |task| task.destroy! } unless add_friend_tasks.empty?
       delete_friend_tasks.each { |task| task.destroy! } unless delete_friend_tasks.empty?
-
-      { get_task: { error:    'Success',
-                    quantity: quantity,
-                    tasks:    tasks }}.to_json
+      tasks
     end
   end
 end

@@ -111,14 +111,14 @@ class User
                           lastname:  receiver.lastname }}.to_json
         else
           system_message = Task.new
-          system_message.save_in_db("#{sender.firstname} #{sender.lastname} false", 5,sender.id, receiver.login)
+          system_message.save_in_db("#{sender.firstname} #{sender.lastname} false", 5, sender.id, receiver.login)
           invite_task.destroy!
           { add_friend: { error: 'Success' }}.to_json
         end
 
       else
         system_message = Task.new
-        system_message.save_in_db("#{sender.firstname} #{sender.lastname} false", 5,sender.id, receiver.login)
+        system_message.save_in_db("#{sender.firstname} #{sender.lastname} false", 5, sender.id, receiver.login)
         invite_task.destroy!
         { add_friend: { error: 'Success' }}.to_json
       end
