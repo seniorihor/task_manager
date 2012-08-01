@@ -31,17 +31,8 @@ class User
     end
 
     # friends.map! means that array of friends of certain user prepared to json parse
-    def login(user, password)
-      user.token = self.new_token
-      if user.save
-        friends = Array.new(user.friends)
-        friends.map! { |friend| { login:     friend.login,
-                                  firstname: friend.firstname,
-                                  lastname:  friend.lastname }}
-        friends
-      else
-        false
-      end
+    def login(user)
+      user.update(token: self.new_token)
     end
 
     # When logout, token of certain user become nil
@@ -92,57 +83,17 @@ class User
 
     # Sending message of agree or disagree if user accept or declain friendship request
     # There is a special priority: 5 of friendship request message
-    def add_friend(sender, receiver, options = {})
-      invite_task = receiver.tasks.all(receiver_login: sender.login).last(priority: 4)
-
-      return { add_friend: { error: "Invite doesn't exist" }}.to_json if invite_task.nil?
-
-      if options['friendship'] == 'true'
+    def add_friend(sender, receiver)
         sender.friends   << receiver
         receiver.friends << sender
-
-        if sender.friends.save && receiver.friends.save
-          system_message = Task.new
-          system_message.save_in_db("#{sender.firstname} #{sender.lastname} true", 5, sender.id, receiver.login)
-          invite_task.destroy!
-          { add_friend: { error:     'Success',
-                          login:     receiver.login,
-                          firstname: receiver.firstname,
-                          lastname:  receiver.lastname }}.to_json
-        else
-          system_message = Task.new
-          system_message.save_in_db("#{sender.firstname} #{sender.lastname} false", 5, sender.id, receiver.login)
-          invite_task.destroy!
-          { add_friend: { error: 'Success' }}.to_json
-        end
-
-      else
-        system_message = Task.new
-        system_message.save_in_db("#{sender.firstname} #{sender.lastname} false", 5, sender.id, receiver.login)
-        invite_task.destroy!
-        { add_friend: { error: 'Success' }}.to_json
-      end
+        sender.friends.save && receiver.friends.save
     end
 
     # Delete relations from both sides of friendship
     def delete_friend(sender, receiver)
       sender.friends.delete(receiver)
       receiver.friends.delete(sender)
-
-      if sender.friends.save && receiver.friends.save
-        system_message = Task.new
-        system_message.save_in_db('true', 6, sender.id, receiver.login)
-      end
-    end
-
-    def friends_online(auth_token)
-      user    = User.first(token: auth_token)
-      friends = user.friends.select { |friend| friend.token }
-      friends = friends.map! { |friend| { login:     friend.login,
-                                          firstname: friend.firstname,
-                                          lastname:  friend.lastname }}
-      { friends_online: { error:   'Success',
-                          friends: friends }}.to_json
+      sender.friends.save && receiver.friends.save
     end
   end
 end

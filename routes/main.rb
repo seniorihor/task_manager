@@ -40,12 +40,16 @@ class TaskManager < Sinatra::Application
     halt 403, { login: { error: 'Invalid login or password' }}.to_json if user.nil? || password != user.password
     halt 403, { login: { error: 'Already in system' }}.to_json         if user.token
 
-    unless friends = User.login(user, password)
-      halt 424, { login: { error: 'Failure' }}.to_json
-    else
+    if User.login(user)
+      friends = Array.new(user.friends)
+      friends.map! { |friend| { login:     friend.login,
+                                firstname: friend.firstname,
+                                lastname:  friend.lastname }}
       halt 200, { login: { error:      'Success',
                            auth_token: user.token,
                            friends:    friends }}.to_json
+    else
+      halt 424, { login: { error: 'Failure' }}.to_json
     end
   end
 
@@ -142,7 +146,29 @@ class TaskManager < Sinatra::Application
         halt 424, { add_friend: { error: 'Failure' }}.to_json
       end
     when 5
-      User.add_friend(sender, receiver, @protected_hash['taskmanager'])
+      halt 403, { add_friend: { error: "Invite doesn't exist" }}.to_json if invite_task_receiver.nil?
+      if @protected_hash['taskmanager']['friendship'] == 'true'
+        if User.add_friend(sender, receiver)
+          system_message = Task.new
+          system_message.save_in_db("#{sender.firstname} #{sender.lastname} true", 5, sender.id, receiver.login)
+          invite_task_receiver.destroy!
+          halt 200, { add_friend: { error:     'Success',
+                                    login:     receiver.login,
+                                    firstname: receiver.firstname,
+                                    lastname:  receiver.lastname }}.to_json
+        else
+          system_message = Task.new
+          system_message.save_in_db("#{sender.firstname} #{sender.lastname} false", 5, sender.id, receiver.login)
+          invite_task.destroy!
+          halt 424, { add_friend: { error: 'Failure' }}.to_json
+        end
+      else
+        system_message = Task.new
+        system_message.save_in_db("#{sender.firstname} #{sender.lastname} false", 5, sender.id, receiver.login)
+        invite_task_receiver.destroy!
+        { add_friend: { error: 'Success' }}.to_json
+      end
+
     else
       halt 406, { add_friend: { error: 'Wrong priority' }}.to_json
     end
@@ -160,6 +186,8 @@ class TaskManager < Sinatra::Application
     halt 403, { delete_friend: { error: 'This is not your friend' }}.to_json unless sender.friends.include?(receiver)
 
     if User.delete_friend(sender, receiver)
+      system_message = Task.new
+      system_message.save_in_db('true', 6, sender.id, receiver.login)
       halt 200, { delete_friend: { error: 'Success' }}.to_json
     else
       halt 424, { delete_friend: { error: 'Failure' }}.to_json
