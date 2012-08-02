@@ -28,13 +28,8 @@ module CommonHelper
   end
 
   def delete_temporary_tasks(login)
-    add_friend_tasks    = Array.new(Task.all(receiver_login: login,
-                                             read:           true,
-                                             priority:       5))
-    delete_friend_tasks = Array.new(Task.all(receiver_login: login,
-                                             read:           true,
-                                             priority:       6))
-    add_friend_tasks.each    { |task| task.destroy! } unless add_friend_tasks.empty?
-    delete_friend_tasks.each { |task| task.destroy! } unless delete_friend_tasks.empty?
+    Array.new(Task.all(receiver_login: login,
+                       read:           true,
+                       :priority.gte => 5)).each { |task| task.destroy! if task }
   end
 end
