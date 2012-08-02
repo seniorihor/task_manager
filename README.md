@@ -1,6 +1,7 @@
-# TaskManager Server Modular RC
+# TaskManager Server Modular
 
-Перед Вами сервер, створений з використанням DSL [Sinatra][], який обслуговує [клієнтську частину][] додатку TaskManager для платформи [Android][]
+Перед Вами [сервер][], створений з використанням DSL [Sinatra][], який обслуговує [клієнтську частину][] додатку TaskManager для платформи [Android][]
+[сервер]: https://task-manager-modular.herokuapp.com
 [клієнтську частину]: https://github.com/paul-ihnatolia/taskmanager
 [Sinatra]: http://www.sinatrarb.com
 [Android]: http://www.android.com
