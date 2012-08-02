@@ -251,7 +251,10 @@ class TaskManager < Sinatra::Base
     halt 403, { get_task: { error: '403 Forbidden' }}.to_json unless @auth
     halt 400, { get_task: { error: 'Empty fields' }}.to_json  if empty_fields?(@protected_hash['taskmanager'])
 
-    if tasks = Task.get(user_by_token)
+    unless tasks = Task.get(user_by_token)
+      halt 200, { get_task: { error:    'Success',
+                              quantity: 0 }}.to_json
+    else
       tasks.map! { |task| { id:         task.id,
                             content:    task.content,
                             priority:   task.priority,
@@ -263,9 +266,6 @@ class TaskManager < Sinatra::Base
       halt 200, { get_task: { error:    'Success',
                               quantity: tasks.size,
                               tasks:    tasks }}.to_json
-    else
-      halt 200, { get_task: { error:    'Success',
-                              quantity: 0 }}.to_json
     end
   end
 end
