@@ -48,14 +48,9 @@ class User
 
     # Search by certain fields in database (also can search by substring)
     def find(user, search_value)
-      users              = Array.new
-      users_by_login     = Array.new(User.all(:login.like     => "%#{search_value}%"))
-      users_by_firstname = Array.new(User.all(:firstname.like => "%#{search_value}%"))
-      users_by_lastname  = Array.new(User.all(:lastname.like  => "%#{search_value}%"))
-
-      users_by_login.each     { |user| users << user } unless users_by_login.empty?
-      users_by_firstname.each { |user| users << user } unless users_by_firstname.empty?
-      users_by_lastname.each  { |user| users << user } unless users_by_lastname.empty?
+      users = Array.new(User.all(:login.like     => "%#{search_value}%") |
+                        User.all(:firstname.like => "%#{search_value}%") |
+                        User.all(:lastname.like  => "%#{search_value}%"))
 
       # Delete user which searching for other users
       users.delete(user)
