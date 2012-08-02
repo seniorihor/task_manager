@@ -110,11 +110,11 @@ class TaskManager < Sinatra::Base
     search_value = @protected_hash['taskmanager']['search_value']
     halt 411, { find_user: { error: 'Need at least 2 characters' }}.to_json if search_value.size == 1
 
-    unless users = User.find(user_by_token, search_value)
-      halt 500, { find_user: { error: 'No matching users' }}.to_json
-    else
+    if users = User.find(user_by_token, search_value)
       { find_user: { error: 'Success',
                      users: users }}.to_json
+    else
+      halt 500, { find_user: { error: 'No matching users' }}.to_json
     end
   end
 
@@ -251,10 +251,7 @@ class TaskManager < Sinatra::Base
     halt 403, { get_task: { error: '403 Forbidden' }}.to_json unless @auth
     halt 400, { get_task: { error: 'Empty fields' }}.to_json  if empty_fields?(@protected_hash['taskmanager'])
 
-    unless tasks = Task.get(user_by_token)
-      halt 200, { get_task: { error:    'Success',
-                              quantity: 0 }}.to_json
-    else
+    if tasks = Task.get(user_by_token)
       tasks.map! { |task| { id:         task.id,
                             content:    task.content,
                             priority:   task.priority,
@@ -266,6 +263,9 @@ class TaskManager < Sinatra::Base
       halt 200, { get_task: { error:    'Success',
                               quantity: tasks.size,
                               tasks:    tasks }}.to_json
+    else
+      halt 200, { get_task: { error:    'Success',
+                              quantity: 0 }}.to_json
     end
   end
 end
