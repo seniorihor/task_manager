@@ -13,19 +13,34 @@ class Task
 
   belongs_to :user
 
-  def initialize(content, priority, user_id, receiver_login)
-    @content        = content
-    @priority       = priority
-    @user_id        = user_id
-    @receiver_login = receiver_login
-  end
+  class << self
+    def add(sender, receiver, options = {})
+      priority = options['priority']
+      content  = priority == 4 ? 'Add me to friends' : options['content']
 
-  def create
-    self.content        = @content
-    self.priority       = @priority
-    self.user_id        = @user_id
-    self.receiver_login = @receiver_login
-    self.save
-  end
+      Task.new({ content:        content,
+                 priority:       priority,
+                 user_id:        sender.id,
+                 receiver_login: receiver.login }).save
+    end
 
+    def delete(task)
+      task.destroy!
+    end
+
+    def get(user)
+      tasks = Array.new(Task.all(read:           false,
+                                 receiver_login: user.login))
+      return false if tasks.size == 0
+
+      tasks.each do |task|
+        task.update(read: true)
+      end
+      tasks
+    end
+
+    def system_message(options = {})
+      Task.new(options).save
+    end
+  end
 end
