@@ -1,11 +1,12 @@
 require 'json'
 require 'curb'
+Curl::CURL_USESSL_NONE
 
 def url_path(url)
 	if url == 'login' || 'register'
-		adress = 'http://task-manager-modular.herokuapp.com/'+url
+		adress = 'https://task-manager-modular.herokuapp.com/'+url
 	else
-		adress = 'http://task-manager-modular.herokuapp.com/protected/'+url	
+		adress = 'https://task-manager-modular.herokuapp.com/protected/'+url	
 	end	
 end
 
