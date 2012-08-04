@@ -3,9 +3,9 @@ require 'curb'
 
 def url_path(url)
   if url == 'login' || 'register'
-    adress = 'http://task-manager-modular.herokuapp.com/'+url
+    adress = "http://task-manager-modular.herokuapp.com/#{url}"
   else
-    adress = 'http://task-manager-modular.herokuapp.com/protected/'+url	
+    adress = "http://task-manager-modular.herokuapp.com/protected/#{url}"	
   end	
 end
 
@@ -33,5 +33,5 @@ response = Curl::Easy.http_post(url_path(url), content(args)) do |curl|
       curl.headers['Content-Type'] = 'application/json'
 end
 
-puts url+" Response : #{response.body_str}"
+puts "#{url} Response : #{response.body_str}"
 puts "Response code : #{response.response_code}"
