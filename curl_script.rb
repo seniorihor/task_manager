@@ -15,7 +15,7 @@ def content(args)
 	
   array.each do |el|
     if array.index(el)%2 == 0
-	  hash[el] = array[array.index(el)+1]
+      hash[el] = array[array.index(el)+1]
     end		
   end
   jdata = Hash.new
