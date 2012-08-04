@@ -23,7 +23,7 @@ def content(args)
   jdata.to_json
 end
 
-puts "ADRESS:  "
+puts "Adress:  "
 url = gets.chomp
 puts "Arguments: "
 args = gets.chomp
