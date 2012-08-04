@@ -18,7 +18,7 @@ def str_to_json(args)
 			hash['taskmanager'][el] = array[array.index(el)+1]
 		end		
 	end 
-	return hash.to_json
+	hash.to_json
 end
 
 puts "ADRESS:  "
@@ -34,4 +34,3 @@ end
 
 puts url+' Response : '+response.body_str
 puts 'Response code : '+response.response_code.to_s
-
