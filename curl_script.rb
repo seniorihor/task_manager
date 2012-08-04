@@ -2,7 +2,7 @@ require 'json'
 require 'curb'
 
 def url_path(url)
-  if url == 'login' || 'register'
+  if url == 'login' || url == 'register'
     adress = "http://task-manager-modular.herokuapp.com/#{url}"
   else
     adress = "http://task-manager-modular.herokuapp.com/protected/#{url}"	
