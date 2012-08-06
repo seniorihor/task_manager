@@ -2,37 +2,47 @@ require 'json'
 require 'curb'
 
 def url_path(url)
-  case url
-  when 'login' || 'register'
+  unprotected = %w(login register)
+  if unprotected.include?(url)
     adress = "http://task-manager-modular.herokuapp.com/#{url}"
   else
-    adress = "http://task-manager-modular.herokuapp.com/protected/#{url}"	
-  end	
+    adress = "http://task-manager-modular.herokuapp.com/protected/#{url}"
+  end
 end
 
 def content(args)
   array = args.split(' ')
   hash = Hash.new
-	
+
   array.each do |el|
     if array.index(el)%2 == 0
       hash[el] = array[array.index(el)+1]
-    end		
+    end
   end
   jdata = Hash.new
   jdata['taskmanager'] = hash
   jdata.to_json
 end
 
-puts "Adress:  "
-url = gets.chomp
-puts "Arguments: "
-args = gets.chomp
+# Menu
+loop do
+  puts 'Enter command:'
+  case command = gets.chomp
+  when 'new'
+    puts "Adress:  "
+    url = gets.chomp
+    puts "Arguments: "
+    args = gets.chomp
 
-response = Curl::Easy.http_post(url_path(url), content(args)) do |curl|
-  curl.headers['Accept'] = 'application/json'
-  curl.headers['Content-Type'] = 'application/json'
+    response = Curl::Easy.http_post(url_path(url), content(args)) do |curl|
+      curl.headers['Accept'] = 'application/json'
+      curl.headers['Content-Type'] = 'application/json'
+    end
+
+    puts "#{url.capitalize}: #{response.response_code} #{response.body_str}"
+  when 'exit'
+    exit
+  else
+    puts 'Bad request'
+  end
 end
-
-puts "#{url} Response : #{response.body_str}"
-puts "Response code : #{response.response_code}"
