@@ -45,9 +45,10 @@ class TaskManager < Sinatra::Base
       friends.map! { |friend| { login:     friend.login,
                                 firstname: friend.firstname,
                                 lastname:  friend.lastname }}
-      halt 200, { login: { error:      'Success',
-                           auth_token: user.token,
-                           friends:    friends }}.to_json
+      halt 200, { login: { error:        'Success',
+                           current_user: user.login,
+                           auth_token:   user.token,
+                           friends:      friends }}.to_json
     else
       halt 424, { login: { error: 'Failure' }}.to_json
     end
