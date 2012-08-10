@@ -90,9 +90,10 @@ describe 'TaskManager' do
                                   password: User.first.password }}
       post '/login', request.to_json
 
-      response = { login: { error:      'Success',
-                            auth_token: User.first.token,
-                            friends:    User.first.friends.to_a }}
+      response = { login: { error:        'Success',
+                            current_user: User.first.login,
+                            auth_token:   User.first.token,
+                            friends:      User.first.friends.to_a }}
 
       last_response.body.should == response.to_json
     end

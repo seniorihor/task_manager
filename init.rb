@@ -141,7 +141,7 @@ helpers do
                                   firstname: friend.firstname,
                                   lastname:  friend.lastname }}
         { login: { error:        'Success',
-                   current_user: user.login
+                   current_user: user.login,
                    auth_token:   user.token,
                    friends:      friends }}.to_json
       else
