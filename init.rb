@@ -140,10 +140,10 @@ helpers do
         friends.map! { |friend| { login:     friend.login,
                                   firstname: friend.firstname,
                                   lastname:  friend.lastname }}
-        { login: { error:      'Success',
-                   curent_user: user.login
-                   auth_token: user.token,
-                   friends:    friends }}.to_json
+        { login: { error:        'Success',
+                   current_user: user.login
+                   auth_token:   user.token,
+                   friends:      friends }}.to_json
       else
         { login: { error: 'Failure' }}.to_json
       end
