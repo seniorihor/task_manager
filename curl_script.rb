@@ -32,7 +32,6 @@ def content(args)
   end
   jdata = Hash.new
   jdata['taskmanager'] = hash
-  puts  jdata.to_json
   jdata.to_json
 end
 
