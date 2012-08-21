@@ -23,7 +23,7 @@ class User
 
     # friends.map! means that array of friends of certain user prepared to json parse
     def login(user)
-      user.update(token: self.new_token)
+      user.token ? true : user.update(token: self.new_token)
     end
 
     # When logout, token of certain user become nil

@@ -38,7 +38,6 @@ class TaskManager < Sinatra::Base
     password = @hash['taskmanager']['password']
 
     halt 403, { login: { error: 'Invalid login or password' }}.to_json if user.nil? || password != user.password
-    halt 403, { login: { error: 'Already in system' }}.to_json         if user.token
 
     if User.login(user)
       friends = Array.new(user.friends)

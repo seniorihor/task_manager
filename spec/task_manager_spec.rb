@@ -86,12 +86,15 @@ describe 'TaskManager' do
       last_response.body.should == response.to_json
     end
 
-    it 'of user1 again should be failure' do
+    it 'of user1 again should be successful' do
       request  = { taskmanager: { login:    User.first.login,
                                   password: User.first.password }}
       post '/login', request.to_json
 
-      response = { login: { error: 'Already in system' }}
+      response = { login: { error:        'Success',
+                            current_user: User.first.login,
+                            auth_token:   User.first.token,
+                            friends:      User.first.friends.to_a }}
       last_response.body.should == response.to_json
     end
 
