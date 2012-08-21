@@ -213,14 +213,14 @@ helpers do
     return { find_user: { error: 'Empty fields' }}.to_json               if search_value.empty?
     return { find_user: { error: 'Need at least 2 characters' }}.to_json if search_value.size == 1
 
-    users              = Array.new
-    users_by_login     = Array.new(User.all(:login.downcase.like     => "%#{search_value}%".downcase))
-    users_by_firstname = Array.new(User.all(:firstname.downcase.like => "%#{search_value}%".downcase))
-    users_by_lastname  = Array.new(User.all(:lastname.downcase.like  => "%#{search_value}%".downcase))
+    cases = [search_value.downcase, search_value.capitalize, search_value.upcase]
+    users = Array.new
 
-    users_by_login.each     { |user| users << user } unless users_by_login.empty?
-    users_by_firstname.each { |user| users << user } unless users_by_firstname.empty?
-    users_by_lastname.each  { |user| users << user } unless users_by_lastname.empty?
+    cases.each do |value|
+      users.concat(Array.new(User.all(:login.like     => "%#{value}%") |
+                             User.all(:firstname.like => "%#{value}%") |
+                             User.all(:lastname.like  => "%#{value}%")))
+    end
 
     users.delete(User.first(token: auth_token))
 
