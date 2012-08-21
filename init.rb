@@ -214,9 +214,9 @@ helpers do
     return { find_user: { error: 'Need at least 2 characters' }}.to_json if search_value.size == 1
 
     users              = Array.new
-    users_by_login     = Array.new(User.all(:login.like     => "%#{search_value}%"))
-    users_by_firstname = Array.new(User.all(:firstname.like => "%#{search_value}%"))
-    users_by_lastname  = Array.new(User.all(:lastname.like  => "%#{search_value}%"))
+    users_by_login     = Array.new(User.all(:login.downcase.like     => "%#{search_value}%".downcase))
+    users_by_firstname = Array.new(User.all(:firstname.downcase.like => "%#{search_value}%".downcase))
+    users_by_lastname  = Array.new(User.all(:lastname.downcase.like  => "%#{search_value}%".downcase))
 
     users_by_login.each     { |user| users << user } unless users_by_login.empty?
     users_by_firstname.each { |user| users << user } unless users_by_firstname.empty?
