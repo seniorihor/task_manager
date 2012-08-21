@@ -131,22 +131,22 @@ helpers do
     user = User.first(login: login)
 
     return { login: { error: 'Invalid login or password' }}.to_json if user.nil?
-    return { login: { error: 'Already in system' }}.to_json         if user.token
 
     if password == user.password
-      user.token = new_token
-      if user.save
-        friends = Array.new(user.friends)
-        friends.map! { |friend| { login:     friend.login,
-                                  firstname: friend.firstname,
-                                  lastname:  friend.lastname }}
-        { login: { error:        'Success',
-                   current_user: user.login,
-                   auth_token:   user.token,
-                   friends:      friends }}.to_json
-      else
-        { login: { error: 'Failure' }}.to_json
+      unless user.token
+        user.token = new_token
       end
+
+      return { login: { error: 'Failure' }}.to_json unless user.save
+
+      friends = Array.new(user.friends)
+      friends.map! { |friend| { login:     friend.login,
+                                firstname: friend.firstname,
+                                lastname:  friend.lastname }}
+      { login: { error:        'Success',
+                 current_user: user.login,
+                 auth_token:   user.token,
+                 friends:      friends }}.to_json
     else
       { login: { error: 'Invalid login or password' }}.to_json
     end
