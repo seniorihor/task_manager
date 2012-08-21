@@ -48,9 +48,14 @@ class User
 
     # Search by certain fields in database (also can search by substring)
     def find(user, search_value)
-      users = Array.new(User.all(:login.downcase.like     => "%#{search_value}%".downcase) |
-                        User.all(:firstname.downcase.like => "%#{search_value}%".downcase) |
-                        User.all(:lastname.downcase.like  => "%#{search_value}%".downcase))
+      cases = [search_value.downcase, search_value.capitalize, search_value.upcase]
+      users = Array.new
+
+      cases.each do |value|
+        users.concat(Array.new(User.all(:login.like     => "%#{value}%") |
+                               User.all(:firstname.like => "%#{value}%") |
+                               User.all(:lastname.like  => "%#{value}%")))
+      end
 
       # Delete user which searching for other users
       users.delete(user)
