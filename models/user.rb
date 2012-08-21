@@ -36,12 +36,12 @@ class User
       User.new(options).save
     end
 
-    # Property deleted of certain user become true (rights of "deleted" user is limited)
+    # Property "deleted" of certain user become true (rights of "deleted" user is limited)
     def remove(user)
       user.update(deleted: true)
     end
 
-    # Property deleted of certain user become false (all rights are restored)
+    # Property "deleted" of certain user become false (all rights are restored)
     def restore(user)
       user.update(deleted: false)
     end
