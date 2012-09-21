@@ -3,7 +3,7 @@ require_relative 'spec_helper'
 describe 'TaskManager' do
 
   before(:each) do
-
+    
     User.create(login:     'login1',
                 password:  'password1',
                 firstname: 'firstname1',

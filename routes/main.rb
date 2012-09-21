@@ -27,6 +27,8 @@ class TaskManager < Sinatra::Base
     end
   end
 
+
+
   # Routes
   # Login user
   post '/login' do
@@ -39,7 +41,7 @@ class TaskManager < Sinatra::Base
 
     halt 403, { login: { error: 'Invalid login or password' }}.to_json if user.nil? || password != user.password
 
-    if User.login(user)
+    if user.login?
       friends = Array.new(user.friends)
       friends.map! { |friend| { login:     friend.login,
                                 firstname: friend.firstname,
@@ -57,7 +59,7 @@ class TaskManager < Sinatra::Base
   post '/protected/logout' do
     halt 403, { logout: { error: '403 Forbidden' }}.to_json unless @auth
 
-    if User.logout(user_by_token)
+    if user_by_token.logout
       halt 200, { logout: { error: 'Success' }}.to_json
     else
       halt 424, { logout: { error: 'Failure' }}.to_json
@@ -68,11 +70,11 @@ class TaskManager < Sinatra::Base
   post '/register' do
     @hash = to_hash(request.body.read)
     halt 400, { register: { error: 'Empty fields' }}.to_json if empty_fields?(@hash['taskmanager'])
-
+    user = User.new(@hash['taskmanager'])
     if login_exists?(@hash['taskmanager']['login'])
       halt 403, { register: { error: 'Login exists' }}.to_json
     else
-      if User.register(@hash['taskmanager'])
+      if user.register
         halt 200, { register: { error: 'Success' }}.to_json
       else
         halt 424, { register: { error: 'Failure' }}.to_json
@@ -84,7 +86,7 @@ class TaskManager < Sinatra::Base
   post '/protected/delete_user' do
     halt 403, { delete_user: { error: '403 Forbidden' }}.to_json unless @auth
 
-    if User.remove(user_by_token)
+    if user_by_token.remove
       halt 200, { delete_user: { error: 'Success' }}.to_json
     else
       halt 424, { delete_user: { error: 'Failure' }}.to_json
@@ -95,7 +97,7 @@ class TaskManager < Sinatra::Base
   post '/protected/restore_user' do
     halt 403, { restore_user: { error: '403 Forbidden' }}.to_json unless @restore_auth
 
-    if User.restore(user_by_token)
+    if user_by_token.restore
       halt 200, { restore_user: { error: 'Success' }}.to_json
     else
       halt 424, { restore_user: { error: 'Failure' }}.to_json
@@ -110,7 +112,7 @@ class TaskManager < Sinatra::Base
     search_value = @protected_hash['taskmanager']['search_value']
     halt 411, { find_user: { error: 'Need at least 2 characters' }}.to_json if search_value.size == 1
 
-    if users = User.find(user_by_token, search_value)
+    if users = user_by_token.find(search_value)
       { find_user: { error: 'Success',
                      users: users }}.to_json
     else
@@ -141,7 +143,7 @@ class TaskManager < Sinatra::Base
     when 4
       halt 403, { add_friend: { error: 'You have invite from this user' }}.to_json if invite_task_receiver
 
-      if Task.add(sender, receiver, @protected_hash['taskmanager'])
+      if sender.add_task(receiver, @protected_hash['taskmanager'])
         halt 200, { add_friend: { error: 'Success' }}.to_json
       else
         halt 424, { add_friend: { error: 'Failure' }}.to_json
@@ -149,7 +151,7 @@ class TaskManager < Sinatra::Base
     when 5
       halt 403, { add_friend: { error: "Invite doesn't exist" }}.to_json if invite_task_receiver.nil?
       if @protected_hash['taskmanager']['friendship'] == 'true'
-        if User.add_friend(sender, receiver)
+        if sender.add_friend(receiver)
           Task.system_message({ content:        "#{sender.firstname} #{sender.lastname} true",
                                 priority:       5,
                                 user_id:        sender.id,
@@ -192,7 +194,7 @@ class TaskManager < Sinatra::Base
     halt 403, { delete_friend: { error: "User doesn't exist" }}.to_json      if receiver.nil?
     halt 403, { delete_friend: { error: 'This is not your friend' }}.to_json unless sender.friends.include?(receiver)
 
-    if User.delete_friend(sender, receiver)
+    if sender.delete_friend(receiver)
       Task.system_message({ content:        'true',
                             priority:       6,
                             user_id:        sender.id,
@@ -223,7 +225,7 @@ class TaskManager < Sinatra::Base
       halt 406, { new_task: { error: 'Wrong priority' }}.to_json
     end
 
-    if Task.add(sender, receiver, @protected_hash['taskmanager'])
+    if sender.add_task(receiver, @protected_hash['taskmanager'])
       halt 200, { new_task: { error: 'Success' }}.to_json
     else
       halt 424, { new_task: { error: 'Failure' }}.to_json
@@ -239,7 +241,7 @@ class TaskManager < Sinatra::Base
 
     halt 403, { delete_task: { error: "Task doesn't exist" }}.to_json if task.nil?
 
-    if Task.delete(task)
+    if task.delete
       halt 200, { delete_task: { error: 'Success' }}.to_json
     else
       halt 424, { delete_task: { error: 'Failure' }}.to_json
@@ -251,7 +253,7 @@ class TaskManager < Sinatra::Base
     halt 403, { get_task: { error: '403 Forbidden' }}.to_json unless @auth
     halt 400, { get_task: { error: 'Empty fields' }}.to_json  if empty_fields?(@protected_hash['taskmanager'])
 
-    if tasks = Task.get(user_by_token)
+    if tasks = user_by_token.get_task
       tasks.map! { |task| { id:         task.id,
                             content:    task.content,
                             priority:   task.priority,

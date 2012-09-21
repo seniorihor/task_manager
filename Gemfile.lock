@@ -3,6 +3,7 @@ GEM
   specs:
     addressable (2.2.8)
     bcrypt-ruby (3.0.1)
+    bcrypt-ruby (3.0.1-x86-mingw32)
     data_objects (0.10.8)
       addressable (~> 2.1)
     diff-lcs (1.1.3)
@@ -33,12 +34,17 @@ GEM
       dm-core (~> 1.2.0)
     do_postgres (0.10.8)
       data_objects (= 0.10.8)
+    do_postgres (0.10.8-x86-mingw32)
+      data_objects (= 0.10.8)
     do_sqlite3 (0.10.8)
+      data_objects (= 0.10.8)
+    do_sqlite3 (0.10.8-x86-mingw32)
       data_objects (= 0.10.8)
     fastercsv (1.5.5)
     json (1.6.1)
     multi_json (1.0.4)
     pg (0.14.0)
+    pg (0.14.0-x86-mingw32)
     rack (1.4.1)
     rack-protection (1.2.0)
       rack
@@ -58,12 +64,14 @@ GEM
       rack-protection (~> 1.2)
       tilt (~> 1.3, >= 1.3.3)
     sqlite3 (1.3.6)
+    sqlite3 (1.3.6-x86-mingw32)
     stringex (1.3.3)
     tilt (1.3.3)
     uuidtools (2.1.3)
 
 PLATFORMS
   ruby
+  x86-mingw32
 
 DEPENDENCIES
   dm-core
@@ -73,7 +81,7 @@ DEPENDENCIES
   dm-timestamps
   dm-types
   dm-validations
-  json
+  json (= 1.6.1)
   pg
   rack
   rack-test

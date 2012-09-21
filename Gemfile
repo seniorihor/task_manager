@@ -10,7 +10,7 @@ gem 'dm-timestamps'
 gem 'dm-migrations'
 gem 'dm-types'
 gem 'dm-core'
-gem 'json'
+gem 'json', '1.6.1'
 
 group :development, :test do
   gem 'sqlite3'
