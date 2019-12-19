@@ -45,7 +45,7 @@ GEM
     multi_json (1.0.4)
     pg (0.14.0)
     pg (0.14.0-x86-mingw32)
-    rack (1.4.1)
+    rack (1.6.12)
     rack-protection (1.2.0)
       rack
     rack-test (0.6.1)
